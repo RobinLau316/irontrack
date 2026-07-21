@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a2e">
+<title>IronTrack - 智能健身伴侣</title>
+<link rel="manifest" href="data:application/json,{}">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#1a1a2e;--card:#2d2d44;--border:#3d3d54;--accent:#ff6b35;
+  --accent-light:#ff8c42;--text:#e8e8e8;--muted:#888
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+#app{max-width:430px;margin:0 auto;min-height:100vh;padding:16px 16px 100px;position:relative}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* 页面容器 */
+.page{display:none;animation:fadeIn .25s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* 底部导航 */
+#bottomNav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(29,29,44,.95);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0)}
+#bottomNav .nav-inner{display:flex;align-items:center;justify-content:space-around;height:64px;max-width:430px;margin:0 auto}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 12px;cursor:pointer;border:none;background:none;color:var(--muted);font-size:11px;transition:color .2s;position:relative}
+.nav-item.active{color:var(--accent);font-weight:600}
+.nav-item svg{width:22px;height:22px}
+.nav-item.primary{margin-top:-24px}
+.nav-item.primary .nav-btn-circle{width:52px;height:52px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(255,107,53,.3);transition:transform .2s}
+.nav-item.primary:hover .nav-btn-circle{transform:scale(1.08)}
+.nav-item.primary svg{width:26px;height:26px}
+
+/* 通用组件 */
+.card{background:var(--card);border-radius:16px;border:1px solid var(--border);padding:16px;margin-bottom:12px}
+.btn{display:block;width:100%;padding:14px;border-radius:14px;border:none;font-size:16px;font-weight:700;cursor:pointer;text-align:center;transition:opacity .2s;text-decoration:none}
+.btn-accent{background:var(--accent);color:#fff;box-shadow:0 0 0 0 rgba(255,107,53,.4);animation:pulse 2s infinite}
+.btn-accent:hover{opacity:.9}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,53,.4)}50%{box-shadow:0 0 0 12px rgba(255,107,53,0)}}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;background:var(--bg);font-size:11px;color:var(--muted);border:1px solid var(--border)}
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;background:var(--bg);font-size:11px;color:var(--muted)}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat-item{background:var(--card);border-radius:12px;padding:12px;text-align:center;border:1px solid var(--border)}
+.stat-value{color:var(--accent);font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat-label{color:var(--muted);font-size:11px;margin-top:2px}
+.section-title{font-size:15px;font-weight:700;margin-bottom:12px}
+.row{display:flex;align-items:center;justify-content:space-between}
+.flex-gap{display:flex;gap:8px;flex-wrap:wrap}
+.mt-3{margin-top:12px}.mt-4{margin-top:16px}.mb-3{margin-bottom:12px}.mb-4{margin-bottom:16px}
+.text-accent{color:var(--accent)}.text-muted{color:var(--muted)}.text-sm{font-size:13px}.text-xs{font-size:11px}
+.font-bold{font-weight:700}.text-center{text-align:center}
+
+/* 首页 */
+.greeting{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.greeting h1{font-size:22px;font-weight:700}
+.avatar{width:40px;height:40px;border-radius:50%;background:rgba(255,107,53,.15);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:14px;font-weight:700}
+.today-card{position:relative}
+.today-card .card-header{display:flex;justify-content:space-between;margin-bottom:10px}
+.exercise-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+
+/* 计划页 */
+.day-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.day-tab{flex-shrink:0;padding:8px 16px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);white-space:nowrap;transition:all .2s}
+.day-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.exercise-list>div{padding:12px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.exercise-list>div:last-child{border-bottom:none}
+.ex-number{color:var(--accent);font-weight:700;font-size:14px;width:20px;flex-shrink:0}
+.ex-info{flex:1;min-width:0}
+.ex-name{font-weight:600;font-size:14px}
+.ex-target{color:var(--muted);font-size:12px}
+.ex-prev{color:var(--muted);font-size:11px;text-align:right;flex-shrink:0}
+
+/* 训练页 - 全屏聚焦 */
+.training-container{display:flex;flex-direction:column;min-height:calc(100vh - 200px);justify-content:center}
+.training-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.exercise-name{font-size:24px;font-weight:700;text-align:center;margin-bottom:4px}
+.exercise-target{color:var(--muted);font-size:13px;text-align:center;margin-bottom:32px}
+.num-control{display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:24px}
+.num-btn{width:44px;height:44px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s;user-select:none}
+.num-btn:hover{border-color:var(--accent)}
+.num-display{text-align:center}
+.num-display .big{font-size:48px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent);line-height:1}
+.num-display .unit{font-size:14px;color:var(--muted)}
+.num-display .small{font-size:36px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.set-indicator{color:var(--muted);font-size:13px;text-align:center;margin-bottom:16px}
+.set-history{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:24px}
+.set-dot{padding:5px 12px;border-radius:20px;background:var(--card);border:1px solid var(--border);font-size:12px;color:var(--muted)}
+
+/* 休息倒计时 */
+.rest-overlay{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 200px);text-align:center}
+.rest-circle{width:120px;height:120px;border-radius:50%;border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.rest-time{font-size:40px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent)}
+.rest-label{color:var(--muted);font-size:14px;margin-bottom:8px}
+.rest-next{color:var(--muted);font-size:13px;margin-bottom:24px}
+.skip-btn{padding:8px 20px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer}
+
+/* 完成页 */
+.complete-container{display:flex;flex-direction:column;align-items:center;text-align:center;min-height:calc(100vh - 200px);justify-content:center}
+.complete-icon{font-size:60px;margin-bottom:16px}
+.complete-title{font-size:24px;font-weight:700;margin-bottom:4px}
+.complete-time{color:var(--muted);font-size:14px;margin-bottom:20px}
+.summary-card{width:100%;text-align:left;margin-bottom:20px}
+
+/* 数据页 */
+.tab-bar{display:flex;background:var(--card);border-radius:12px;padding:3px;border:1px solid var(--border)}
+.tab-btn{flex:1;padding:8px;border-radius:10px;border:none;background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.tab-btn.active{background:var(--accent);color:#fff}
+.bar-chart{display:flex;align-items:flex-end;gap:4px;height:140px;padding-top:20px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;position:relative;overflow:hidden;min-height:4px}
+.bar-inner{position:absolute;bottom:0;left:0;right:0;border-radius:4px 4px 0 0;background:var(--accent);opacity:.3}
+.bar-inner.fill{opacity:.8;height:70%}
+.bar-value{font-size:10px;color:var(--muted)}
+.bar-label{font-size:10px;color:var(--muted)}
+.progress-bar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;border-radius:4px;transition:width .5s}
+.stat-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.stat-item-2{background:var(--bg);border-radius:10px;padding:12px}
+.stat-item-2 .val{color:var(--accent);font-size:18px;font-weight:700}
+.stat-item-2 .lbl{color:var(--muted);font-size:11px}
+
+/* 档案页 */
+.field-group{margin-bottom:14px}
+.field-label{color:var(--muted);font-size:11px;margin-bottom:4px;display:block}
+.field-value{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:14px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.knowledge-item{display:flex;align-items:flex-start;gap:12px;padding:14px;cursor:pointer;transition:border-color .2s}
+.knowledge-item:hover{border-color:rgba(255,107,53,.3)}
+.knowledge-icon{font-size:24px;flex-shrink:0}
+
+/* 响应式 */
+@media(min-width:768px){.page{padding:0 20px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- 首页 -->
+  <div id="page-home" class="page active">
+    <div id="homeContent"></div>
+  </div>
+
+  <!-- 计划页 -->
+  <div id="page-plan" class="page">
+    <div id="planHeader"></div>
+    <div class="day-tabs mb-4" id="dayTabs"></div>
+    <div class="card" id="dayDetail"></div>
+    <div class="btn btn-accent mt-4" onclick="navigate('training')">开始今日训练</div>
+  </div>
+
+  <!-- 训练页 -->
+  <div id="page-training" class="page">
+    <div id="trainingContent"></div>
+  </div>
+
+  <!-- 数据页 -->
+  <div id="page-data" class="page">
+    <h1 class="section-title" style="font-size:22px;margin-bottom:16px">数据追踪</h1>
+    <div class="tab-bar mb-4">
+      <button class="tab-btn active" onclick="switchDataTab('weight',this)">体重趋势</button>
+      <button class="tab-btn" onclick="switchDataTab('strength',this)">力量增长</button>
+    </div>
+    <div class="card" id="dataChart"></div>
+    <div class="card mt-3">
+      <div class="section-title">本周训练统计</div>
+      <div class="stat-grid-2" id="weekStats">
+        <div class="stat-item-2"><div class="val">0</div><div class="lbl">完成训练</div></div>
+        <div class="stat-item-2"><div class="val">0</div><div class="lbl">总组数</div></div>
+        <div class="stat-item-2"><div class="val">0</div><div class="lbl">总容量 kg</div></div>
+        <div class="stat-item-2"><div class="val">0h</div><div class="lbl">总时长</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 我的页 -->
+  <div id="page-profile" class="page">
+    <h1 class="section-title" style="font-size:22px;margin-bottom:16px">我的</h1>
+    <div class="tab-bar mb-4">
+      <button class="tab-btn active" onclick="switchProfileTab('profile',this)">个人档案</button>
+      <button class="tab-btn" onclick="switchProfileTab('knowledge',this)">知识库</button>
+    </div>
+    <div id="profileContent"></div>
+  </div>
+</div>
+
+<!-- 底部导航 -->
+<nav id="bottomNav">
+  <div class="nav-inner">
+    <button class="nav-item active" onclick="navigate('home')" data-page="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>首页</span>
+    </button>
+    <button class="nav-item" onclick="navigate('plan')" data-page="plan">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>计划</span>
+    </button>
+    <button class="nav-item primary" onclick="navigate('training')" data-page="training">
+      <div class="nav-btn-circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><rect x="14" y="14" width="8" height="8" rx="1"/></svg>
+      </div>
+      <span style="color:#ff6b35">训练</span>
+    </button>
+    <button class="nav-item" onclick="navigate('data')" data-page="data">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>数据</span>
+    </button>
+    <button class="nav-item" onclick="navigate('profile')" data-page="profile">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>我的</span>
+    </button>
+  </div>
+</nav>
+
+<script>
+// ============ localStorage 存储引擎 ============
+const LS = {
+  get(key, fallback) {
+    try { const v = localStorage.getItem('irontrack_'+key); return v ? JSON.parse(v) : fallback; }
+    catch(e) { return fallback; }
+  },
+  set(key, val) {
+    try { localStorage.setItem('irontrack_'+key, JSON.stringify(val)); }
+    catch(e) { console.warn('存储失败:', e); }
+  }
+};
+
+// ============ 默认数据 ============
+const DEFAULT_PROFILE = {
+  height: 178, weight: 78.5, bodyFat: 18, trainingDays: 4, experience: '有一定基础', goal: '增肌塑形',
+  equipment: ['杠铃','哑铃','卧推架','深蹲架','绳索机','蝴蝶机','腿举机'],
+  planTemplate: 'ppl', apiKey: ''
+};
+
+const DEFAULT_PLAN = {
+  name: "PPL 推拉腿三分化", cycle: "3天循环",
+  days: [
+    { id:"d1", name:"推日", focus:"胸+肩+三头", exercises:[
+      {id:"e1",name:"杠铃卧推",sets:5,reps:5,weight:80,rest:120},
+      {id:"e2",name:"上斜哑铃卧推",sets:4,reps:8,weight:30,rest:90},
+      {id:"e3",name:"杠铃推举",sets:4,reps:8,weight:50,rest:90},
+      {id:"e4",name:"哑铃侧平举",sets:4,reps:12,weight:12,rest:60},
+      {id:"e5",name:"绳索飞鸟",sets:3,reps:12,weight:15,rest:60},
+      {id:"e6",name:"绳索下压",sets:4,reps:12,weight:20,rest:60},
+      {id:"e7",name:"双杠臂屈伸",sets:3,reps:10,weight:0,rest:90}
+    ]},
+    { id:"d2", name:"拉日", focus:"背+二头+后束", exercises:[
+      {id:"e8",name:"引体向上",sets:4,reps:8,weight:0,rest:120},
+      {id:"e9",name:"杠铃划船",sets:4,reps:8,weight:70,rest:90},
+      {id:"e10",name:"高位下拉",sets:4,reps:10,weight:55,rest:90},
+      {id:"e11",name:"坐姿划船",sets:3,reps:12,weight:45,rest:60},
+      {id:"e12",name:"俯身飞鸟",sets:4,reps:12,weight:10,rest:60},
+      {id:"e13",name:"杠铃弯举",sets:4,reps:10,weight:30,rest:60},
+      {id:"e14",name:"锤式弯举",sets:3,reps:12,weight:14,rest:60}
+    ]},
+    { id:"d3", name:"腿日", focus:"股四+腘绳+小腿+腹", exercises:[
+      {id:"e15",name:"杠铃深蹲",sets:5,reps:5,weight:100,rest:150},
+      {id:"e16",name:"罗马尼亚硬拉",sets:4,reps:8,weight:90,rest:120},
+      {id:"e17",name:"腿举",sets:4,reps:10,weight:160,rest:90},
+      {id:"e18",name:"腿弯举",sets:3,reps:12,weight:40,rest:60},
+      {id:"e19",name:"站姿提踵",sets:4,reps:15,weight:80,rest:60},
+      {id:"e20",name:"悬垂举腿",sets:3,reps:15,weight:0,rest:60}
+    ]}
+  ]
+};
+
+// 可选计划模板
+const PLAN_TEMPLATES = {
+  'ppl': {
+    name: "PPL 推拉腿三分化", cycle: "3天循环",
+    desc: "推日(胸肩三头) + 拉日(背二头后束) + 腿日(腿+腹)，每周可练2轮",
+    days: DEFAULT_PLAN.days
+  },
+  'ppl_shoulder': {
+    name: "推拉腿肩四分化", cycle: "4天循环",
+    desc: "推胸日 + 拉背日 + 腿部日 + 肩部日，肩部单独训练日",
+    days: [
+      { id:"s1", name:"推胸日", focus:"胸+三头", exercises:[
+        {id:"s1e1",name:"杠铃卧推",sets:5,reps:5,weight:80,rest:120},
+        {id:"s1e2",name:"上斜哑铃卧推",sets:4,reps:8,weight:30,rest:90},
+        {id:"s1e3",name:"绳索飞鸟",sets:4,reps:12,weight:15,rest:60},
+        {id:"s1e4",name:"双杠臂屈伸",sets:3,reps:10,weight:0,rest:90},
+        {id:"s1e5",name:"绳索下压",sets:4,reps:12,weight:20,rest:60},
+        {id:"s1e6",name:"俯身哑铃臂屈伸",sets:3,reps:12,weight:10,rest:60}
+      ]},
+      { id:"s2", name:"拉背日", focus:"背+二头", exercises:[
+        {id:"s2e1",name:"引体向上",sets:4,reps:8,weight:0,rest:120},
+        {id:"s2e2",name:"杠铃划船",sets:4,reps:8,weight:70,rest:90},
+        {id:"s2e3",name:"高位下拉",sets:4,reps:10,weight:55,rest:90},
+        {id:"s2e4",name:"坐姿划船",sets:3,reps:12,weight:45,rest:60},
+        {id:"s2e5",name:"杠铃弯举",sets:4,reps:10,weight:30,rest:60},
+        {id:"s2e6",name:"锤式弯举",sets:3,reps:12,weight:14,rest:60}
+      ]},
+      { id:"s3", name:"腿部日", focus:"股四+腘绳+小腿", exercises:[
+        {id:"s3e1",name:"杠铃深蹲",sets:5,reps:5,weight:100,rest:150},
+        {id:"s3e2",name:"罗马尼亚硬拉",sets:4,reps:8,weight:90,rest:120},
+        {id:"s3e3",name:"腿举",sets:4,reps:10,weight:160,rest:90},
+        {id:"s3e4",name:"腿弯举",sets:3,reps:12,weight:40,rest:60},
+        {id:"s3e5",name:"站姿提踵",sets:4,reps:15,weight:80,rest:60}
+      ]},
+      { id:"s4", name:"肩部日", focus:"肩+腹", exercises:[
+        {id:"s4e1",name:"杠铃推举",sets:5,reps:5,weight:50,rest:120},
+        {id:"s4e2",name:"哑铃侧平举",sets:4,reps:12,weight:12,rest:60},
+        {id:"s4e3",name:"俯身飞鸟",sets:4,reps:12,weight:10,rest:60},
+        {id:"s4e4",name:"绳索面拉",sets:3,reps:15,weight:15,rest:60},
+        {id:"s4e5",name:"悬垂举腿",sets:3,reps:15,weight:0,rest:60}
+      ]}
+    ]
+  },
+  'upper_lower': {
+    name: "上下肢分化", cycle: "2天循环",
+    desc: "上肢日 + 下肢日，适合每周4练",
+    days: [
+      { id:"u1", name:"上肢日", focus:"胸+背+肩+臂", exercises:[
+        {id:"u1e1",name:"杠铃卧推",sets:5,reps:5,weight:80,rest:120},
+        {id:"u1e2",name:"引体向上",sets:4,reps:8,weight:0,rest:120},
+        {id:"u1e3",name:"杠铃推举",sets:4,reps:8,weight:50,rest:90},
+        {id:"u1e4",name:"杠铃划船",sets:4,reps:8,weight:70,rest:90},
+        {id:"u1e5",name:"哑铃侧平举",sets:3,reps:12,weight:12,rest:60},
+        {id:"u1e6",name:"杠铃弯举",sets:3,reps:10,weight:30,rest:60},
+        {id:"u1e7",name:"绳索下压",sets:3,reps:12,weight:20,rest:60}
+      ]},
+      { id:"u2", name:"下肢日", focus:"股四+腘绳+小腿+腹", exercises:[
+        {id:"u2e1",name:"杠铃深蹲",sets:5,reps:5,weight:100,rest:150},
+        {id:"u2e2",name:"罗马尼亚硬拉",sets:4,reps:8,weight:90,rest:120},
+        {id:"u2e3",name:"腿举",sets:4,reps:10,weight:160,rest:90},
+        {id:"u2e4",name:"腿弯举",sets:3,reps:12,weight:40,rest:60},
+        {id:"u2e5",name:"站姿提踵",sets:4,reps:15,weight:80,rest:60},
+        {id:"u2e6",name:"悬垂举腿",sets:3,reps:15,weight:0,rest:60}
+      ]}
+    ]
+  }
+};
+
+const knowledge = [
+  {icon:"📈",title:"渐进超负荷原理",desc:"增肌的核心原则：逐步增加训练压力"},
+  {icon:"🧮",title:"训练容量怎么算",desc:"组数×次数×重量，一次看懂你的训练量"},
+  {icon:"🥩",title:"蛋白摄入指南",desc:"每天吃多少蛋白质才够增肌？"},
+  {icon:"⏱",title:"组间休息多久",desc:"不同目标的最佳休息时间"},
+  {icon:"🏋️",title:"复合动作 vs 孤立动作",desc:"如何平衡训练计划中的动作选择"},
+  {icon:"🔓",title:"平台期突破策略",desc:"当力量不再增长时该怎么办"}
+];
+
+// ============ 加载持久化数据 ============
+let profile = LS.get('profile', DEFAULT_PROFILE);
+let plan = LS.get('plan', DEFAULT_PLAN);
+let sessions = LS.get('sessions', []);
+let bodyRecords = LS.get('body_records', []);
+let todayIndex = LS.get('today_index', 0);
+
+// 确保 profile 有 planTemplate 字段
+if (!profile.planTemplate) profile.planTemplate = 'ppl';
+
+// 如果没有保存过计划，根据模板加载
+if (!LS.get('plan', null)) {
+  const tmpl = PLAN_TEMPLATES[profile.planTemplate] || PLAN_TEMPLATES['ppl'];
+  plan = { name: tmpl.name, cycle: tmpl.cycle, days: JSON.parse(JSON.stringify(tmpl.days)) };
+  LS.set('plan', plan);
+}
+
+// 切换计划模板
+function switchPlan(templateKey) {
+  const tmpl = PLAN_TEMPLATES[templateKey];
+  if (!tmpl) return;
+  plan = { name: tmpl.name, cycle: tmpl.cycle, days: JSON.parse(JSON.stringify(tmpl.days)) };
+  LS.set('plan', plan);
+  profile.planTemplate = templateKey;
+  LS.set('profile', profile);
+  todayIndex = 0;
+  LS.set('today_index', 0);
+  applyPrevRecords();
+  resetTraining();
+  renderPlanPage();
+  renderHomePage();
+}
+
+// 如果没有体重记录，生成初始记录
+if (bodyRecords.length === 0 && profile.weight) {
+  const today = new Date();
+  bodyRecords = [{ date: formatDate(today), weight: profile.weight, bodyFat: profile.bodyFat }];
+  LS.set('body_records', bodyRecords);
+}
+
+// 根据上次训练记录更新 prevW/prevR
+function applyPrevRecords() {
+  plan.days.forEach(day => {
+    day.exercises.forEach(ex => {
+      const lastSession = [...sessions].reverse().find(s => s.dayName === day.name);
+      if (lastSession) {
+        const lastEx = lastSession.exercises.find(e => e.name === ex.name);
+        if (lastEx && lastEx.sets.length > 0) {
+          const lastSet = lastEx.sets[lastEx.sets.length - 1];
+          ex.prevW = lastSet.w;
+          ex.prevR = lastSet.r;
+        }
+      }
+    });
+  });
+}
+applyPrevRecords();
+
+function formatDate(d) {
+  return (d.getMonth()+1)+'/'+d.getDate();
+}
+
+function getTodayStr() {
+  const d = new Date();
+  return d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0')+'-'+d.getDate().toString().padStart(2,'0');
+}
+
+function getWeekStart() {
+  const d = new Date();
+  d.setDate(d.getDate() - d.getDay() + 1);
+  return d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0')+'-'+d.getDate().toString().padStart(2,'0');
+}
+
+function getWeekSessions() {
+  const ws = getWeekStart();
+  return sessions.filter(s => s.date >= ws);
+}
+
+function getStreak() {
+  let streak = 0;
+  const sorted = [...sessions].sort((a,b) => b.date.localeCompare(a.date));
+  const seen = new Set();
+  for (const s of sorted) {
+    if (!seen.has(s.date)) {
+      seen.add(s.date);
+      if (streak === 0) streak = 1;
+      else streak++;
+    }
+  }
+  return streak;
+}
+
+// ============ 导航 ============
+let currentPage = 'home';
+let selectedDayIdx = 0;
+
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + page);
+  if (target) target.classList.add('active');
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.page === page);
+  });
+  if (page === 'home') renderHomePage();
+  if (page === 'plan') renderPlanPage();
+  if (page === 'training') renderTrainingPage();
+  if (page === 'data') renderDataChart('weight');
+  if (page === 'profile') renderProfileContent('profile');
+  window.scrollTo(0, 0);
+}
+
+// ============ 首页 ============
+function renderHomePage() {
+  const today = plan.days[todayIndex];
+  const weekSessions = getWeekSessions();
+  const weekDone = weekSessions.length;
+  const streak = getStreak();
+  const container = document.getElementById('homeContent');
+  container.innerHTML = `
+    <div class="greeting">
+      <div><h1>IronTrack</h1><p class="text-muted text-sm">准备开始今天的训练吗？</p></div>
+      <div class="avatar">${profile.weight}kg</div>
+    </div>
+    <div class="card today-card" onclick="navigate('training')" style="cursor:pointer">
+      <div class="card-header"><span class="text-accent text-sm font-bold">今日训练</span><span class="text-muted text-xs">第 ${weekDone+1}/${profile.trainingDays} 天</span></div>
+      <div style="font-size:18px;font-weight:700;margin-bottom:4px">${today.name}</div>
+      <div class="text-muted text-sm mb-4">${today.focus} · ${today.exercises.length}个动作 · 预计${today.exercises.reduce((s,e)=>s+e.sets*2+e.rest*e.sets/60,0)|0}分钟</div>
+      <div class="exercise-tags">
+        ${today.exercises.slice(0,4).map(e=>`<span class="tag">${e.name}</span>`).join('')}
+        ${today.exercises.length>4?`<span class="tag">+${today.exercises.length-4}</span>`:''}
+      </div>
+      <div class="btn btn-accent mt-3">开始训练</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-item"><div class="stat-value">${weekDone}/${profile.trainingDays}</div><div class="stat-label">本周训练</div></div>
+      <div class="stat-item"><div class="stat-value">${profile.weight}</div><div class="stat-label">体重 kg</div></div>
+      <div class="stat-item"><div class="stat-value">${streak}</div><div class="stat-label">连续天数</div></div>
+    </div>
+    <div class="flex-gap mt-4">
+      <div class="card" style="flex:1;cursor:pointer" onclick="navigate('plan')">
+        <div style="font-size:24px;margin-bottom:4px">📋</div>
+        <div class="font-bold text-sm">训练计划</div>
+        <div class="text-muted text-xs">${plan.name}</div>
+      </div>
+      <div class="card" style="flex:1;cursor:pointer" onclick="navigate('data')">
+        <div style="font-size:24px;margin-bottom:4px">📊</div>
+        <div class="font-bold text-sm">数据追踪</div>
+        <div class="text-muted text-xs">${sessions.length}次训练记录</div>
+      </div>
+    </div>`;
+}
+
+// ============ 计划页 ============
+function renderPlanPage() {
+  document.getElementById('planHeader').innerHTML = `
+    <div class="row mb-4">
+      <div><h1 class="section-title" style="font-size:22px;margin-bottom:2px">训练计划</h1><p class="text-muted text-sm">${plan.name}</p></div>
+      <button class="btn" style="width:auto;padding:8px 16px;font-size:13px;background:var(--accent);color:#fff;border-radius:10px" onclick="generatePlan()">AI 调整</button>
+    </div>`;
+  const tabs = document.getElementById('dayTabs');
+  const detail = document.getElementById('dayDetail');
+  tabs.innerHTML = plan.days.map((d,i) =>
+    `<div class="day-tab${i===selectedDayIdx?' active':''}" onclick="selectDay(${i})">第${i+1}天 · ${d.name}</div>`
+  ).join('');
+  renderDayDetail();
+}
+
+function selectDay(i) {
+  selectedDayIdx = i;
+  renderPlanPage();
+}
+
+function renderDayDetail() {
+  const day = plan.days[selectedDayIdx];
+  const detail = document.getElementById('dayDetail');
+  detail.innerHTML = `
+    <div style="padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:0;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div class="font-bold">${day.name}</div>
+        <div class="text-muted text-sm">${day.focus}</div>
+      </div>
+      <button onclick="aiAdjustDay()" style="padding:6px 12px;background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:8px;font-size:12px;cursor:pointer">AI 优化</button>
+    </div>
+    <div class="exercise-list">
+      ${day.exercises.map((ex,i) => `
+        <div>
+          <span class="ex-number">${i+1}</span>
+          <div class="ex-info">
+            <div class="ex-name">${ex.name}</div>
+            <div class="ex-target">${ex.sets}组×${ex.reps}次 · ${ex.weight}kg · 休息${ex.rest}s</div>
+          </div>
+          ${ex.prevW!==undefined ? `<div class="ex-prev">上次<br><span class="text-accent">${ex.prevW}kg×${ex.prevR}</span></div>` : ''}
+        </div>
+      `).join('')}
+    </div>`;
+}
+
+async function aiAdjustDay() {
+  if (!profile.apiKey) { alert('请先在「我的」页面设置 DeepSeek API Key'); return; }
+  const day = plan.days[selectedDayIdx];
+  const recentForDay = sessions.filter(s => s.dayName === day.name).slice(0, 3);
+  const recentStr = recentForDay.map(s => {
+    return s.exercises.map(e => {
+      const maxW = Math.max(...e.sets.map(st => st.w));
+      return `${e.name}(${maxW}kg)`;
+    }).join(', ');
+  }).join('\n');
+
+  const prompt = `你是专业健身教练。请根据以下信息优化【${day.name}】这一天的训练内容：
+
+【当前训练日】
+${day.name} - ${day.focus}
+${day.exercises.map(e => `${e.name}: ${e.sets}组×${e.reps}次, ${e.weight}kg, 休息${e.rest}s`).join('\n')}
+
+【该训练日最近记录】
+${recentStr || '无记录'}
+
+【用户档案】
+体重: ${profile.weight}kg, 体脂: ${profile.bodyFat}%, 目标: ${profile.goal}, 经验: ${profile.experience}
+
+【输出要求】只输出 JSON：
+{
+  "name": "${day.name}",
+  "focus": "训练部位",
+  "exercises": [
+    {"name": "动作", "sets": 组数, "reps": 次数, "weight": 建议重量, "rest": 休息秒}
+  ]
+}
+要求：动作数量 5-7 个，复合动作优先，重量基于上次记录递增，只输出 JSON`;
+
+  const result = await aiCall(prompt);
+  if (!result) return;
+  try {
+    const jsonStr = result.replace(/```json\s*|\s*```/g, '').trim();
+    const newDay = JSON.parse(jsonStr);
+    if (!newDay.exercises || !Array.isArray(newDay.exercises)) throw new Error('格式错误');
+    // 更新当前这一天
+    plan.days[selectedDayIdx] = {
+      ...plan.days[selectedDayIdx],
+      name: newDay.name || day.name,
+      focus: newDay.focus || day.focus,
+      exercises: newDay.exercises.map((ex, i) => ({
+        id: 'adj-' + selectedDayIdx + '-' + i,
+        name: ex.name, sets: ex.sets, reps: ex.reps,
+        weight: ex.weight || 0, rest: ex.rest || 90,
+        sortOrder: i
+      }))
+    };
+    LS.set('plan', plan);
+    applyPrevRecords();
+    renderPlanPage();
+  } catch(e) {
+    alert('AI 返回格式解析失败: ' + e.message);
+  }
+}
+
+// ============ 训练页 ============
+let trainState = {
+  day: plan.days[0], exIdx: 0, set: 1, weight: 0, reps: 0,
+  records: {}, isResting: false, restTimer: 0, sessionTime: 0, complete: false,
+  timerInterval: null, restInterval: null
+};
+
+function resetTraining() {
+  trainState = {
+    day: plan.days[0], exIdx: 0, set: 1, weight: plan.days[0].exercises[0].weight,
+    reps: plan.days[0].exercises[0].reps, records: {}, isResting: false,
+    restTimer: 0, sessionTime: 0, complete: false,
+    timerInterval: null, restInterval: null
+  };
+  startSessionTimer();
+}
+
+function startSessionTimer() {
+  if (trainState.timerInterval) clearInterval(trainState.timerInterval);
+  trainState.timerInterval = setInterval(() => {
+    if (!trainState.complete && !trainState.isResting) trainState.sessionTime++;
+  }, 1000);
+}
+
+function startRestTimer() {
+  const ex = trainState.day.exercises[trainState.exIdx];
+  trainState.restTimer = ex.rest;
+  trainState.isResting = true;
+  if (trainState.restInterval) clearInterval(trainState.restInterval);
+  trainState.restInterval = setInterval(() => {
+    if (trainState.restTimer > 0) {
+      trainState.restTimer--;
+    } else {
+      clearInterval(trainState.restInterval);
+      trainState.isResting = false;
+      renderTrainingPage();
+    }
+    if (trainState.isResting) renderRestOverlay();
+  }, 1000);
+  renderRestOverlay();
+}
+
+function renderTrainingPage() {
+  const s = trainState;
+  if (s.complete) { renderComplete(); return; }
+  if (s.isResting) { renderRestOverlay(); return; }
+  renderTrainingUI();
+}
+
+function renderTrainingUI() {
+  const s = trainState;
+  const ex = s.day.exercises[s.exIdx];
+  const recs = s.records[ex.id] || [];
+  const container = document.getElementById('trainingContent');
+  container.innerHTML = `
+    <div class="training-header">
+      <span class="text-accent font-bold">${s.day.name}</span>
+      <span class="text-muted text-sm">⏱ ${formatTime(s.sessionTime)}</span>
+      <span class="text-muted text-sm">${s.exIdx+1}/${s.day.exercises.length}</span>
+    </div>
+    <div class="training-container">
+      <div class="exercise-name">${ex.name}</div>
+      <div class="exercise-target">目标 ${ex.weight}kg · ${ex.sets}组×${ex.reps}次</div>
+      <div class="num-control">
+        <div class="num-btn" onclick="adjustWeight(-2.5)">−</div>
+        <div class="num-display"><div class="big">${s.weight}</div><div class="unit">kg</div></div>
+        <div class="num-btn" onclick="adjustWeight(2.5)">+</div>
+      </div>
+      <div class="num-control">
+        <div class="num-btn" onclick="adjustReps(-1)">−</div>
+        <div class="num-display"><div class="small">${s.reps}</div><div class="unit">次</div></div>
+        <div class="num-btn" onclick="adjustReps(1)">+</div>
+      </div>
+      <div class="set-indicator">第 ${s.set} 组 / 共 ${ex.sets} 组</div>
+      ${recs.length > 0 ? `<div class="set-history">${recs.map(r=>`<span class="set-dot">组${r.set}:${r.w}×${r.r}</span>`).join('')}</div>` : ''}
+    </div>
+    <div class="btn btn-accent" style="margin-top:auto" onclick="completeSet()">完成本组</div>
+  `;
+}
+
+function renderRestOverlay() {
+  const s = trainState;
+  const ex = s.day.exercises[s.exIdx];
+  const container = document.getElementById('trainingContent');
+  container.innerHTML = `
+    <div class="rest-overlay">
+      <div class="rest-label">组间休息</div>
+      <div class="rest-circle"><div class="rest-time">${s.restTimer}</div></div>
+      <div class="rest-next">下一组：第 ${s.set} 组 · ${ex.name}</div>
+      <button class="skip-btn" onclick="skipRest()">跳过休息</button>
+    </div>
+  `;
+}
+
+function renderComplete() {
+  const s = trainState;
+  const container = document.getElementById('trainingContent');
+  let summary = s.day.exercises.map(ex => {
+    const recs = s.records[ex.id] || [];
+    const vol = recs.reduce((sum,r) => sum + r.w*r.r, 0);
+    return vol > 0 ? `<div class="row text-sm"><span>${ex.name}</span><span class="text-accent">${vol}kg 总容量</span></div>` : '';
+  }).filter(Boolean).join('');
+  if (!summary) summary = '<div class="text-muted text-sm text-center">无记录</div>';
+  container.innerHTML = `
+    <div class="complete-container">
+      <div class="complete-icon">🏆</div>
+      <div class="complete-title">${s.day.name} 完成！</div>
+      <div class="complete-time">总用时 ${formatTime(s.sessionTime)}</div>
+      <div class="card summary-card">${summary}</div>
+      <button class="btn btn-accent" onclick="resetTraining();renderTrainingPage()">继续训练</button>
+      <button class="btn btn-outline mt-3" onclick="navigate('home')">返回首页</button>
+    </div>
+  `;
+}
+
+function adjustWeight(delta) {
+  trainState.weight = Math.max(0, trainState.weight + delta);
+  renderTrainingUI();
+}
+
+function adjustReps(delta) {
+  trainState.reps = Math.max(0, trainState.reps + delta);
+  renderTrainingUI();
+}
+
+function completeSet() {
+  const s = trainState;
+  const ex = s.day.exercises[s.exIdx];
+  if (!s.records[ex.id]) s.records[ex.id] = [];
+  s.records[ex.id].push({set:s.set, w:s.weight, r:s.reps});
+  if (s.set < ex.sets) {
+    s.set++;
+    startRestTimer();
+  } else if (s.exIdx < s.day.exercises.length - 1) {
+    s.exIdx++;
+    s.set = 1;
+    const next = s.day.exercises[s.exIdx];
+    s.weight = next.weight;
+    s.reps = next.reps;
+    s.restTimer = 90;
+    s.isResting = true;
+    startRestTimer();
+  } else {
+    s.complete = true;
+    if (s.timerInterval) clearInterval(s.timerInterval);
+    // 保存训练记录到 localStorage
+    saveSession();
+    // 当天体重记录
+    const todayDate = formatDate(new Date());
+    if (!bodyRecords.find(r => r.date === todayDate)) {
+      bodyRecords.push({ date: todayDate, weight: profile.weight, bodyFat: profile.bodyFat });
+      if (bodyRecords.length > 30) bodyRecords.shift();
+      LS.set('body_records', bodyRecords);
+    }
+    renderComplete();
+  }
+}
+
+function saveSession() {
+  const s = trainState;
+  const session = {
+    date: getTodayStr(),
+    dayName: s.day.name,
+    focusArea: s.day.focus,
+    duration: s.sessionTime,
+    exercises: s.day.exercises.map(ex => {
+      const recs = s.records[ex.id] || [];
+      return { name: ex.name, sets: recs.map(r => ({ w: r.w, r: r.r })) };
+    }).filter(e => e.sets.length > 0)
+  };
+  sessions.unshift(session);
+  if (sessions.length > 200) sessions.length = 200;
+  LS.set('sessions', sessions);
+  todayIndex = (todayIndex + 1) % plan.days.length;
+  LS.set('today_index', todayIndex);
+  applyPrevRecords();
+}
+
+function skipRest() {
+  if (trainState.restInterval) clearInterval(trainState.restInterval);
+  trainState.isResting = false;
+  trainState.restTimer = 0;
+  renderTrainingPage();
+}
+
+function formatTime(s) {
+  return Math.floor(s/60)+':'+(s%60).toString().padStart(2,'0');
+}
+
+function resetTraining() {
+  const day = plan.days[todayIndex];
+  trainState = {
+    day: day, exIdx: 0, set: 1, weight: day.exercises[0].weight,
+    reps: day.exercises[0].reps, records: {}, isResting: false,
+    restTimer: 0, sessionTime: 0, complete: false,
+    timerInterval: null, restInterval: null
+  };
+  startSessionTimer();
+}
+
+// 初始化训练数据
+(function initTraining() {
+  const day = plan.days[todayIndex];
+  trainState = {
+    day: day, exIdx: 0, set: 1, weight: day.exercises[0].weight,
+    reps: day.exercises[0].reps, records: {}, isResting: false,
+    restTimer: 0, sessionTime: 0, complete: false,
+    timerInterval: null, restInterval: null
+  };
+})();
+
+// ============ 数据页 ============
+function switchDataTab(tab, btn) {
+  document.querySelectorAll('#page-data .tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDataChart(tab);
+}
+
+function renderDataChart(tab) {
+  const container = document.getElementById('dataChart');
+  if (tab === 'weight') {
+    if (bodyRecords.length === 0) {
+      container.innerHTML = '<div class="text-center text-muted text-sm" style="padding:40px">暂无体重记录<br>完成训练后自动记录</div>';
+      return;
+    }
+    const max = Math.max(...bodyRecords.map(r=>r.weight));
+    const min = Math.min(...bodyRecords.map(r=>r.weight));
+    const range = (max - min) || 1;
+    const display = bodyRecords.slice(-7);
+    container.innerHTML = `
+      <div class="row mb-3"><div class="font-bold text-sm">体重变化</div><span class="text-muted text-xs">最近${display.length}次</span></div>
+      <div class="bar-chart">
+        ${display.map(r => {
+          const h = ((r.weight-min)/range)*100+20;
+          return `<div class="bar-col"><span class="bar-value">${r.weight}</span><div class="bar" style="height:${h}%"><div class="bar-inner fill"></div></div><span class="bar-label">${r.date}</span></div>`;
+        }).join('')}
+      </div>`;
+    if (display.length > 1) {
+      const first = display[0].weight;
+      const last = display[display.length-1].weight;
+      const diff = (last - first).toFixed(1);
+      const arrow = diff > 0 ? '↑' : diff < 0 ? '↓' : '→';
+      container.innerHTML += `
+      <div class="row mt-3 text-xs text-muted">
+        <span>起始 ${first}kg</span>
+        <span class="${diff<0?'text-accent':diff>0?'':'text-muted'}" style="color:${diff>0?'#f4a261':'var(--accent)'}">${arrow} ${Math.abs(diff)}kg</span>
+        <span>当前 ${last}kg</span>
+      </div>`;
+    }
+  } else {
+    // 力量增长 - 从训练记录中提取
+    const allEx = {};
+    sessions.forEach(s => {
+      s.exercises.forEach(ex => {
+        if (ex.sets.length > 0) {
+          const maxW = Math.max(...ex.sets.map(st => st.w));
+          if (!allEx[ex.name]) allEx[ex.name] = [];
+          allEx[ex.name].push({ date: s.date, weight: maxW });
+        }
+      });
+    });
+    const topEx = Object.entries(allEx)
+      .filter(([,v]) => v.length >= 2)
+      .slice(0, 4);
+    if (topEx.length === 0) {
+      container.innerHTML = '<div class="text-center text-muted text-sm" style="padding:40px">完成2次以上训练后<br>可查看力量增长曲线</div>';
+      return;
+    }
+    const colors = ['var(--accent)','#f4a261','#2a9d8f','#e76f51'];
+    container.innerHTML = `
+      <div class="row mb-4"><div class="font-bold text-sm">力量增长曲线</div><div class="flex-gap text-xs">${topEx.map(([n],i)=>`<span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${colors[i]};vertical-align:middle;margin-right:3px"></span>${n}</span>`).join('')}</div></div>
+      ${topEx.map(([name, records], i) => {
+        const first = records[0].weight;
+        const last = records[records.length-1].weight;
+        const pct = Math.min(100, Math.max(0, Math.round(((last - first) / Math.max(first, 1)) * 100)));
+        return `<div style="margin-bottom:14px"><div class="row text-xs text-muted mb-1"><span>${name}</span><span style="color:${colors[i]}">${first} → ${last}kg ${last>=first?'+':''}${(last-first).toFixed(1)}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct>0?30+pct*0.7:10}%;background:${colors[i]}"></div></div></div>`;
+      }).join('')}
+      <div class="text-center text-xs text-muted mt-4">共 ${sessions.length} 次训练记录</div>`;
+  }
+  // 更新底部统计
+  updateWeekStats();
+}
+
+function updateWeekStats() {
+  const ws = getWeekSessions();
+  const totalSets = ws.reduce((s, sess) => s + sess.exercises.reduce((es, ex) => es + ex.sets.length, 0), 0);
+  const totalVol = ws.reduce((s, sess) => s + sess.exercises.reduce((es, ex) => es + ex.sets.reduce((ss, st) => ss + st.w*st.r, 0), 0), 0);
+  const totalTime = ws.reduce((s, sess) => s + (sess.duration||0), 0);
+  const statsEl = document.getElementById('weekStats');
+  if (statsEl) {
+    statsEl.innerHTML = `
+      <div class="stat-item-2"><div class="val">${ws.length}</div><div class="lbl">完成训练</div></div>
+      <div class="stat-item-2"><div class="val">${totalSets}</div><div class="lbl">总组数</div></div>
+      <div class="stat-item-2"><div class="val">${totalVol.toLocaleString()}</div><div class="lbl">总容量 kg</div></div>
+      <div class="stat-item-2"><div class="val">${(totalTime/3600).toFixed(1)}h</div><div class="lbl">总时长</div></div>`;
+  }
+}
+
+// ============ 我的页 ============
+function switchProfileTab(tab, btn) {
+  document.querySelectorAll('#page-profile .tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProfileContent(tab);
+}
+
+function renderProfileContent(tab) {
+  const container = document.getElementById('profileContent');
+  if (tab === 'profile') {
+    container.innerHTML = `
+      <div class="card"><div class="section-title">身体数据</div>
+        <div class="grid-2">
+          <div class="field-group"><span class="field-label">身高 (cm)</span><input class="field-value" id="pf-height" type="number" value="${profile.height}" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg)"></div>
+          <div class="field-group"><span class="field-label">体重 (kg)</span><input class="field-value" id="pf-weight" type="number" step="0.1" value="${profile.weight}" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg)"></div>
+          <div class="field-group"><span class="field-label">体脂率 (%)</span><input class="field-value" id="pf-bodyfat" type="number" value="${profile.bodyFat}" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg)"></div>
+          <div class="field-group"><span class="field-label">每周训练天数</span><input class="field-value" id="pf-days" type="number" min="1" max="7" value="${profile.trainingDays}" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg)"></div>
+        </div>
+      </div>
+      <div class="card"><div class="section-title">训练偏好</div>
+        <div class="field-group"><span class="field-label">训练目标</span>
+          <select class="field-value" id="pf-goal" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);appearance:none;font-size:14px">
+            <option value="增肌塑形" ${profile.goal==='增肌塑形'?'selected':''}>增肌塑形</option>
+            <option value="减脂瘦身" ${profile.goal==='减脂瘦身'?'selected':''}>减脂瘦身</option>
+            <option value="综合体能" ${profile.goal==='综合体能'?'selected':''}>综合体能</option>
+            <option value="力量举" ${profile.goal==='力量举'?'selected':''}>力量举</option>
+          </select>
+        </div>
+        <div class="field-group"><span class="field-label">经验水平</span>
+          <select class="field-value" id="pf-exp" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);appearance:none;font-size:14px">
+            <option value="新手入门" ${profile.experience==='新手入门'?'selected':''}>新手入门</option>
+            <option value="有一定基础" ${profile.experience==='有一定基础'?'selected':''}>有一定基础</option>
+            <option value="中级进阶" ${profile.experience==='中级进阶'?'selected':''}>中级进阶</option>
+            <option value="高级训练者" ${profile.experience==='高级训练者'?'selected':''}>高级训练者</option>
+          </select>
+        </div>
+      </div>
+      <div class="card"><div class="section-title">分化方式</div>
+        <div class="field-group"><span class="field-label">训练计划模板</span>
+          <select class="field-value" id="pf-plan" onchange="switchPlan(this.value)" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);appearance:none;font-size:14px">
+            ${Object.entries(PLAN_TEMPLATES).map(([k,v]) => `<option value="${k}" ${profile.planTemplate===k?'selected':''}>${v.name} - ${v.desc}</option>`).join('')}
+          </select>
+        </div>
+        <div class="text-xs text-muted mt-2">切换模板会重置训练计划，但保留历史训练记录</div>
+      </div>
+      <div class="card"><div class="section-title">AI 设置</div>
+        <div class="field-group"><span class="field-label">DeepSeek API Key</span>
+          <div style="display:flex;gap:8px">
+            <input class="field-value" id="pf-apiKey" type="password" value="${profile.apiKey||''}" placeholder="sk-..." style="flex:1;border:none;outline:none;color:var(--text);background:var(--bg);font-size:13px">
+            <button class="pf-apiKey" onclick="testApiKey()" style="padding:6px 12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;white-space:nowrap">测试连接</button>
+          </div>
+        </div>
+        <div class="text-xs text-muted mt-2">在 <a href="https://platform.deepseek.com" target="_blank" style="color:var(--accent)">platform.deepseek.com</a> 获取 Key，生成一次计划约 ¥0.01</div>
+        <div id="apiTestMsg" class="text-xs mt-2"></div>
+      </div>
+      <button class="btn btn-accent" onclick="saveProfile()">保存修改</button>
+      <div class="text-center text-xs text-muted mt-3" id="saveMsg"></div>`;
+  } else {
+    container.innerHTML = knowledge.map(a => `
+      <div class="card knowledge-item">
+        <span class="knowledge-icon">${a.icon}</span>
+        <div><div class="font-bold text-sm">${a.title}</div><div class="text-muted text-xs mt-0.5">${a.desc}</div></div>
+      </div>
+    `).join('');
+  }
+}
+
+function saveProfile() {
+  profile.height = parseFloat(document.getElementById('pf-height').value) || profile.height;
+  profile.weight = parseFloat(document.getElementById('pf-weight').value) || profile.weight;
+  profile.bodyFat = parseFloat(document.getElementById('pf-bodyfat').value) || profile.bodyFat;
+  profile.trainingDays = parseInt(document.getElementById('pf-days').value) || profile.trainingDays;
+  profile.goal = document.getElementById('pf-goal').value;
+  profile.experience = document.getElementById('pf-exp').value;
+  profile.apiKey = document.getElementById('pf-apiKey').value.trim();
+  LS.set('profile', profile);
+  var msg = document.getElementById('saveMsg');
+  msg.textContent = '已保存';
+  setTimeout(function(){ msg.textContent = ''; }, 2000);
+  renderHomePage();
+}
+
+async function testApiKey() {
+  const key = document.getElementById('pf-apiKey').value.trim();
+  if (!key) { document.getElementById('apiTestMsg').innerHTML = '<span style="color:#f4a261">请输入 API Key</span>'; return; }
+  document.getElementById('apiTestMsg').innerHTML = '<span style="color:var(--muted)">测试中...</span>';
+  try {
+    const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({ model: 'deepseek-chat', messages: [{ role: 'user', content: '回复"OK"' }], max_tokens: 5 })
+    });
+    if (res.ok) {
+      document.getElementById('apiTestMsg').innerHTML = '<span style="color:#2a9d8f">连接成功</span>';
+    } else {
+      const err = await res.json().catch(() => ({}));
+      document.getElementById('apiTestMsg').innerHTML = '<span style="color:#e76f51">连接失败: ' + (err.error?.message || res.status) + '</span>';
+    }
+  } catch(e) {
+    document.getElementById('apiTestMsg').innerHTML = '<span style="color:#e76f51">网络错误: ' + e.message + '</span>';
+  }
+}
+
+// ============ AI 调用 ============
+async function aiCall(prompt) {
+  const key = profile.apiKey;
+  if (!key) { alert('请先在「我的」页面设置 DeepSeek API Key'); return null; }
+  try {
+    const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({ model: 'deepseek-chat', messages: [{ role: 'user', content: prompt }], temperature: 0.7, max_tokens: 4000 })
+    });
+    if (!res.ok) { const err = await res.json().catch(() => ({})); alert('AI 调用失败: ' + (err.error?.message || res.status)); return null; }
+    const data = await res.json();
+    return data.choices[0].message.content;
+  } catch(e) { alert('网络错误: ' + e.message); return null; }
+}
+
+function buildAiPrompt() {
+  const recent = sessions.slice(0, 6).map(s => {
+    const exSummary = s.exercises.map(e => {
+      const maxW = Math.max(...e.sets.map(st => st.w));
+      return `${e.name}(${maxW}kg)`;
+    }).join('、');
+    return `${s.date} ${s.dayName}: ${exSummary}`;
+  }).join('\n');
+
+  return `你是一个专业的健身教练，专门为增肌训练者设计训练计划。请根据以下信息生成训练计划：
+
+【用户档案】
+- 身高: ${profile.height}cm, 体重: ${profile.weight}kg, 体脂率: ${profile.bodyFat}%
+- 训练经验: ${profile.experience}, 目标: ${profile.goal}
+- 每周训练天数: ${profile.trainingDays}天
+- 可用器械: ${profile.equipment.join('、')}
+- 当前分化方式: ${plan.name}
+
+【最近训练记录】
+${recent || '尚无训练记录'}
+
+【输出要求】
+请生成一个调整后的训练计划，输出严格按以下 JSON 格式（不要包含任何其他文字）：
+
+{
+  "name": "计划名称",
+  "cycle": "循环说明",
+  "days": [
+    {
+      "name": "训练日名称",
+      "focus": "训练部位",
+      "exercises": [
+        {"name": "动作名称", "sets": 组数, "reps": 次数, "weight": 建议重量kg, "rest": 休息秒数}
+      ]
+    }
+  ]
+}
+
+要求：
+1. 计划天数与用户每周训练天数匹配
+2. 每组动作数量控制在 5-7 个
+3. 复合动作(深蹲/卧推/硬拉/推举/划船)优先排在前面
+4. 重量建议基于用户上次训练记录渐进递增
+5. 增肌目标：大重量动作 5-8 次/组，孤立动作 10-12 次/组
+6. 动作名称用中文
+7. 只输出 JSON，不要有任何解释文字`;
+}
+
+async function generatePlan() {
+  const btn = event.target;
+  if (!profile.apiKey) { alert('请先在「我的」页面设置 DeepSeek API Key'); return; }
+  btn.textContent = 'AI 生成中...';
+  btn.disabled = true;
+  const prompt = buildAiPrompt();
+  const result = await aiCall(prompt);
+  if (!result) { btn.textContent = 'AI 调整'; btn.disabled = false; return; }
+  // 解析 JSON
+  try {
+    const jsonStr = result.replace(/```json\s*|\s*```/g, '').trim();
+    const newPlan = JSON.parse(jsonStr);
+    if (!newPlan.days || !Array.isArray(newPlan.days)) throw new Error('格式错误');
+    // 给每个动作加 id
+    let eid = 1;
+    newPlan.days.forEach((d, di) => {
+      d.id = 'ai-' + di;
+      d.exercises.forEach(ex => { ex.id = 'ai-e' + (eid++); ex.prevW = null; ex.prevR = null; });
+    });
+    plan = newPlan;
+    LS.set('plan', plan);
+    todayIndex = 0;
+    LS.set('today_index', 0);
+    applyPrevRecords();
+    resetTraining();
+    selectedDayIdx = 0;
+    renderPlanPage();
+    renderHomePage();
+    btn.textContent = 'AI 调整';
+    btn.disabled = false;
+  } catch(e) {
+    alert('AI 返回格式解析失败，请重试。错误: ' + e.message);
+    btn.textContent = 'AI 调整';
+    btn.disabled = false;
+  }
+}
+
+// ============ 初始化 ============
+navigate('home');
+resetTraining();
+</script>
+</body>
+</html>
