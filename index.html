@@ -12,10 +12,10 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#1a1a2e;--card:#2d2d44;--border:#3d3d54;--accent:#ff6b35;
-  --accent-light:#ff8c42;--text:#e8e8e8;--muted:#888
+  --accent-light:#ff8c42;--text:#e8e8e8;--muted:#999
 }
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-#app{max-width:430px;margin:0 auto;min-height:100vh;padding:16px 16px 100px;position:relative}
+#app{max-width:430px;margin:0 auto;min-height:100vh;padding:16px 16px 100px;position:relative;padding-top:max(16px,env(safe-area-inset-top,16px))}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
@@ -26,118 +26,156 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 /* 底部导航 */
 #bottomNav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(29,29,44,.95);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0)}
-#bottomNav .nav-inner{display:flex;align-items:center;justify-content:space-around;height:64px;max-width:430px;margin:0 auto}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 12px;cursor:pointer;border:none;background:none;color:var(--muted);font-size:11px;transition:color .2s;position:relative}
+#bottomNav .nav-inner{display:flex;align-items:center;justify-content:space-around;height:70px;max-width:430px;margin:0 auto}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;cursor:pointer;border:none;background:none;color:var(--muted);font-size:14px;transition:color .2s;position:relative;min-height:44px;justify-content:center}
 .nav-item.active{color:var(--accent);font-weight:600}
-.nav-item svg{width:22px;height:22px}
-.nav-item.primary{margin-top:-24px}
-.nav-item.primary .nav-btn-circle{width:52px;height:52px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(255,107,53,.3);transition:transform .2s}
+.nav-item svg{width:24px;height:24px}
+.nav-item.primary{margin-top:-28px}
+.nav-item.primary .nav-btn-circle{width:56px;height:56px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(255,107,53,.3);transition:transform .2s}
 .nav-item.primary:hover .nav-btn-circle{transform:scale(1.08)}
-.nav-item.primary svg{width:26px;height:26px}
+.nav-item.primary svg{width:28px;height:28px}
 
 /* 通用组件 */
-.card{background:var(--card);border-radius:16px;border:1px solid var(--border);padding:16px;margin-bottom:12px}
-.btn{display:block;width:100%;padding:14px;border-radius:14px;border:none;font-size:16px;font-weight:700;cursor:pointer;text-align:center;transition:opacity .2s;text-decoration:none}
+.card{background:var(--card);border-radius:16px;border:1px solid var(--border);padding:18px;margin-bottom:14px}
+.btn{display:block;width:100%;padding:16px;border-radius:14px;border:none;font-size:18px;font-weight:700;cursor:pointer;text-align:center;transition:opacity .2s;text-decoration:none;min-height:50px}
 .btn-accent{background:var(--accent);color:#fff;box-shadow:0 0 0 0 rgba(255,107,53,.4);animation:pulse 2s infinite}
 .btn-accent:hover{opacity:.9}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,53,.4)}50%{box-shadow:0 0 0 12px rgba(255,107,53,0)}}
 .btn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
-.badge{display:inline-block;padding:4px 10px;border-radius:20px;background:var(--bg);font-size:11px;color:var(--muted);border:1px solid var(--border)}
-.tag{display:inline-block;padding:3px 10px;border-radius:20px;background:var(--bg);font-size:11px;color:var(--muted)}
-.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.stat-item{background:var(--card);border-radius:12px;padding:12px;text-align:center;border:1px solid var(--border)}
-.stat-value{color:var(--accent);font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
-.stat-label{color:var(--muted);font-size:11px;margin-top:2px}
-.section-title{font-size:15px;font-weight:700;margin-bottom:12px}
+.badge{display:inline-block;padding:6px 14px;border-radius:20px;background:var(--bg);font-size:14px;color:var(--muted);border:1px solid var(--border)}
+.tag{display:inline-block;padding:5px 14px;border-radius:20px;background:var(--bg);font-size:14px;color:var(--muted)}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat-item{background:var(--card);border-radius:14px;padding:14px;text-align:center;border:1px solid var(--border)}
+.stat-value{color:var(--accent);font-size:36px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat-label{color:var(--muted);font-size:14px;margin-top:4px}
+.section-title{font-size:18px;font-weight:700;margin-bottom:14px}
 .row{display:flex;align-items:center;justify-content:space-between}
-.flex-gap{display:flex;gap:8px;flex-wrap:wrap}
-.mt-3{margin-top:12px}.mt-4{margin-top:16px}.mb-3{margin-bottom:12px}.mb-4{margin-bottom:16px}
-.text-accent{color:var(--accent)}.text-muted{color:var(--muted)}.text-sm{font-size:13px}.text-xs{font-size:11px}
+.flex-gap{display:flex;gap:10px;flex-wrap:wrap}
+.mt-3{margin-top:14px}.mt-4{margin-top:18px}.mb-3{margin-bottom:14px}.mb-4{margin-bottom:18px}
+.text-accent{color:var(--accent)}.text-muted{color:var(--muted)}.text-sm{font-size:16px}.text-xs{font-size:14px}
 .font-bold{font-weight:700}.text-center{text-align:center}
 
+/* 登录页 */
+.login-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;padding-top:max(32px,env(safe-area-inset-top,32px))}
+.login-overlay.hidden{display:none}
+.login-logo{font-size:48px;margin-bottom:8px}
+.login-title{font-size:26px;font-weight:700;margin-bottom:4px}
+.login-subtitle{font-size:16px;color:var(--muted);margin-bottom:28px}
+.login-input{width:100%;max-width:300px;padding:14px 18px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:18px;text-align:center;outline:none;margin-bottom:16px;min-height:50px}
+.login-input:focus{border-color:var(--accent)}
+.login-user-list{width:100%;max-width:300px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px}
+.login-user-chip{padding:10px 20px;border-radius:24px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:16px;cursor:pointer;transition:border-color .2s;min-height:44px;display:flex;align-items:center}
+.login-user-chip:hover,.login-user-chip:active{border-color:var(--accent)}
+.login-divider{width:100%;max-width:300px;text-align:center;color:var(--muted);font-size:14px;margin-bottom:16px;position:relative}
+.login-divider::before,.login-divider::after{content:'';position:absolute;top:50%;width:30%;height:1px;background:var(--border)}
+.login-divider::before{left:0}.login-divider::after{right:0}
+
 /* 首页 */
-.greeting{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.greeting h1{font-size:22px;font-weight:700}
-.avatar{width:40px;height:40px;border-radius:50%;background:rgba(255,107,53,.15);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:14px;font-weight:700}
+.greeting{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.greeting h1{font-size:28px;font-weight:700}
+.greeting .user-badge{font-size:14px;color:var(--accent);margin-bottom:2px}
+.avatar{width:44px;height:44px;border-radius:50%;background:rgba(255,107,53,.15);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:16px;font-weight:700}
 .today-card{position:relative}
-.today-card .card-header{display:flex;justify-content:space-between;margin-bottom:10px}
-.exercise-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.today-card .card-header{display:flex;justify-content:space-between;margin-bottom:12px}
+.exercise-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.today-day-name{font-size:20px;font-weight:700;margin-bottom:4px}
+.today-day-focus{font-size:16px;color:var(--muted);margin-bottom:16px}
 
 /* 计划页 */
 .day-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
-.day-tab{flex-shrink:0;padding:8px 16px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);white-space:nowrap;transition:all .2s}
+.day-tab{flex-shrink:0;padding:10px 18px;border-radius:14px;font-size:16px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);white-space:nowrap;transition:all .2s;min-height:44px;display:flex;align-items:center}
 .day-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.exercise-list>div{padding:12px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.exercise-list>div{padding:14px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
 .exercise-list>div:last-child{border-bottom:none}
-.ex-number{color:var(--accent);font-weight:700;font-size:14px;width:20px;flex-shrink:0}
+.ex-number{color:var(--accent);font-weight:700;font-size:17px;width:24px;flex-shrink:0}
 .ex-info{flex:1;min-width:0}
-.ex-name{font-weight:600;font-size:14px}
-.ex-target{color:var(--muted);font-size:12px}
-.ex-prev{color:var(--muted);font-size:11px;text-align:right;flex-shrink:0}
+.ex-name{font-weight:600;font-size:17px}
+.ex-target{color:var(--muted);font-size:15px;margin-top:2px}
+.ex-prev{color:var(--muted);font-size:14px;text-align:right;flex-shrink:0}
 
 /* 训练页 - 全屏聚焦 */
-.training-container{display:flex;flex-direction:column;min-height:calc(100vh - 200px);justify-content:center}
-.training-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
-.exercise-name{font-size:24px;font-weight:700;text-align:center;margin-bottom:4px}
-.exercise-target{color:var(--muted);font-size:13px;text-align:center;margin-bottom:32px}
-.num-control{display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:24px}
-.num-btn{width:44px;height:44px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s;user-select:none}
-.num-btn:hover{border-color:var(--accent)}
+.training-container{display:flex;flex-direction:column;min-height:calc(100vh - 220px);justify-content:center}
+.training-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;font-size:16px}
+.exercise-name{font-size:30px;font-weight:700;text-align:center;margin-bottom:6px}
+.exercise-target{color:var(--muted);font-size:16px;text-align:center;margin-bottom:36px}
+.num-control{display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:28px}
+.num-btn{width:52px;height:52px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s;user-select:none}
+.num-btn:hover,.num-btn:active{border-color:var(--accent)}
 .num-display{text-align:center}
-.num-display .big{font-size:48px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent);line-height:1}
-.num-display .unit{font-size:14px;color:var(--muted)}
-.num-display .small{font-size:36px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
-.set-indicator{color:var(--muted);font-size:13px;text-align:center;margin-bottom:16px}
-.set-history{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:24px}
-.set-dot{padding:5px 12px;border-radius:20px;background:var(--card);border:1px solid var(--border);font-size:12px;color:var(--muted)}
+.num-display .big{font-size:52px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent);line-height:1}
+.num-display .unit{font-size:17px;color:var(--muted)}
+.num-display .small{font-size:40px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.set-indicator{color:var(--muted);font-size:16px;text-align:center;margin-bottom:18px}
+.set-history{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:28px}
+.set-dot{padding:6px 16px;border-radius:20px;background:var(--card);border:1px solid var(--border);font-size:15px;color:var(--muted)}
 
 /* 休息倒计时 */
-.rest-overlay{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 200px);text-align:center}
-.rest-circle{width:120px;height:120px;border-radius:50%;border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
-.rest-time{font-size:40px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent)}
-.rest-label{color:var(--muted);font-size:14px;margin-bottom:8px}
-.rest-next{color:var(--muted);font-size:13px;margin-bottom:24px}
-.skip-btn{padding:8px 20px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer}
+.rest-overlay{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 220px);text-align:center}
+.rest-circle{width:140px;height:140px;border-radius:50%;border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.rest-time{font-size:44px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent)}
+.rest-label{color:var(--muted);font-size:17px;margin-bottom:10px}
+.rest-next{color:var(--muted);font-size:16px;margin-bottom:28px}
+.skip-btn{padding:10px 24px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:16px;cursor:pointer;min-height:44px}
 
 /* 完成页 */
-.complete-container{display:flex;flex-direction:column;align-items:center;text-align:center;min-height:calc(100vh - 200px);justify-content:center}
-.complete-icon{font-size:60px;margin-bottom:16px}
-.complete-title{font-size:24px;font-weight:700;margin-bottom:4px}
-.complete-time{color:var(--muted);font-size:14px;margin-bottom:20px}
-.summary-card{width:100%;text-align:left;margin-bottom:20px}
+.complete-container{display:flex;flex-direction:column;align-items:center;text-align:center;min-height:calc(100vh - 220px);justify-content:center}
+.complete-icon{font-size:64px;margin-bottom:20px}
+.complete-title{font-size:30px;font-weight:700;margin-bottom:6px}
+.complete-time{color:var(--muted);font-size:17px;margin-bottom:24px}
+.summary-card{width:100%;text-align:left;margin-bottom:24px}
 
 /* 数据页 */
-.tab-bar{display:flex;background:var(--card);border-radius:12px;padding:3px;border:1px solid var(--border)}
-.tab-btn{flex:1;padding:8px;border-radius:10px;border:none;background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.tab-bar{display:flex;background:var(--card);border-radius:14px;padding:4px;border:1px solid var(--border)}
+.tab-btn{flex:1;padding:10px;border-radius:12px;border:none;background:transparent;color:var(--muted);font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;min-height:44px}
 .tab-btn.active{background:var(--accent);color:#fff}
-.bar-chart{display:flex;align-items:flex-end;gap:4px;height:140px;padding-top:20px}
-.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:160px;padding-top:24px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
 .bar{width:100%;border-radius:4px 4px 0 0;position:relative;overflow:hidden;min-height:4px}
 .bar-inner{position:absolute;bottom:0;left:0;right:0;border-radius:4px 4px 0 0;background:var(--accent);opacity:.3}
 .bar-inner.fill{opacity:.8;height:70%}
-.bar-value{font-size:10px;color:var(--muted)}
-.bar-label{font-size:10px;color:var(--muted)}
-.progress-bar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin-top:4px}
-.progress-fill{height:100%;border-radius:4px;transition:width .5s}
-.stat-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.stat-item-2{background:var(--bg);border-radius:10px;padding:12px}
-.stat-item-2 .val{color:var(--accent);font-size:18px;font-weight:700}
-.stat-item-2 .lbl{color:var(--muted);font-size:11px}
+.bar-value{font-size:13px;color:var(--muted)}
+.bar-label{font-size:13px;color:var(--muted)}
+.progress-bar{height:10px;background:var(--bg);border-radius:5px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;border-radius:5px;transition:width .5s}
+.stat-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.stat-item-2{background:var(--bg);border-radius:12px;padding:14px}
+.stat-item-2 .val{color:var(--accent);font-size:28px;font-weight:700}
+.stat-item-2 .lbl{color:var(--muted);font-size:14px}
 
 /* 档案页 */
-.field-group{margin-bottom:14px}
-.field-label{color:var(--muted);font-size:11px;margin-bottom:4px;display:block}
-.field-value{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:14px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.knowledge-item{display:flex;align-items:flex-start;gap:12px;padding:14px;cursor:pointer;transition:border-color .2s}
+.field-group{margin-bottom:16px}
+.field-label{color:var(--muted);font-size:14px;margin-bottom:6px;display:block}
+.field-value{background:var(--bg);border-radius:12px;padding:12px 14px;font-size:17px;min-height:44px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.knowledge-item{display:flex;align-items:flex-start;gap:14px;padding:16px;cursor:pointer;transition:border-color .2s}
 .knowledge-item:hover{border-color:rgba(255,107,53,.3)}
-.knowledge-icon{font-size:24px;flex-shrink:0}
+.knowledge-icon{font-size:28px;flex-shrink:0}
+
+/* 用户切换区域 */
+.user-section{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--card);border-radius:14px;border:1px solid var(--border);margin-bottom:14px}
+.user-section .user-name{font-size:18px;font-weight:600}
+.user-section .user-action{font-size:14px;color:var(--accent);cursor:pointer;padding:8px 14px;border-radius:10px;border:1px solid var(--accent);background:transparent;min-height:44px;display:flex;align-items:center}
+
+/* API Key 状态 */
+.api-status{display:inline-flex;align-items:center;gap:6px;font-size:14px;padding:6px 12px;border-radius:20px}
+.api-status.set{background:rgba(42,157,143,.15);color:#2a9d8f}
+.api-status.unset{background:rgba(244,162,97,.15);color:#f4a261}
 
 /* 响应式 */
 @media(min-width:768px){.page{padding:0 20px}}
 </style>
 </head>
 <body>
+<!-- 登录遮罩 -->
+<div id="loginOverlay" class="login-overlay">
+  <div class="login-logo">🏋️</div>
+  <div class="login-title">IronTrack</div>
+  <div class="login-subtitle">智能健身伴侣</div>
+  <div id="existingUsers" style="width:100%;max-width:300px"></div>
+  <input class="login-input" id="loginInput" type="text" placeholder="输入你的名字" maxlength="12" autocomplete="off">
+  <button class="btn btn-accent" style="max-width:300px" onclick="doLogin()">进入</button>
+</div>
+
 <div id="app">
   <!-- 首页 -->
   <div id="page-home" class="page active">
@@ -159,7 +197,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
   <!-- 数据页 -->
   <div id="page-data" class="page">
-    <h1 class="section-title" style="font-size:22px;margin-bottom:16px">数据追踪</h1>
+    <h1 class="section-title" style="font-size:24px;margin-bottom:18px">数据追踪</h1>
     <div class="tab-bar mb-4">
       <button class="tab-btn active" onclick="switchDataTab('weight',this)">体重趋势</button>
       <button class="tab-btn" onclick="switchDataTab('strength',this)">力量增长</button>
@@ -178,7 +216,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
   <!-- 我的页 -->
   <div id="page-profile" class="page">
-    <h1 class="section-title" style="font-size:22px;margin-bottom:16px">我的</h1>
+    <h1 class="section-title" style="font-size:24px;margin-bottom:18px">我的</h1>
+    <div id="userSection"></div>
     <div class="tab-bar mb-4">
       <button class="tab-btn active" onclick="switchProfileTab('profile',this)">个人档案</button>
       <button class="tab-btn" onclick="switchProfileTab('knowledge',this)">知识库</button>
@@ -216,14 +255,49 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 </nav>
 
 <script>
-// ============ localStorage 存储引擎 ============
+// ============ 全局 API Key（所有用户共享）============
+function getGlobalApiKey() {
+  try { return localStorage.getItem('irontrack_global_apikey') || ''; }
+  catch(e) { return ''; }
+}
+function setGlobalApiKey(key) {
+  try { localStorage.setItem('irontrack_global_apikey', key); }
+  catch(e) { console.warn('存储 API Key 失败:', e); }
+}
+
+// ============ 用户管理 ============
+let currentUser = '';
+
+function getAllUsers() {
+  try {
+    const raw = localStorage.getItem('irontrack_users');
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) { return []; }
+}
+
+function saveAllUsers(users) {
+  try { localStorage.setItem('irontrack_users', JSON.stringify(users)); }
+  catch(e) { console.warn('存储用户列表失败:', e); }
+}
+
+function addUser(name) {
+  const users = getAllUsers();
+  if (!users.includes(name)) {
+    users.push(name);
+    saveAllUsers(users);
+  }
+}
+
+// ============ localStorage 存储引擎（按用户命名空间）============
 const LS = {
   get(key, fallback) {
-    try { const v = localStorage.getItem('irontrack_'+key); return v ? JSON.parse(v) : fallback; }
+    if (!currentUser) return fallback;
+    try { const v = localStorage.getItem('irontrack_'+currentUser+'_'+key); return v ? JSON.parse(v) : fallback; }
     catch(e) { return fallback; }
   },
   set(key, val) {
-    try { localStorage.setItem('irontrack_'+key, JSON.stringify(val)); }
+    if (!currentUser) return;
+    try { localStorage.setItem('irontrack_'+currentUser+'_'+key, JSON.stringify(val)); }
     catch(e) { console.warn('存储失败:', e); }
   }
 };
@@ -232,7 +306,7 @@ const LS = {
 const DEFAULT_PROFILE = {
   height: 178, weight: 78.5, bodyFat: 18, trainingDays: 4, experience: '有一定基础', goal: '增肌塑形',
   equipment: ['杠铃','哑铃','卧推架','深蹲架','绳索机','蝴蝶机','腿举机'],
-  planTemplate: 'ppl', apiKey: ''
+  planTemplate: 'ppl'
 };
 
 const DEFAULT_PLAN = {
@@ -267,7 +341,6 @@ const DEFAULT_PLAN = {
   ]
 };
 
-// 可选计划模板
 const PLAN_TEMPLATES = {
   'ppl': {
     name: "PPL 推拉腿三分化", cycle: "3天循环",
@@ -344,64 +417,94 @@ const knowledge = [
   {icon:"🔓",title:"平台期突破策略",desc:"当力量不再增长时该怎么办"}
 ];
 
-// ============ 加载持久化数据 ============
-let profile = LS.get('profile', DEFAULT_PROFILE);
-let plan = LS.get('plan', DEFAULT_PLAN);
-let sessions = LS.get('sessions', []);
-let bodyRecords = LS.get('body_records', []);
-let todayIndex = LS.get('today_index', 0);
+// ============ 全局变量（登录后初始化）============
+let profile, plan, sessions, bodyRecords, todayIndex;
 
-// 确保 profile 有 planTemplate 字段
-if (!profile.planTemplate) profile.planTemplate = 'ppl';
+function initUserData() {
+  profile = LS.get('profile', JSON.parse(JSON.stringify(DEFAULT_PROFILE)));
+  if (!profile.planTemplate) profile.planTemplate = 'ppl';
 
-// 如果没有保存过计划，根据模板加载
-if (!LS.get('plan', null)) {
-  const tmpl = PLAN_TEMPLATES[profile.planTemplate] || PLAN_TEMPLATES['ppl'];
-  plan = { name: tmpl.name, cycle: tmpl.cycle, days: JSON.parse(JSON.stringify(tmpl.days)) };
-  LS.set('plan', plan);
-}
+  if (!LS.get('plan', null)) {
+    const tmpl = PLAN_TEMPLATES[profile.planTemplate] || PLAN_TEMPLATES['ppl'];
+    plan = { name: tmpl.name, cycle: tmpl.cycle, days: JSON.parse(JSON.stringify(tmpl.days)) };
+    LS.set('plan', plan);
+  } else {
+    plan = LS.get('plan', DEFAULT_PLAN);
+  }
 
-// 切换计划模板
-function switchPlan(templateKey) {
-  const tmpl = PLAN_TEMPLATES[templateKey];
-  if (!tmpl) return;
-  plan = { name: tmpl.name, cycle: tmpl.cycle, days: JSON.parse(JSON.stringify(tmpl.days)) };
-  LS.set('plan', plan);
-  profile.planTemplate = templateKey;
-  LS.set('profile', profile);
-  todayIndex = 0;
-  LS.set('today_index', 0);
+  sessions = LS.get('sessions', []);
+  bodyRecords = LS.get('body_records', []);
+  todayIndex = LS.get('today_index', 0);
+
+  if (bodyRecords.length === 0 && profile.weight) {
+    const today = new Date();
+    bodyRecords = [{ date: formatDate(today), weight: profile.weight, bodyFat: profile.bodyFat }];
+    LS.set('body_records', bodyRecords);
+  }
+
   applyPrevRecords();
+}
+
+// ============ 登录逻辑 ============
+function renderLogin() {
+  const users = getAllUsers();
+  const existingEl = document.getElementById('existingUsers');
+  const input = document.getElementById('loginInput');
+
+  if (users.length > 0) {
+    existingEl.innerHTML = `
+      <div class="login-user-list">
+        ${users.map(u => `<div class="login-user-chip" onclick="selectUser('${u}')">${u}</div>`).join('')}
+      </div>
+      <div class="login-divider">或输入新名字</div>`;
+  } else {
+    existingEl.innerHTML = '';
+  }
+
+  input.value = '';
+  input.focus();
+  document.getElementById('loginOverlay').classList.remove('hidden');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('bottomNav').style.display = 'none';
+}
+
+function selectUser(name) {
+  document.getElementById('loginInput').value = name;
+  doLogin();
+}
+
+function doLogin() {
+  var name = document.getElementById('loginInput').value.trim();
+  if (!name) { alert('请输入你的名字'); return; }
+  if (name.length > 12) { alert('名字最多12个字'); return; }
+
+  currentUser = name;
+  addUser(name);
+  initUserData();
+
+  document.getElementById('loginOverlay').classList.add('hidden');
+  document.getElementById('app').style.display = '';
+  document.getElementById('bottomNav').style.display = '';
+
   resetTraining();
-  renderPlanPage();
-  renderHomePage();
+  navigate('home');
 }
 
-// 如果没有体重记录，生成初始记录
-if (bodyRecords.length === 0 && profile.weight) {
-  const today = new Date();
-  bodyRecords = [{ date: formatDate(today), weight: profile.weight, bodyFat: profile.bodyFat }];
-  LS.set('body_records', bodyRecords);
+function switchUser() {
+  if (trainState.timerInterval) clearInterval(trainState.timerInterval);
+  if (trainState.restInterval) clearInterval(trainState.restInterval);
+  currentUser = '';
+  renderLogin();
 }
 
-// 根据上次训练记录更新 prevW/prevR
-function applyPrevRecords() {
-  plan.days.forEach(day => {
-    day.exercises.forEach(ex => {
-      const lastSession = [...sessions].reverse().find(s => s.dayName === day.name);
-      if (lastSession) {
-        const lastEx = lastSession.exercises.find(e => e.name === ex.name);
-        if (lastEx && lastEx.sets.length > 0) {
-          const lastSet = lastEx.sets[lastEx.sets.length - 1];
-          ex.prevW = lastSet.w;
-          ex.prevR = lastSet.r;
-        }
-      }
-    });
+// 监听回车键登录
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('loginInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doLogin();
   });
-}
-applyPrevRecords();
+});
 
+// ============ 工具函数 ============
 function formatDate(d) {
   return (d.getMonth()+1)+'/'+d.getDate();
 }
@@ -436,6 +539,37 @@ function getStreak() {
   return streak;
 }
 
+function applyPrevRecords() {
+  plan.days.forEach(day => {
+    day.exercises.forEach(ex => {
+      const lastSession = [...sessions].reverse().find(s => s.dayName === day.name);
+      if (lastSession) {
+        const lastEx = lastSession.exercises.find(e => e.name === ex.name);
+        if (lastEx && lastEx.sets.length > 0) {
+          const lastSet = lastEx.sets[lastEx.sets.length - 1];
+          ex.prevW = lastSet.w;
+          ex.prevR = lastSet.r;
+        }
+      }
+    });
+  });
+}
+
+function switchPlan(templateKey) {
+  const tmpl = PLAN_TEMPLATES[templateKey];
+  if (!tmpl) return;
+  plan = { name: tmpl.name, cycle: tmpl.cycle, days: JSON.parse(JSON.stringify(tmpl.days)) };
+  LS.set('plan', plan);
+  profile.planTemplate = templateKey;
+  LS.set('profile', profile);
+  todayIndex = 0;
+  LS.set('today_index', 0);
+  applyPrevRecords();
+  resetTraining();
+  renderPlanPage();
+  renderHomePage();
+}
+
 // ============ 导航 ============
 let currentPage = 'home';
 let selectedDayIdx = 0;
@@ -452,12 +586,13 @@ function navigate(page) {
   if (page === 'plan') renderPlanPage();
   if (page === 'training') renderTrainingPage();
   if (page === 'data') renderDataChart('weight');
-  if (page === 'profile') renderProfileContent('profile');
+  if (page === 'profile') renderProfilePage();
   window.scrollTo(0, 0);
 }
 
 // ============ 首页 ============
 function renderHomePage() {
+  if (!currentUser) return;
   const today = plan.days[todayIndex];
   const weekSessions = getWeekSessions();
   const weekDone = weekSessions.length;
@@ -465,13 +600,17 @@ function renderHomePage() {
   const container = document.getElementById('homeContent');
   container.innerHTML = `
     <div class="greeting">
-      <div><h1>IronTrack</h1><p class="text-muted text-sm">准备开始今天的训练吗？</p></div>
+      <div>
+        <div class="user-badge">${currentUser}</div>
+        <h1>IronTrack</h1>
+        <p class="text-muted text-sm">准备开始今天的训练吗？</p>
+      </div>
       <div class="avatar">${profile.weight}kg</div>
     </div>
     <div class="card today-card" onclick="navigate('training')" style="cursor:pointer">
       <div class="card-header"><span class="text-accent text-sm font-bold">今日训练</span><span class="text-muted text-xs">第 ${weekDone+1}/${profile.trainingDays} 天</span></div>
-      <div style="font-size:18px;font-weight:700;margin-bottom:4px">${today.name}</div>
-      <div class="text-muted text-sm mb-4">${today.focus} · ${today.exercises.length}个动作 · 预计${today.exercises.reduce((s,e)=>s+e.sets*2+e.rest*e.sets/60,0)|0}分钟</div>
+      <div class="today-day-name">${today.name}</div>
+      <div class="today-day-focus">${today.focus} · ${today.exercises.length}个动作 · 预计${today.exercises.reduce((s,e)=>s+e.sets*2+e.rest*e.sets/60,0)|0}分钟</div>
       <div class="exercise-tags">
         ${today.exercises.slice(0,4).map(e=>`<span class="tag">${e.name}</span>`).join('')}
         ${today.exercises.length>4?`<span class="tag">+${today.exercises.length-4}</span>`:''}
@@ -485,12 +624,12 @@ function renderHomePage() {
     </div>
     <div class="flex-gap mt-4">
       <div class="card" style="flex:1;cursor:pointer" onclick="navigate('plan')">
-        <div style="font-size:24px;margin-bottom:4px">📋</div>
+        <div style="font-size:28px;margin-bottom:6px">📋</div>
         <div class="font-bold text-sm">训练计划</div>
         <div class="text-muted text-xs">${plan.name}</div>
       </div>
       <div class="card" style="flex:1;cursor:pointer" onclick="navigate('data')">
-        <div style="font-size:24px;margin-bottom:4px">📊</div>
+        <div style="font-size:28px;margin-bottom:6px">📊</div>
         <div class="font-bold text-sm">数据追踪</div>
         <div class="text-muted text-xs">${sessions.length}次训练记录</div>
       </div>
@@ -499,10 +638,11 @@ function renderHomePage() {
 
 // ============ 计划页 ============
 function renderPlanPage() {
+  if (!currentUser) return;
   document.getElementById('planHeader').innerHTML = `
     <div class="row mb-4">
-      <div><h1 class="section-title" style="font-size:22px;margin-bottom:2px">训练计划</h1><p class="text-muted text-sm">${plan.name}</p></div>
-      <button class="btn" style="width:auto;padding:8px 16px;font-size:13px;background:var(--accent);color:#fff;border-radius:10px" onclick="generatePlan()">AI 调整</button>
+      <div><h1 class="section-title" style="font-size:24px;margin-bottom:2px">训练计划</h1><p class="text-muted text-sm">${plan.name}</p></div>
+      <button class="btn" style="width:auto;padding:10px 20px;font-size:16px;background:var(--accent);color:#fff;border-radius:12px;min-height:44px" onclick="generatePlan()">AI 调整</button>
     </div>`;
   const tabs = document.getElementById('dayTabs');
   const detail = document.getElementById('dayDetail');
@@ -521,12 +661,12 @@ function renderDayDetail() {
   const day = plan.days[selectedDayIdx];
   const detail = document.getElementById('dayDetail');
   detail.innerHTML = `
-    <div style="padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:0;display:flex;justify-content:space-between;align-items:center">
+    <div style="padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:0;display:flex;justify-content:space-between;align-items:center">
       <div>
-        <div class="font-bold">${day.name}</div>
+        <div class="font-bold" style="font-size:17px">${day.name}</div>
         <div class="text-muted text-sm">${day.focus}</div>
       </div>
-      <button onclick="aiAdjustDay()" style="padding:6px 12px;background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:8px;font-size:12px;cursor:pointer">AI 优化</button>
+      <button onclick="aiAdjustDay()" style="padding:8px 16px;background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:10px;font-size:14px;cursor:pointer;min-height:44px">AI 优化</button>
     </div>
     <div class="exercise-list">
       ${day.exercises.map((ex,i) => `
@@ -543,7 +683,8 @@ function renderDayDetail() {
 }
 
 async function aiAdjustDay() {
-  if (!profile.apiKey) { alert('请先在「我的」页面设置 DeepSeek API Key'); return; }
+  const apiKey = getGlobalApiKey();
+  if (!apiKey) { alert('请先在「我的」页面设置 DeepSeek API Key'); return; }
   const day = plan.days[selectedDayIdx];
   const recentForDay = sessions.filter(s => s.dayName === day.name).slice(0, 3);
   const recentStr = recentForDay.map(s => {
@@ -581,7 +722,6 @@ ${recentStr || '无记录'}
     const jsonStr = result.replace(/```json\s*|\s*```/g, '').trim();
     const newDay = JSON.parse(jsonStr);
     if (!newDay.exercises || !Array.isArray(newDay.exercises)) throw new Error('格式错误');
-    // 更新当前这一天
     plan.days[selectedDayIdx] = {
       ...plan.days[selectedDayIdx],
       name: newDay.name || day.name,
@@ -602,16 +742,14 @@ ${recentStr || '无记录'}
 }
 
 // ============ 训练页 ============
-let trainState = {
-  day: plan.days[0], exIdx: 0, set: 1, weight: 0, reps: 0,
-  records: {}, isResting: false, restTimer: 0, sessionTime: 0, complete: false,
-  timerInterval: null, restInterval: null
-};
+let trainState = {};
 
 function resetTraining() {
+  if (!currentUser) return;
+  const day = plan.days[todayIndex];
   trainState = {
-    day: plan.days[0], exIdx: 0, set: 1, weight: plan.days[0].exercises[0].weight,
-    reps: plan.days[0].exercises[0].reps, records: {}, isResting: false,
+    day: day, exIdx: 0, set: 1, weight: day.exercises[0].weight,
+    reps: day.exercises[0].reps, records: {}, isResting: false,
     restTimer: 0, sessionTime: 0, complete: false,
     timerInterval: null, restInterval: null
   };
@@ -644,6 +782,7 @@ function startRestTimer() {
 }
 
 function renderTrainingPage() {
+  if (!currentUser) return;
   const s = trainState;
   if (s.complete) { renderComplete(); return; }
   if (s.isResting) { renderRestOverlay(); return; }
@@ -746,9 +885,7 @@ function completeSet() {
   } else {
     s.complete = true;
     if (s.timerInterval) clearInterval(s.timerInterval);
-    // 保存训练记录到 localStorage
     saveSession();
-    // 当天体重记录
     const todayDate = formatDate(new Date());
     if (!bodyRecords.find(r => r.date === todayDate)) {
       bodyRecords.push({ date: todayDate, weight: profile.weight, bodyFat: profile.bodyFat });
@@ -790,28 +927,6 @@ function formatTime(s) {
   return Math.floor(s/60)+':'+(s%60).toString().padStart(2,'0');
 }
 
-function resetTraining() {
-  const day = plan.days[todayIndex];
-  trainState = {
-    day: day, exIdx: 0, set: 1, weight: day.exercises[0].weight,
-    reps: day.exercises[0].reps, records: {}, isResting: false,
-    restTimer: 0, sessionTime: 0, complete: false,
-    timerInterval: null, restInterval: null
-  };
-  startSessionTimer();
-}
-
-// 初始化训练数据
-(function initTraining() {
-  const day = plan.days[todayIndex];
-  trainState = {
-    day: day, exIdx: 0, set: 1, weight: day.exercises[0].weight,
-    reps: day.exercises[0].reps, records: {}, isResting: false,
-    restTimer: 0, sessionTime: 0, complete: false,
-    timerInterval: null, restInterval: null
-  };
-})();
-
 // ============ 数据页 ============
 function switchDataTab(tab, btn) {
   document.querySelectorAll('#page-data .tab-btn').forEach(b => b.classList.remove('active'));
@@ -820,6 +935,7 @@ function switchDataTab(tab, btn) {
 }
 
 function renderDataChart(tab) {
+  if (!currentUser) return;
   const container = document.getElementById('dataChart');
   if (tab === 'weight') {
     if (bodyRecords.length === 0) {
@@ -851,7 +967,6 @@ function renderDataChart(tab) {
       </div>`;
     }
   } else {
-    // 力量增长 - 从训练记录中提取
     const allEx = {};
     sessions.forEach(s => {
       s.exercises.forEach(ex => {
@@ -871,16 +986,15 @@ function renderDataChart(tab) {
     }
     const colors = ['var(--accent)','#f4a261','#2a9d8f','#e76f51'];
     container.innerHTML = `
-      <div class="row mb-4"><div class="font-bold text-sm">力量增长曲线</div><div class="flex-gap text-xs">${topEx.map(([n],i)=>`<span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${colors[i]};vertical-align:middle;margin-right:3px"></span>${n}</span>`).join('')}</div></div>
+      <div class="row mb-4"><div class="font-bold text-sm">力量增长曲线</div><div class="flex-gap text-xs">${topEx.map(([n],i)=>`<span><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${colors[i]};vertical-align:middle;margin-right:3px"></span>${n}</span>`).join('')}</div></div>
       ${topEx.map(([name, records], i) => {
         const first = records[0].weight;
         const last = records[records.length-1].weight;
         const pct = Math.min(100, Math.max(0, Math.round(((last - first) / Math.max(first, 1)) * 100)));
-        return `<div style="margin-bottom:14px"><div class="row text-xs text-muted mb-1"><span>${name}</span><span style="color:${colors[i]}">${first} → ${last}kg ${last>=first?'+':''}${(last-first).toFixed(1)}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct>0?30+pct*0.7:10}%;background:${colors[i]}"></div></div></div>`;
+        return `<div style="margin-bottom:16px"><div class="row text-xs text-muted mb-1"><span>${name}</span><span style="color:${colors[i]}">${first} → ${last}kg ${last>=first?'+':''}${(last-first).toFixed(1)}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct>0?30+pct*0.7:10}%;background:${colors[i]}"></div></div></div>`;
       }).join('')}
       <div class="text-center text-xs text-muted mt-4">共 ${sessions.length} 次训练记录</div>`;
   }
-  // 更新底部统计
   updateWeekStats();
 }
 
@@ -900,6 +1014,27 @@ function updateWeekStats() {
 }
 
 // ============ 我的页 ============
+function renderProfilePage() {
+  if (!currentUser) return;
+  renderUserSection();
+  document.querySelectorAll('#page-profile .tab-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  renderProfileContent('profile');
+}
+
+function renderUserSection() {
+  const el = document.getElementById('userSection');
+  const apiKey = getGlobalApiKey();
+  const apiStatus = apiKey ? '<span class="api-status set">API 已设置</span>' : '<span class="api-status unset">API 未设置</span>';
+  el.innerHTML = `
+    <div class="user-section">
+      <div>
+        <div class="user-name">${currentUser}</div>
+        <div style="font-size:14px;color:var(--muted);margin-top:2px">${apiStatus}</div>
+      </div>
+      <button class="user-action" onclick="switchUser()">切换用户</button>
+    </div>`;
+}
+
 function switchProfileTab(tab, btn) {
   document.querySelectorAll('#page-profile .tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -909,18 +1044,19 @@ function switchProfileTab(tab, btn) {
 function renderProfileContent(tab) {
   const container = document.getElementById('profileContent');
   if (tab === 'profile') {
+    const apiKey = getGlobalApiKey();
     container.innerHTML = `
       <div class="card"><div class="section-title">身体数据</div>
         <div class="grid-2">
-          <div class="field-group"><span class="field-label">身高 (cm)</span><input class="field-value" id="pf-height" type="number" value="${profile.height}" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg)"></div>
-          <div class="field-group"><span class="field-label">体重 (kg)</span><input class="field-value" id="pf-weight" type="number" step="0.1" value="${profile.weight}" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg)"></div>
-          <div class="field-group"><span class="field-label">体脂率 (%)</span><input class="field-value" id="pf-bodyfat" type="number" value="${profile.bodyFat}" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg)"></div>
-          <div class="field-group"><span class="field-label">每周训练天数</span><input class="field-value" id="pf-days" type="number" min="1" max="7" value="${profile.trainingDays}" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg)"></div>
+          <div class="field-group"><span class="field-label">身高 (cm)</span><input class="field-value" id="pf-height" type="number" value="${profile.height}" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);font-size:17px"></div>
+          <div class="field-group"><span class="field-label">体重 (kg)</span><input class="field-value" id="pf-weight" type="number" step="0.1" value="${profile.weight}" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);font-size:17px"></div>
+          <div class="field-group"><span class="field-label">体脂率 (%)</span><input class="field-value" id="pf-bodyfat" type="number" value="${profile.bodyFat}" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);font-size:17px"></div>
+          <div class="field-group"><span class="field-label">每周训练天数</span><input class="field-value" id="pf-days" type="number" min="1" max="7" value="${profile.trainingDays}" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);font-size:17px"></div>
         </div>
       </div>
       <div class="card"><div class="section-title">训练偏好</div>
         <div class="field-group"><span class="field-label">训练目标</span>
-          <select class="field-value" id="pf-goal" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);appearance:none;font-size:14px">
+          <select class="field-value" id="pf-goal" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);appearance:none;font-size:17px">
             <option value="增肌塑形" ${profile.goal==='增肌塑形'?'selected':''}>增肌塑形</option>
             <option value="减脂瘦身" ${profile.goal==='减脂瘦身'?'selected':''}>减脂瘦身</option>
             <option value="综合体能" ${profile.goal==='综合体能'?'selected':''}>综合体能</option>
@@ -928,7 +1064,7 @@ function renderProfileContent(tab) {
           </select>
         </div>
         <div class="field-group"><span class="field-label">经验水平</span>
-          <select class="field-value" id="pf-exp" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);appearance:none;font-size:14px">
+          <select class="field-value" id="pf-exp" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);appearance:none;font-size:17px">
             <option value="新手入门" ${profile.experience==='新手入门'?'selected':''}>新手入门</option>
             <option value="有一定基础" ${profile.experience==='有一定基础'?'selected':''}>有一定基础</option>
             <option value="中级进阶" ${profile.experience==='中级进阶'?'selected':''}>中级进阶</option>
@@ -938,20 +1074,20 @@ function renderProfileContent(tab) {
       </div>
       <div class="card"><div class="section-title">分化方式</div>
         <div class="field-group"><span class="field-label">训练计划模板</span>
-          <select class="field-value" id="pf-plan" onchange="switchPlan(this.value)" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);appearance:none;font-size:14px">
+          <select class="field-value" id="pf-plan" onchange="switchPlan(this.value)" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);appearance:none;font-size:17px">
             ${Object.entries(PLAN_TEMPLATES).map(([k,v]) => `<option value="${k}" ${profile.planTemplate===k?'selected':''}>${v.name} - ${v.desc}</option>`).join('')}
           </select>
         </div>
         <div class="text-xs text-muted mt-2">切换模板会重置训练计划，但保留历史训练记录</div>
       </div>
       <div class="card"><div class="section-title">AI 设置</div>
-        <div class="field-group"><span class="field-label">DeepSeek API Key</span>
+        <div class="field-group"><span class="field-label">DeepSeek API Key（所有用户共享）</span>
           <div style="display:flex;gap:8px">
-            <input class="field-value" id="pf-apiKey" type="password" value="${profile.apiKey||''}" placeholder="sk-..." style="flex:1;border:none;outline:none;color:var(--text);background:var(--bg);font-size:13px">
-            <button class="pf-apiKey" onclick="testApiKey()" style="padding:6px 12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;white-space:nowrap">测试连接</button>
+            <input class="field-value" id="pf-apiKey" type="password" value="${apiKey}" placeholder="sk-..." style="flex:1;border:none;outline:none;color:var(--text);background:var(--bg);font-size:15px">
+            <button onclick="testApiKey()" style="padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;cursor:pointer;white-space:nowrap;min-height:44px">测试连接</button>
           </div>
         </div>
-        <div class="text-xs text-muted mt-2">在 <a href="https://platform.deepseek.com" target="_blank" style="color:var(--accent)">platform.deepseek.com</a> 获取 Key，生成一次计划约 ¥0.01</div>
+        <div class="text-xs text-muted mt-2">在 <a href="https://platform.deepseek.com" target="_blank" style="color:var(--accent)">platform.deepseek.com</a> 获取 Key，设置一次即可，所有用户共用</div>
         <div id="apiTestMsg" class="text-xs mt-2"></div>
       </div>
       <button class="btn btn-accent" onclick="saveProfile()">保存修改</button>
@@ -973,11 +1109,16 @@ function saveProfile() {
   profile.trainingDays = parseInt(document.getElementById('pf-days').value) || profile.trainingDays;
   profile.goal = document.getElementById('pf-goal').value;
   profile.experience = document.getElementById('pf-exp').value;
-  profile.apiKey = document.getElementById('pf-apiKey').value.trim();
   LS.set('profile', profile);
+
+  // API Key 保存到全局
+  const apiKey = document.getElementById('pf-apiKey').value.trim();
+  setGlobalApiKey(apiKey);
+
   var msg = document.getElementById('saveMsg');
   msg.textContent = '已保存';
   setTimeout(function(){ msg.textContent = ''; }, 2000);
+  renderUserSection();
   renderHomePage();
 }
 
@@ -1003,7 +1144,7 @@ async function testApiKey() {
 
 // ============ AI 调用 ============
 async function aiCall(prompt) {
-  const key = profile.apiKey;
+  const key = getGlobalApiKey();
   if (!key) { alert('请先在「我的」页面设置 DeepSeek API Key'); return null; }
   try {
     const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
@@ -1066,18 +1207,17 @@ ${recent || '尚无训练记录'}
 
 async function generatePlan() {
   const btn = event.target;
-  if (!profile.apiKey) { alert('请先在「我的」页面设置 DeepSeek API Key'); return; }
+  const apiKey = getGlobalApiKey();
+  if (!apiKey) { alert('请先在「我的」页面设置 DeepSeek API Key'); return; }
   btn.textContent = 'AI 生成中...';
   btn.disabled = true;
   const prompt = buildAiPrompt();
   const result = await aiCall(prompt);
   if (!result) { btn.textContent = 'AI 调整'; btn.disabled = false; return; }
-  // 解析 JSON
   try {
     const jsonStr = result.replace(/```json\s*|\s*```/g, '').trim();
     const newPlan = JSON.parse(jsonStr);
     if (!newPlan.days || !Array.isArray(newPlan.days)) throw new Error('格式错误');
-    // 给每个动作加 id
     let eid = 1;
     newPlan.days.forEach((d, di) => {
       d.id = 'ai-' + di;
@@ -1102,8 +1242,8 @@ async function generatePlan() {
 }
 
 // ============ 初始化 ============
-navigate('home');
-resetTraining();
+// 显示登录页面
+renderLogin();
 </script>
 </body>
 </html>
