@@ -165,6 +165,35 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .api-status.set{background:rgba(42,157,143,.15);color:#2a9d8f}
 .api-status.unset{background:rgba(244,162,97,.15);color:#f4a261}
 
+/* 训练前设置弹窗 */
+.setup-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:90;background:rgba(10,10,20,.72);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:0}
+.setup-overlay.hidden{display:none}
+.setup-sheet{background:var(--card);width:100%;max-width:430px;border-radius:24px 24px 0 0;padding:26px 22px 34px;max-height:92vh;overflow-y:auto;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.setup-title{font-size:22px;font-weight:700;text-align:center;margin-bottom:4px}
+.setup-subtitle{font-size:15px;color:var(--muted);text-align:center;margin-bottom:22px}
+.setup-group{margin-bottom:20px}
+.setup-label{font-size:15px;color:var(--muted);margin-bottom:10px;display:block}
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt-chip{padding:14px 10px;border-radius:14px;background:var(--bg);border:2px solid var(--border);color:var(--text);font-size:16px;text-align:center;cursor:pointer;transition:all .2s;min-height:52px;display:flex;align-items:center;justify-content:center}
+.opt-chip.sel{border-color:var(--accent);background:rgba(255,107,53,.12);color:var(--accent);font-weight:700}
+.opt-chip .opt-emoji{display:block;font-size:22px;margin-bottom:4px}
+.opt-chip .opt-text{font-size:15px}
+
+/* 训练页分板块 */
+.section-tabs{display:flex;gap:8px;margin-bottom:18px}
+.section-tab{flex:1;padding:12px 6px;border-radius:12px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-size:15px;font-weight:600;text-align:center;cursor:pointer;transition:all .2s;min-height:46px;display:flex;align-items:center;justify-content:center}
+.section-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.section-tab .done-mark{margin-left:4px;color:#2a9d8f}
+.guide-list>div{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}
+.guide-list>div:last-child{border-bottom:none}
+.guide-check{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:all .2s;color:transparent}
+.guide-check.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.guide-info{flex:1;min-width:0}
+.guide-name{font-weight:600;font-size:17px}
+.guide-note{color:var(--muted);font-size:14px;margin-top:2px}
+.nutrition-card{background:linear-gradient(135deg,rgba(255,107,53,.12),rgba(42,157,143,.12));border:1px solid var(--border);border-radius:16px;padding:18px;font-size:16px;line-height:1.7;white-space:pre-line}
+
 /* 响应式 */
 @media(min-width:768px){.page{padding:0 20px}}
 </style>
@@ -178,6 +207,33 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   <div id="existingUsers" style="width:100%;max-width:300px"></div>
   <input class="login-input" id="loginInput" type="text" placeholder="输入你的名字" maxlength="12" autocomplete="off">
   <button class="btn btn-accent" style="max-width:300px" onclick="doLogin()">进入</button>
+</div>
+
+<!-- 训练前设置弹窗 -->
+<div id="setupOverlay" class="setup-overlay hidden">
+  <div class="setup-sheet">
+    <div class="setup-title">开始今天的训练</div>
+    <div class="setup-subtitle">告诉我你今天的状况，为你生成个性化计划</div>
+    <div class="setup-group">
+      <span class="setup-label">今日想练的部位</span>
+      <div class="opt-grid" id="setupFocus"></div>
+    </div>
+    <div class="setup-group">
+      <span class="setup-label">身体状态</span>
+      <div class="opt-grid" id="setupState"></div>
+    </div>
+    <div class="setup-group">
+      <span class="setup-label">可用时间</span>
+      <div class="opt-grid" id="setupTime"></div>
+    </div>
+    <div class="setup-group">
+      <span class="setup-label">训练环境</span>
+      <div class="opt-grid" id="setupEnv"></div>
+    </div>
+    <div id="setupMsg" class="text-center text-muted text-sm" style="margin-bottom:14px"></div>
+    <button class="btn btn-accent" onclick="confirmSetup()">生成今日计划</button>
+    <button class="btn btn-outline mt-3" onclick="closeSetup()">取消</button>
+  </div>
 </div>
 
 <div id="app">
@@ -445,6 +501,11 @@ function initUserData() {
   measurements = LS.get('measurements', []);
   todayIndex = LS.get('today_index', 0);
 
+  // 恢复今日动态计划（若存在）
+  todayPlan = LS.get('today_plan', null);
+  if (!todayPlan || todayPlan.date !== getTodayStr()) todayPlan = null;
+  else initDynamicTraining();
+
   if (bodyRecords.length === 0 && profile.weight) {
     const today = new Date();
     bodyRecords = [{ date: formatDate(today), weight: profile.weight, bodyFat: profile.bodyFat }];
@@ -593,10 +654,185 @@ function navigate(page) {
   });
   if (page === 'home') renderHomePage();
   if (page === 'plan') renderPlanPage();
-  if (page === 'training') renderTrainingPage();
+  if (page === 'training') enterTraining();
   if (page === 'data') renderDataChart('weight');
   if (page === 'profile') renderProfilePage();
   window.scrollTo(0, 0);
+}
+
+// ============ 训练入口：动态生成今日计划 ============
+let todayPlan = null;   // 今日动态计划
+let setupSel = { focus:'', state:'', time:'', env:'' };
+
+const FOCUS_OPTIONS = ['胸','背','腿','肩','手臂','全身'];
+const STATE_OPTIONS = [
+  {k:'精力充沛',e:'⚡'},{k:'状态一般',e:'😊'},{k:'有些疲惫',e:'🌤'},{k:'比较疲劳',e:'😴'}
+];
+const TIME_OPTIONS = [{k:'30分钟',e:'⏱'},{k:'45分钟',e:'⏳'},{k:'60分钟',e:'🕐'},{k:'90分钟',e:'🕒'}];
+const ENV_OPTIONS = [
+  {k:'健身房',e:'🏢'},{k:'家用哑铃',e:'🏠'},{k:'家用徒手',e:'🧘'}
+];
+
+function enterTraining() {
+  if (!currentUser) return;
+  // 若已有今日计划且未完成，直接继续
+  if (todayPlan && todayPlan.date === getTodayStr() && !trainState.complete) {
+    renderTrainingPage();
+    return;
+  }
+  showTrainingSetup();
+}
+
+function showTrainingSetup() {
+  if (!currentUser) return;
+  setupSel = { focus:'', state:'', time:'', env:'' };
+  // 推荐今日部位（基于连贯性：从未练过的或上次间隔最久的）
+  const suggested = suggestTodayFocus();
+  setupSel.focus = suggested;
+  const focusEl = document.getElementById('setupFocus');
+  focusEl.innerHTML = FOCUS_OPTIONS.map(f =>
+    `<div class="opt-chip ${f===suggested?'sel':''}" onclick="pickFocus('${f}')">${f}</div>`
+  ).join('');
+  renderState('state', STATE_OPTIONS, 'setState');
+  renderState('time', TIME_OPTIONS, 'setTime');
+  renderState('env', ENV_OPTIONS, 'setEnv');
+  document.getElementById('setupMsg').textContent = '';
+  document.getElementById('setupOverlay').classList.remove('hidden');
+}
+
+function renderState(id, options, fn) {
+  document.getElementById('setup'+id.charAt(0).toUpperCase()+id.slice(1)).innerHTML =
+    options.map(o => `<div class="opt-chip" onclick="${fn}('${o.k}')"><span class="opt-emoji">${o.e}</span><span class="opt-text">${o.k}</span></div>`).join('');
+}
+
+function pickFocus(f) { setupSel.focus = f; document.querySelectorAll('#setupFocus .opt-chip').forEach(c=>c.classList.toggle('sel',c.textContent===f)); }
+function setState(k) { setupSel.state = k; markSel('setupState'); }
+function setTime(k) { setupSel.time = k; markSel('setupTime'); }
+function setEnv(k) { setupSel.env = k; markSel('setupEnv'); }
+function markSel(id) {
+  document.querySelectorAll('#'+id+' .opt-chip').forEach(c => {
+    const txt = c.querySelector('.opt-text') ? c.querySelector('.opt-text').textContent : '';
+    const key = c.dataset.k || txt;
+    const selObj = { setupState:setupSel.state, setupTime:setupSel.time, setupEnv:setupSel.env }[id];
+    c.classList.toggle('sel', key === selObj);
+  });
+}
+
+function closeSetup() {
+  document.getElementById('setupOverlay').classList.add('hidden');
+  if (currentPage === 'training') navigate('home');
+}
+
+function suggestTodayFocus() {
+  // 优先考虑未在最近训练中覆盖的部位，保证连贯性
+  const recent = sessions.slice(0, 4);
+  const recentText = recent.map(s => s.focusArea || s.dayName).join('');
+  const focusMap = { '胸':'胸','肩':'肩','三头':'手臂','背':'背','二头':'手臂','腿':'腿','腹部':'核心' };
+  const covered = new Set();
+  recentText.split('+').forEach(p => p.trim() && covered.add(p.trim()));
+  // 简单启发：若最近练过手臂/肩，则优先推其他，否则按套餐顺序
+  const order = ['胸','背','腿','肩','手臂','全身'];
+  return order[0];
+}
+
+async function confirmSetup() {
+  if (!setupSel.focus) { document.getElementById('setupMsg').textContent = '请选择今日训练部位'; return; }
+  if (!setupSel.state) { document.getElementById('setupMsg').textContent = '请选择身体状态'; return; }
+  if (!setupSel.time) { document.getElementById('setupMsg').textContent = '请选择可用时间'; return; }
+  if (!setupSel.env) { document.getElementById('setupMsg').textContent = '请选择训练环境'; return; }
+  const apiKey = getGlobalApiKey();
+  if (!apiKey) { alert('请先在「我的」页面设置 DeepSeek API Key'); return; }
+  const msg = document.getElementById('setupMsg');
+  msg.textContent = 'AI 正在生成今日计划，请稍候...';
+  const btn = document.querySelector('#setupOverlay .btn-accent');
+  btn.disabled = true;
+  const plan = await generateTodayPlan();
+  btn.disabled = false;
+  if (plan) {
+    document.getElementById('setupOverlay').classList.add('hidden');
+    renderTrainingPage();
+  } else {
+    msg.textContent = '生成失败，请重试';
+  }
+}
+
+function buildTodayPrompt() {
+  const recent = sessions.slice(0, 6).map(s => {
+    const exSummary = (s.exercises || []).map(e => {
+      const maxW = e.sets && e.sets.length ? Math.max(...e.sets.map(st => st.w)) : 0;
+      return `${e.name}(${maxW}kg)`;
+    }).join('、');
+    return `${s.date} ${s.dayName||s.focusArea||''}: ${exSummary}`;
+  }).join('\n');
+
+  const envHint = {
+    '健身房':'可自由使用杠铃、哑铃、绳索、固定器械等全套设备',
+    '家用哑铃':'仅有一副哑铃，可配合长凳做推、拉、蹲、弯举等',
+    '家用徒手':'无器械，主要用自重动作（俯卧撑、引体、深蹲、弓步、核心）'
+  }[setupSel.env];
+
+  return `你是一名专业健身教练，为增肌训练者按当天需求生成一次训练课。请结合以下信息，生成包含热身、正式训练、拉伸放松和饮食建议的完整训练方案。
+
+【用户档案】
+- 身高: ${profile.height}cm, 体重: ${profile.weight}kg, 体脂率: ${profile.bodyFat}%
+- 训练经验: ${profile.experience}, 目标: ${profile.goal}
+- 可用器械偏好: ${profile.equipment.join('、')}
+
+【今日训练安排】
+- 训练部位: ${setupSel.focus}
+- 身体状态: ${setupSel.state}
+- 可用时间: ${setupSel.time}
+- 训练环境: ${setupSel.env}（${envHint}）
+
+【最近训练记录（用于连贯性与平衡各部位训练量）】
+${recent || '尚无训练记录'}
+
+【生成要求】
+1. 正式训练动作数量为 8-15 个；当可用时间较短时适当减少动作与组数，时间充足时可增多组数与动作。
+2. 复合动作（卧推/深蹲/硬拉/推举/划船/引体等）优先靠前。
+3. 重量结合用户上次训练记录、身体状态与动作难度综合判断，给出合理建议值，不必强行递增；身体疲劳时适当降低。
+4. 增肌目标：大重量复合动作 5-8 次/组，中重量动作 8-12 次/组，孤立辅助动作 10-15 次/组。
+5. 若训练部位包含推或拉，适度穿插补足肩、二头、三头等薄弱部位，保证训练量均衡。
+6. 热身与拉伸每个动作配一句简短要领说明。
+7. 饮食建议结合训练目标与今日训练部位，给出当顿或当日的具体建议（一两句话）。
+8. 动作名称用中文。
+
+【输出格式】只输出 JSON，不要任何解释文字：
+{
+  "focus": "今日训练部位",
+  "warmup": [{"name":"热身动作","note":"要领"}],
+  "workout": [{"name":"动作","sets":组数,"reps":次数,"weight":建议重量kg,"rest":休息秒}],
+  "stretch": [{"name":"拉伸动作","note":"要领"}],
+  "nutrition": "饮食建议文本"
+}`;
+}
+
+async function generateTodayPlan() {
+  const prompt = buildTodayPrompt();
+  const result = await aiCall(prompt);
+  if (!result) return null;
+  try {
+    const jsonStr = result.replace(/```json\s*|\s*```/g, '').trim();
+    const data = JSON.parse(jsonStr);
+    if (!data.workout || !Array.isArray(data.workout) || data.workout.length === 0) throw new Error('动作为空');
+    let eid = 1;
+    data.workout.forEach(ex => { ex.id = 'dyn-' + (eid++); });
+    todayPlan = {
+      date: getTodayStr(),
+      focus: data.focus || setupSel.focus,
+      factors: { focus: setupSel.focus, state: setupSel.state, time: setupSel.time, env: setupSel.env },
+      warmup: data.warmup || [],
+      workout: data.workout,
+      stretch: data.stretch || [],
+      nutrition: data.nutrition || ''
+    };
+    LS.set('today_plan', todayPlan);
+    initDynamicTraining();
+    return todayPlan;
+  } catch(e) {
+    alert('AI 返回格式解析失败，请重试。错误: ' + e.message);
+    return null;
+  }
 }
 
 // ============ 上次训练摘要 ============
@@ -618,7 +854,6 @@ function getLastSessionSummary() {
 // ============ 首页 ============
 function renderHomePage() {
   if (!currentUser) return;
-  const today = plan.days[todayIndex];
   const weekSessions = getWeekSessions();
   const weekDone = weekSessions.length;
   const streak = getStreak();
@@ -636,14 +871,17 @@ function renderHomePage() {
       <div class="avatar">${profile.weight}kg</div>
     </div>
     <div class="card today-card" onclick="navigate('training')" style="cursor:pointer">
-      <div class="card-header"><span class="text-accent text-sm font-bold">今日训练</span><span class="text-muted text-xs">第 ${weekDone+1}/${profile.trainingDays} 天</span></div>
-      <div class="today-day-name">${today.name}</div>
-      <div class="today-day-focus">${today.focus} · ${today.exercises.length}个动作 · 预计${today.exercises.reduce((s,e)=>s+e.sets*2+e.rest*e.sets/60,0)|0}分钟</div>
+      <div class="card-header"><span class="text-accent text-sm font-bold">今日训练</span><span class="text-muted text-xs">本周已完成 ${weekDone} 次</span></div>
+      <div class="today-day-name">${todayPlan ? todayPlan.focus+'训练' : '按需生成今日计划'}</div>
+      <div class="today-day-focus">${todayPlan
+        ? `${todayPlan.workout.length}个动作 · ${todayPlan.factors.time} · ${todayPlan.factors.env}`
+        : '告诉我今天的身体状态、时间与环境，AI 为你生成含热身、正式训练、拉伸和饮食建议的个性化计划'}</div>
       <div class="exercise-tags">
-        ${today.exercises.slice(0,4).map(e=>`<span class="tag">${e.name}</span>`).join('')}
-        ${today.exercises.length>4?`<span class="tag">+${today.exercises.length-4}</span>`:''}
+        ${todayPlan
+          ? todayPlan.workout.slice(0,4).map(e=>`<span class="tag">${e.name}</span>`).join('') + (todayPlan.workout.length>4?`<span class="tag">+${todayPlan.workout.length-4}</span>`:'')
+          : `<span class="tag">⚡ 身体状态</span><span class="tag">⏱ 可用时间</span><span class="tag">🏢 训练环境</span>`}
       </div>
-      <div class="btn btn-accent mt-3">开始训练</div>
+      <div class="btn btn-accent mt-3">${todayPlan ? '继续训练' : '开始训练'}</div>
     </div>
     <div class="card" style="cursor:pointer" onclick="navigate('data')">
       <div class="row mb-3">
@@ -793,16 +1031,27 @@ ${recentStr || '无记录'}
   }
 }
 
-// ============ 训练页 ============
+// ============ 训练页（动态四板块：热身/正式/拉伸/饮食）============
 let trainState = {};
 
 function resetTraining() {
   if (!currentUser) return;
-  const day = plan.days[todayIndex];
+  todayPlan = null;
+  LS.set('today_plan', null);
+  trainState = {};
+}
+
+function initDynamicTraining() {
+  const tp = todayPlan;
+  const exercises = tp.workout;
   trainState = {
-    day: day, exIdx: 0, set: 1, weight: day.exercises[0].weight,
-    reps: day.exercises[0].reps, records: {}, isResting: false,
-    restTimer: 0, sessionTime: 0, complete: false,
+    day: { name: (tp.focus||'训练')+'训练日', focus: tp.focus||'', exercises: exercises },
+    exIdx: 0, set: 1,
+    weight: exercises[0] ? exercises[0].weight||0 : 0,
+    reps: exercises[0] ? exercises[0].reps||8 : 8,
+    records: {}, isResting: false, restTimer: 0, sessionTime: 0, complete: false,
+    section: 'warmup',   // warmup | workout | stretch | nutrition
+    warmupDone: [], stretchDone: [],
     timerInterval: null, restInterval: null
   };
   startSessionTimer();
@@ -817,7 +1066,7 @@ function startSessionTimer() {
 
 function startRestTimer() {
   const ex = trainState.day.exercises[trainState.exIdx];
-  trainState.restTimer = ex.rest;
+  trainState.restTimer = ex.rest || 90;
   trainState.isResting = true;
   if (trainState.restInterval) clearInterval(trainState.restInterval);
   trainState.restInterval = setInterval(() => {
@@ -835,23 +1084,65 @@ function startRestTimer() {
 
 function renderTrainingPage() {
   if (!currentUser) return;
+  if (!todayPlan) { showTrainingSetup(); return; }
   const s = trainState;
   if (s.complete) { renderComplete(); return; }
   if (s.isResting) { renderRestOverlay(); return; }
   renderTrainingUI();
 }
 
-function renderTrainingUI() {
+function setSection(sec) {
+  if (trainState.complete || trainState.isResting) return;
+  trainState.section = sec;
+  renderTrainingUI();
+}
+
+function renderSectionTabs() {
+  const s = trainState;
+  const warmupAll = todayPlan.warmup.length > 0 && s.warmupDone.length === todayPlan.warmup.length;
+  const workoutDone = isWorkoutDone();
+  const stretchAll = todayPlan.stretch.length > 0 && s.stretchDone.length === todayPlan.stretch.length;
+  const tabs = [
+    {k:'warmup', label:'热身', done:warmupAll},
+    {k:'workout', label:'正式', done:workoutDone},
+    {k:'stretch', label:'拉伸', done:stretchAll},
+    {k:'nutrition', label:'饮食', done:false}
+  ];
+  return `<div class="section-tabs">${tabs.map(t =>
+    `<div class="section-tab ${s.section===t.k?'active':''}" onclick="setSection('${t.k}')">${t.label}${t.done?'<span class="done-mark">✓</span>':''}</div>`
+  ).join('')}</div>`;
+}
+
+function isWorkoutDone() {
+  return todayPlan.workout.every(ex => (trainState.records[ex.id]||[]).length >= ex.sets);
+}
+
+function renderWarmup() {
+  const s = trainState;
+  const items = todayPlan.warmup;
+  if (!items || items.length === 0) {
+    return `<div class="card"><div class="text-muted text-sm">今日无需专门热身，直接开始正式训练即可。</div></div>
+      <button class="btn btn-accent mt-3" onclick="setSection('workout')">开始正式训练</button>`;
+  }
+  return `
+    <div class="card">
+      <div class="section-title">热身（${s.warmupDone.length}/${items.length}）</div>
+      <div class="guide-list">
+        ${items.map((it,i) => `
+          <div>
+            <div class="guide-check ${s.warmupDone.includes(i)?'on':''}" onclick="toggleGuide('warmup',${i})">✓</div>
+            <div class="guide-info"><div class="guide-name">${it.name}</div>${it.note?`<div class="guide-note">${it.note}</div>`:''}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <button class="btn btn-accent mt-3" onclick="setSection('workout')">开始正式训练</button>`;
+}
+
+function renderWorkout() {
   const s = trainState;
   const ex = s.day.exercises[s.exIdx];
   const recs = s.records[ex.id] || [];
-  const container = document.getElementById('trainingContent');
-  container.innerHTML = `
-    <div class="training-header">
-      <span class="text-accent font-bold">${s.day.name}</span>
-      <span class="text-muted text-sm">⏱ ${formatTime(s.sessionTime)}</span>
-      <span class="text-muted text-sm">${s.exIdx+1}/${s.day.exercises.length}</span>
-    </div>
+  return `
     <div class="training-container">
       <div class="exercise-name">${ex.name}</div>
       <div class="exercise-target">目标 ${ex.weight}kg · ${ex.sets}组×${ex.reps}次</div>
@@ -865,11 +1156,67 @@ function renderTrainingUI() {
         <div class="num-display"><div class="small">${s.reps}</div><div class="unit">次</div></div>
         <div class="num-btn" onclick="adjustReps(1)">+</div>
       </div>
-      <div class="set-indicator">第 ${s.set} 组 / 共 ${ex.sets} 组</div>
+      <div class="set-indicator">第 ${s.set} 组 / 共 ${ex.sets} 组 · 动作 ${s.exIdx+1}/${s.day.exercises.length}</div>
       ${recs.length > 0 ? `<div class="set-history">${recs.map(r=>`<span class="set-dot">组${r.set}:${r.w}×${r.r}</span>`).join('')}</div>` : ''}
     </div>
-    <div class="btn btn-accent" style="margin-top:auto" onclick="completeSet()">完成本组</div>
-  `;
+    <div class="btn btn-accent" onclick="completeSet()">完成本组</div>
+    <button class="btn btn-outline mt-3" onclick="setSection('stretch')">跳过剩余，去拉伸</button>`;
+}
+
+function renderStretch() {
+  const s = trainState;
+  const items = todayPlan.stretch;
+  if (!items || items.length === 0) {
+    return `<div class="card"><div class="text-muted text-sm">今日无专项拉伸，可自行放松。</div></div>
+      <button class="btn btn-accent mt-3" onclick="finishTraining()">完成训练</button>`;
+  }
+  return `
+    <div class="card">
+      <div class="section-title">拉伸放松（${s.stretchDone.length}/${items.length}）</div>
+      <div class="guide-list">
+        ${items.map((it,i) => `
+          <div>
+            <div class="guide-check ${s.stretchDone.includes(i)?'on':''}" onclick="toggleGuide('stretch',${i})">✓</div>
+            <div class="guide-info"><div class="guide-name">${it.name}</div>${it.note?`<div class="guide-note">${it.note}</div>`:''}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <button class="btn btn-accent mt-3" onclick="finishTraining()">完成训练</button>`;
+}
+
+function renderNutrition() {
+  const n = todayPlan.nutrition;
+  return `
+    <div class="card">
+      <div class="section-title">今日饮食建议</div>
+      <div class="nutrition-card">${n || 'AI 生成后在此显示今日饮食建议。'}</div>
+    </div>
+    ${isWorkoutDone() ? `<button class="btn btn-accent mt-3" onclick="finishTraining()">完成训练</button>` : ''}`;
+}
+
+function renderTrainingUI() {
+  const s = trainState;
+  const container = document.getElementById('trainingContent');
+  let body = '';
+  if (s.section === 'warmup') body = renderWarmup();
+  else if (s.section === 'workout') body = renderWorkout();
+  else if (s.section === 'stretch') body = renderStretch();
+  else body = renderNutrition();
+  container.innerHTML = `
+    <div class="training-header">
+      <span class="text-accent font-bold">${s.day.name}</span>
+      <span class="text-muted text-sm">⏱ ${formatTime(s.sessionTime)}</span>
+    </div>
+    ${renderSectionTabs()}
+    ${body}`;
+}
+
+function toggleGuide(which, idx) {
+  const list = which === 'warmup' ? trainState.warmupDone : trainState.stretchDone;
+  const pos = list.indexOf(idx);
+  if (pos >= 0) list.splice(pos, 1);
+  else list.push(idx);
+  renderTrainingUI();
 }
 
 function renderRestOverlay() {
@@ -901,7 +1248,7 @@ function renderComplete() {
       <div class="complete-title">${s.day.name} 完成！</div>
       <div class="complete-time">总用时 ${formatTime(s.sessionTime)}</div>
       <div class="card summary-card">${summary}</div>
-      <button class="btn btn-accent" onclick="resetTraining();renderTrainingPage()">继续训练</button>
+      <button class="btn btn-accent" onclick="resetTraining();renderTrainingPage()">再练一次</button>
       <button class="btn btn-outline mt-3" onclick="navigate('home')">返回首页</button>
     </div>
   `;
@@ -909,13 +1256,25 @@ function renderComplete() {
 
 function adjustWeight(delta) {
   trainState.weight = Math.max(0, trainState.weight + delta);
-  renderTrainingUI();
+  renderWorkoutOnly();
+}
+
+function renderWorkoutOnly() {
+  const s = trainState;
+  const ex = s.day.exercises[s.exIdx];
+  const recs = s.records[ex.id] || [];
+  const ui = document.getElementById('trainingContent');
+  ui.querySelector('.exercise-target').textContent = `目标 ${ex.weight}kg · ${ex.sets}组×${ex.reps}次`;
+  ui.querySelector('.num-control .big').textContent = s.weight;
+  ui.querySelector('.set-indicator').textContent = `第 ${s.set} 组 / 共 ${ex.sets} 组 · 动作 ${s.exIdx+1}/${s.day.exercises.length}`;
+  const sh = ui.querySelector('.set-history');
+  if (sh) sh.innerHTML = recs.length > 0 ? recs.map(r=>`<span class="set-dot">组${r.set}:${r.w}×${r.r}</span>`).join('') : '';
 }
 
 // 切换动作（左右滑动）
 function switchExercise(dir) {
   const s = trainState;
-  if (s.complete || s.isResting) return;
+  if (s.complete || s.isResting || s.section !== 'workout') return;
   const total = s.day.exercises.length;
   let idx = s.exIdx + dir;
   if (idx < 0 || idx >= total) return;
@@ -929,7 +1288,7 @@ function switchExercise(dir) {
 
 function adjustReps(delta) {
   trainState.reps = Math.max(0, trainState.reps + delta);
-  renderTrainingUI();
+  renderWorkoutOnly();
 }
 
 function completeSet() {
@@ -950,17 +1309,23 @@ function completeSet() {
     s.isResting = true;
     startRestTimer();
   } else {
-    s.complete = true;
-    if (s.timerInterval) clearInterval(s.timerInterval);
-    saveSession();
-    const todayDate = formatDate(new Date());
-    if (!bodyRecords.find(r => r.date === todayDate)) {
-      bodyRecords.push({ date: todayDate, weight: profile.weight, bodyFat: profile.bodyFat });
-      if (bodyRecords.length > 30) bodyRecords.shift();
-      LS.set('body_records', bodyRecords);
-    }
-    renderComplete();
+    s.section = 'stretch';
+    renderTrainingPage();
   }
+}
+
+function finishTraining() {
+  const s = trainState;
+  s.complete = true;
+  if (s.timerInterval) clearInterval(s.timerInterval);
+  saveSession();
+  const todayDate = formatDate(new Date());
+  if (!bodyRecords.find(r => r.date === todayDate)) {
+    bodyRecords.push({ date: todayDate, weight: profile.weight, bodyFat: profile.bodyFat });
+    if (bodyRecords.length > 30) bodyRecords.shift();
+    LS.set('body_records', bodyRecords);
+  }
+  renderComplete();
 }
 
 function saveSession() {
@@ -968,7 +1333,8 @@ function saveSession() {
   const session = {
     date: getTodayStr(),
     dayName: s.day.name,
-    focusArea: s.day.focus,
+    focusArea: todayPlan.focus,
+    factors: todayPlan.factors,
     duration: s.sessionTime,
     exercises: s.day.exercises.map(ex => {
       const recs = s.records[ex.id] || [];
@@ -981,6 +1347,9 @@ function saveSession() {
   todayIndex = (todayIndex + 1) % plan.days.length;
   LS.set('today_index', todayIndex);
   applyPrevRecords();
+  // 今日计划已完成，清空以便明天重新生成
+  LS.set('today_plan', null);
+  todayPlan = null;
 }
 
 function skipRest() {
