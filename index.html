@@ -55,6 +55,24 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .text-accent{color:var(--accent)}.text-muted{color:var(--muted)}.text-sm{font-size:16px}.text-xs{font-size:14px}
 .font-bold{font-weight:700}.text-center{text-align:center}
 
+/* 训练体系页 */
+.cycle-chain{display:flex;align-items:flex-start;gap:6px;overflow-x:auto;padding:6px 2px}
+.cycle-step{flex:1;min-width:74px;text-align:center;position:relative;padding-top:10px}
+.cycle-step::after{content:'';position:absolute;top:16px;left:50%;width:100%;height:2px;background:var(--border)}
+.cycle-step:last-child::after{display:none}
+.cycle-step .cycle-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:var(--card);margin:0 auto 8px;position:relative;z-index:1}
+.cycle-step.done .cycle-dot{background:var(--accent-light);border-color:var(--accent-light)}
+.cycle-step.active .cycle-dot{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px rgba(255,107,53,.22)}
+.cycle-name{font-size:13px}
+.cycle-step.active .cycle-name{color:var(--accent);font-weight:700}
+.cycle-focus{font-size:11px;color:var(--muted)}.cycle-step.done .cycle-focus{color:var(--muted)}
+.setup-recommend{background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.25);color:var(--text);border-radius:12px;padding:12px 14px;font-size:16px;line-height:1.5}
+.lib-item{padding:11px 0;border-bottom:1px solid var(--border)}
+.lib-item:last-child{border-bottom:none}
+.prog-list{list-style:none;padding:0;margin:0}
+.prog-list li{padding:8px 0 8px 24px;position:relative;font-size:16px;color:var(--text);line-height:1.55}
+.prog-list li::before{content:'✓';position:absolute;left:0;color:var(--accent);font-weight:700}
+
 /* 登录页 */
 .login-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;padding-top:max(32px,env(safe-area-inset-top,32px))}
 .login-overlay.hidden{display:none}
@@ -212,12 +230,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
     <div id="homeContent"></div>
   </div>
 
-  <!-- 计划页 -->
+  <!-- 训练体系页 -->
   <div id="page-plan" class="page">
-    <div id="planHeader"></div>
-    <div class="day-tabs mb-4" id="dayTabs"></div>
-    <div class="card" id="dayDetail"></div>
-    <div class="btn btn-accent mt-4" onclick="navigate('training')">开始今日训练</div>
+    <div id="systemContent"></div>
   </div>
 
   <!-- 训练页 -->
@@ -266,7 +281,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
     </button>
     <button class="nav-item" onclick="navigate('plan')" data-page="plan">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <span>计划</span>
+      <span>训练体系</span>
     </button>
     <button class="nav-item primary" onclick="navigate('training')" data-page="training">
       <div class="nav-btn-circle">
@@ -612,7 +627,6 @@ function switchPlan(templateKey) {
 
 // ============ 导航 ============
 let currentPage = 'home';
-let selectedDayIdx = 0;
 
 function navigate(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -762,12 +776,20 @@ function buildTodayPrompt() {
     '家用徒手':'无器械，主要用自重动作（俯卧撑、引体、深蹲、弓步、核心）'
   }[setupSel.env];
 
+  // 当前分化体系的核心动作库，作为 AI 选动作的取向参考
+  const coreLib = plan.days.map(d =>
+    `${d.name}(${d.focus})主项: ${d.exercises.slice(0,5).map(e=>e.name).join('、')}`
+  ).join('\n');
+
   return `你是一名专业健身教练，为增肌训练者按当天需求生成一次训练课。请结合以下信息，生成包含热身、正式训练、拉伸放松和饮食建议的完整训练方案。
 
 【用户档案】
 - 身高: ${profile.height}cm, 体重: ${profile.weight}kg, 体脂率: ${profile.bodyFat}%
 - 训练经验: ${profile.experience}, 目标: ${profile.goal}
 - 可用器械偏好: ${profile.equipment.join('、')}
+
+【分化训练体系（选动作时优先采用其中主项，再按当天状态补足）】
+${coreLib}
 
 【今日训练安排】
 - 训练部位: ${setupSel.focus}
@@ -912,114 +934,79 @@ function renderHomePage() {
     </div>`;
 }
 
-// ============ 计划页 ============
+// ============ 训练体系页 ============
 function renderPlanPage() {
   if (!currentUser) return;
-  document.getElementById('planHeader').innerHTML = `
-    <div class="row mb-4">
-      <div><h1 class="section-title" style="font-size:24px;margin-bottom:2px">训练计划</h1><p class="text-muted text-sm">${plan.name}</p></div>
-      <button class="btn" style="width:auto;padding:10px 20px;font-size:16px;background:var(--accent);color:#fff;border-radius:12px;min-height:44px" onclick="generatePlan()">AI 调整</button>
-    </div>`;
-  const tabs = document.getElementById('dayTabs');
-  const detail = document.getElementById('dayDetail');
-  tabs.innerHTML = plan.days.map((d,i) =>
-    `<div class="day-tab${i===selectedDayIdx?' active':''}" onclick="selectDay(${i})">第${i+1}天 · ${d.name}</div>`
+  const tmpl = PLAN_TEMPLATES[profile.planTemplate] || PLAN_TEMPLATES['ppl'];
+  const sugg = suggestTodayFocus();
+  const todayDay = plan.days.find(d => d.focus.indexOf(sugg.focus) >= 0) || plan.days[0];
+  const todayIdx = plan.days.indexOf(todayDay);
+
+  // 循环进度链：已练=done，今天该练=active
+  const cycleHtml = plan.days.map((d, i) => {
+    const active = d === todayDay;
+    const done = i < todayIdx;
+    return `
+      <div class="cycle-step ${active?'active':''}${done?' done':''}">
+        <div class="cycle-dot"></div>
+        <div class="cycle-name">${d.name}</div>
+        <div class="cycle-focus">${d.focus}</div>
+      </div>`;
+  }).join('');
+
+  // 分化结构
+  const structTags = plan.days.map(d =>
+    `<span class="tag">${d.name} · ${d.focus}</span>`
   ).join('');
-  renderDayDetail();
-}
 
-function selectDay(i) {
-  selectedDayIdx = i;
-  renderPlanPage();
-}
-
-function renderDayDetail() {
-  const day = plan.days[selectedDayIdx];
-  const detail = document.getElementById('dayDetail');
-  detail.innerHTML = `
-    <div style="padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:0;display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div class="font-bold" style="font-size:17px">${day.name}</div>
-        <div class="text-muted text-sm">${day.focus}</div>
+  // 核心动作库：每个训练类型的主项动作
+  const libHtml = plan.days.map(d => `
+    <div class="lib-item">
+      <div class="font-bold text-sm">${d.name} <span class="text-muted" style="font-weight:400">(${d.focus})</span></div>
+      <div class="exercise-tags" style="margin-top:8px">
+        ${d.exercises.slice(0,5).map(e=>`<span class="tag">${e.name}</span>`).join('')}
       </div>
-      <button onclick="aiAdjustDay()" style="padding:8px 16px;background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:10px;font-size:14px;cursor:pointer;min-height:44px">AI 优化</button>
+    </div>`).join('');
+
+  const container = document.getElementById('systemContent');
+  container.innerHTML = `
+    <div class="row mb-4">
+      <div>
+        <h1 class="section-title" style="font-size:24px;margin-bottom:2px">训练体系</h1>
+        <p class="text-muted text-sm">${tmpl.name} · ${tmpl.cycle}</p>
+      </div>
     </div>
-    <div class="exercise-list">
-      ${day.exercises.map((ex,i) => `
-        <div>
-          <span class="ex-number">${i+1}</span>
-          <div class="ex-info">
-            <div class="ex-name">${ex.name}</div>
-            <div class="ex-target">${ex.sets}组×${ex.reps}次 · ${ex.weight}kg · 休息${ex.rest}s</div>
-          </div>
-          ${ex.prevW!==undefined ? `<div class="ex-prev">上次<br><span class="text-accent">${ex.prevW}kg×${ex.prevR}</span></div>` : ''}
-        </div>
-      `).join('')}
+
+    <div class="card">
+      <div class="card-header"><span class="text-accent text-sm font-bold">当前循环进度</span></div>
+      <div class="cycle-chain">${cycleHtml}</div>
+      <div class="setup-recommend" style="margin-top:14px">💡 ${sugg.reason}</div>
+      <div class="text-muted text-sm" style="margin-top:10px">今天建议练：<span class="text-accent font-bold">${todayDay.name}</span>（${todayDay.focus}）</div>
+      <button class="btn btn-accent mt-3" onclick="navigate('training')">${todayPlan ? '继续今日训练' : '开始今日训练'}</button>
+    </div>
+
+    <div class="card">
+      <div class="section-title">分化结构</div>
+      <div class="flex-gap">${structTags}</div>
+      ${tmpl.desc ? `<div class="text-muted text-sm" style="margin-top:12px">${tmpl.desc}</div>` : ''}
+      <div class="text-muted text-xs" style="margin-top:10px">如需切换分化方式，请到「我的」页面设置</div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">核心动作库</div>
+      <div class="text-muted text-sm" style="margin-bottom:12px">AI 生成当天计划时会优先采用这些主项，再按当天状态补足</div>
+      ${libHtml}
+    </div>
+
+    <div class="card">
+      <div class="section-title">渐进策略</div>
+      <ul class="prog-list">
+        <li>每个训练日动作数量 8-15 个，时间紧张时适当减少，时间充足时增多组数。</li>
+        <li>重量结合你上次表现、当天身体状态与动作难度综合判断，不强制递增。</li>
+        <li>复合动作优先靠前；推/拉日适度补足肩、二头、三头，保证各部位训练量均衡。</li>
+        <li>单次训练总时长控制在 60-90 分钟，含热身、正式训练与拉伸放松。</li>
+      </ul>
     </div>`;
-}
-
-async function aiAdjustDay() {
-  const apiKey = getGlobalApiKey();
-  if (!apiKey) { alert('请先在「我的」页面设置 DeepSeek API Key'); return; }
-  const day = plan.days[selectedDayIdx];
-  const recentForDay = sessions.filter(s => s.dayName === day.name).slice(0, 3);
-  const recentStr = recentForDay.map(s => {
-    return s.exercises.map(e => {
-      const maxW = Math.max(...e.sets.map(st => st.w));
-      return `${e.name}(${maxW}kg)`;
-    }).join(', ');
-  }).join('\n');
-
-  const prompt = `你是专业健身教练。请根据以下信息优化【${day.name}】这一天的训练内容：
-
-【当前训练日】
-${day.name} - ${day.focus}
-${day.exercises.map(e => `${e.name}: ${e.sets}组×${e.reps}次, ${e.weight}kg, 休息${e.rest}s`).join('\n')}
-
-【该训练日最近记录】
-${recentStr || '无记录'}
-
-【用户档案】
-体重: ${profile.weight}kg, 体脂: ${profile.bodyFat}%, 目标: ${profile.goal}, 经验: ${profile.experience}
-
-【训练要求】
-- 复合动作优先
-- 若该日为推日或拉日，适度穿插补足肩部、二头、三头的辅助训练，保证相关部位训练量均衡
-- 每组总时长控制在 60-90 分钟，动作多时相应减少每动作组数
-
-【输出要求】只输出 JSON：
-{
-  "name": "${day.name}",
-  "focus": "训练部位",
-  "exercises": [
-    {"name": "动作", "sets": 组数, "reps": 次数, "weight": 建议重量, "rest": 休息秒}
-  ]
-}
-要求：动作数量 8-15 个；重量应结合用户能力、上次训练表现、动作难度与恢复情况综合判断给出合理值，不必强行递增，只输出 JSON`;
-
-  const result = await aiCall(prompt);
-  if (!result) return;
-  try {
-    const jsonStr = result.replace(/```json\s*|\s*```/g, '').trim();
-    const newDay = JSON.parse(jsonStr);
-    if (!newDay.exercises || !Array.isArray(newDay.exercises)) throw new Error('格式错误');
-    plan.days[selectedDayIdx] = {
-      ...plan.days[selectedDayIdx],
-      name: newDay.name || day.name,
-      focus: newDay.focus || day.focus,
-      exercises: newDay.exercises.map((ex, i) => ({
-        id: 'adj-' + selectedDayIdx + '-' + i,
-        name: ex.name, sets: ex.sets, reps: ex.reps,
-        weight: ex.weight || 0, rest: ex.rest || 90,
-        sortOrder: i
-      }))
-    };
-    LS.set('plan', plan);
-    applyPrevRecords();
-    renderPlanPage();
-  } catch(e) {
-    alert('AI 返回格式解析失败: ' + e.message);
-  }
 }
 
 // ============ 训练页（动态四板块：热身/正式/拉伸/饮食）============
@@ -1689,95 +1676,6 @@ async function aiCall(prompt) {
     const data = await res.json();
     return data.choices[0].message.content;
   } catch(e) { alert('网络错误: ' + e.message); return null; }
-}
-
-function buildAiPrompt() {
-  const recent = sessions.slice(0, 6).map(s => {
-    const exSummary = s.exercises.map(e => {
-      const maxW = Math.max(...e.sets.map(st => st.w));
-      return `${e.name}(${maxW}kg)`;
-    }).join('、');
-    return `${s.date} ${s.dayName}: ${exSummary}`;
-  }).join('\n');
-
-  return `你是一个专业的健身教练，专门为增肌训练者设计训练计划。请根据以下信息生成训练计划：
-
-【用户档案】
-- 身高: ${profile.height}cm, 体重: ${profile.weight}kg, 体脂率: ${profile.bodyFat}%
-- 训练经验: ${profile.experience}, 目标: ${profile.goal}
-- 每周训练天数: ${profile.trainingDays}天
-- 可用器械: ${profile.equipment.join('、')}
-- 当前分化方式: ${plan.name}
-
-【分化说明】
-当前采用 ${plan.name}。在推拉两个训练日中，需要在训练主肌群的同时，适度穿插补足肩部、二头、三头的训练，避免对薄弱部位（特别是肩、二头、三头）训练不足，使各部位训练量均衡合理。
-
-【最近训练记录】
-${recent || '尚无训练记录'}
-
-【输出要求】
-请生成一个调整后的训练计划，输出严格按以下 JSON 格式（不要包含任何其他文字）：
-
-{
-  "name": "计划名称",
-  "cycle": "循环说明",
-  "days": [
-    {
-      "name": "训练日名称",
-      "focus": "训练部位",
-      "exercises": [
-        {"name": "动作名称", "sets": 组数, "reps": 次数, "weight": 建议重量kg, "rest": 休息秒数}
-      ]
-    }
-  ]
-}
-
-要求：
-1. 计划天数与用户每周训练天数匹配
-2. 每个训练日动作数量控制在 8-15 个
-3. 每课总时长控制在合理范围（约 60-90 分钟），动作多时相应减少每动作的组数
-4. 复合动作(深蹲/卧推/硬拉/推举/划船)优先排在前面
-5. 重量建议基于用户上次训练记录综合判断，结合训练表现、动作难度与恢复情况给出合理重量，可不做递增；对上次未练到的动作按用户能力估算
-6. 增肌目标：大重量复合动作 5-8 次/组，中重量动作 8-12 次/组，孤立与辅助动作 10-15 次/组
-7. 在推、拉训练日中合理安排肩部、二头、三头等辅助训练动作，保证各部位训练量充足
-8. 动作名称用中文
-9. 只输出 JSON，不要有任何解释文字`;
-}
-
-async function generatePlan() {
-  const btn = event.target;
-  const apiKey = getGlobalApiKey();
-  if (!apiKey) { alert('请先在「我的」页面设置 DeepSeek API Key'); return; }
-  btn.textContent = 'AI 生成中...';
-  btn.disabled = true;
-  const prompt = buildAiPrompt();
-  const result = await aiCall(prompt);
-  if (!result) { btn.textContent = 'AI 调整'; btn.disabled = false; return; }
-  try {
-    const jsonStr = result.replace(/```json\s*|\s*```/g, '').trim();
-    const newPlan = JSON.parse(jsonStr);
-    if (!newPlan.days || !Array.isArray(newPlan.days)) throw new Error('格式错误');
-    let eid = 1;
-    newPlan.days.forEach((d, di) => {
-      d.id = 'ai-' + di;
-      d.exercises.forEach(ex => { ex.id = 'ai-e' + (eid++); ex.prevW = null; ex.prevR = null; });
-    });
-    plan = newPlan;
-    LS.set('plan', plan);
-    todayIndex = 0;
-    LS.set('today_index', 0);
-    applyPrevRecords();
-    resetTraining();
-    selectedDayIdx = 0;
-    renderPlanPage();
-    renderHomePage();
-    btn.textContent = 'AI 调整';
-    btn.disabled = false;
-  } catch(e) {
-    alert('AI 返回格式解析失败，请重试。错误: ' + e.message);
-    btn.textContent = 'AI 调整';
-    btn.disabled = false;
-  }
 }
 
 // ============ 训练页滑动切换 ============
