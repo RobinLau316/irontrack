@@ -156,6 +156,10 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .user-section .user-name{font-size:18px;font-weight:600}
 .user-section .user-action{font-size:14px;color:var(--accent);cursor:pointer;padding:8px 14px;border-radius:10px;border:1px solid var(--accent);background:transparent;min-height:44px;display:flex;align-items:center}
 
+/* 器械选择 */
+.eq-chip{display:inline-block;padding:10px 18px;border-radius:24px;background:var(--bg);border:1px solid var(--border);color:var(--muted);font-size:15px;cursor:pointer;transition:all .2s;min-height:44px;display:flex;align-items:center}
+.eq-chip.eq-on{background:rgba(255,107,53,.15);border-color:var(--accent);color:var(--accent);font-weight:600}
+
 /* API Key 状态 */
 .api-status{display:inline-flex;align-items:center;gap:6px;font-size:14px;padding:6px 12px;border-radius:20px}
 .api-status.set{background:rgba(42,157,143,.15);color:#2a9d8f}
@@ -201,6 +205,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
     <div class="tab-bar mb-4">
       <button class="tab-btn active" onclick="switchDataTab('weight',this)">体重趋势</button>
       <button class="tab-btn" onclick="switchDataTab('strength',this)">力量增长</button>
+      <button class="tab-btn" onclick="switchDataTab('measure',this)">围度变化</button>
     </div>
     <div class="card" id="dataChart"></div>
     <div class="card mt-3">
@@ -306,7 +311,8 @@ const LS = {
 const DEFAULT_PROFILE = {
   height: 178, weight: 78.5, bodyFat: 18, trainingDays: 4, experience: '有一定基础', goal: '增肌塑形',
   equipment: ['杠铃','哑铃','卧推架','深蹲架','绳索机','蝴蝶机','腿举机'],
-  planTemplate: 'ppl'
+  planTemplate: 'ppl',
+  chest: 0, waist: 0, arm: 0, thigh: 0
 };
 
 const DEFAULT_PLAN = {
@@ -417,8 +423,10 @@ const knowledge = [
   {icon:"🔓",title:"平台期突破策略",desc:"当力量不再增长时该怎么办"}
 ];
 
+const EQUIPMENT_OPTIONS = ['杠铃','哑铃','卧推架','深蹲架','史密斯机','腿举机','高位下拉','绳索机','蝴蝶机','划船机','推肩器','腿弯举','腿屈伸','跑步机','椭圆机','龙门架','引体架','壶铃'];
+
 // ============ 全局变量（登录后初始化）============
-let profile, plan, sessions, bodyRecords, todayIndex;
+let profile, plan, sessions, bodyRecords, measurements, todayIndex;
 
 function initUserData() {
   profile = LS.get('profile', JSON.parse(JSON.stringify(DEFAULT_PROFILE)));
@@ -434,6 +442,7 @@ function initUserData() {
 
   sessions = LS.get('sessions', []);
   bodyRecords = LS.get('body_records', []);
+  measurements = LS.get('measurements', []);
   todayIndex = LS.get('today_index', 0);
 
   if (bodyRecords.length === 0 && profile.weight) {
@@ -590,6 +599,22 @@ function navigate(page) {
   window.scrollTo(0, 0);
 }
 
+// ============ 上次训练摘要 ============
+function getLastSessionSummary() {
+  if (sessions.length === 0) return null;
+  const s = sessions[0];
+  const totalSets = s.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
+  const totalVol = s.exercises.reduce((sum, ex) => sum + ex.sets.reduce((ss, st) => ss + st.w*st.r, 0), 0);
+  const dur = s.duration || 0;
+  return {
+    dayName: s.dayName,
+    date: s.date,
+    totalSets: totalSets,
+    totalVol: totalVol,
+    duration: formatTime(dur)
+  };
+}
+
 // ============ 首页 ============
 function renderHomePage() {
   if (!currentUser) return;
@@ -597,6 +622,9 @@ function renderHomePage() {
   const weekSessions = getWeekSessions();
   const weekDone = weekSessions.length;
   const streak = getStreak();
+  const lastS = getLastSessionSummary();
+  const weekTarget = Math.max(1, profile.trainingDays);
+  const weekPct = Math.min(100, Math.round(weekDone / weekTarget * 100));
   const container = document.getElementById('homeContent');
   container.innerHTML = `
     <div class="greeting">
@@ -616,6 +644,25 @@ function renderHomePage() {
         ${today.exercises.length>4?`<span class="tag">+${today.exercises.length-4}</span>`:''}
       </div>
       <div class="btn btn-accent mt-3">开始训练</div>
+    </div>
+    <div class="card" style="cursor:pointer" onclick="navigate('data')">
+      <div class="row mb-3">
+        <span class="section-title" style="margin-bottom:0">本周进度</span>
+        <span class="text-accent font-bold" style="font-size:18px">${weekPct}%</span>
+      </div>
+      <div class="progress-bar" style="height:14px"><div class="progress-fill" style="width:${weekPct}%;background:var(--accent)"></div></div>
+      <div class="text-sm text-muted mb-3" style="margin-top:8px">已完成 ${weekDone}/${weekTarget} 次训练</div>
+      ${lastS ? `
+      <div class="last-session" style="border-top:1px solid var(--border);padding-top:14px">
+        <div class="text-muted text-sm mb-2">上次训练 · ${lastS.date}</div>
+        <div class="stat-grid-2">
+          <div class="stat-item-2"><div class="val">${lastS.dayName}</div><div class="lbl">训练课</div></div>
+          <div class="stat-item-2"><div class="val">${lastS.totalVol.toLocaleString()}</div><div class="lbl">总容量 kg</div></div>
+          <div class="stat-item-2"><div class="val">${lastS.totalSets}</div><div class="lbl">总组数</div></div>
+          <div class="stat-item-2"><div class="val">${lastS.duration}</div><div class="lbl">时长</div></div>
+        </div>
+      </div>` : `
+      <div class="text-muted text-sm" style="padding-top:8px">完成第一次训练后，这里会显示上次训练总结</div>`}
     </div>
     <div class="stat-grid">
       <div class="stat-item"><div class="stat-value">${weekDone}/${profile.trainingDays}</div><div class="stat-label">本周训练</div></div>
@@ -860,6 +907,21 @@ function adjustWeight(delta) {
   renderTrainingUI();
 }
 
+// 切换动作（左右滑动）
+function switchExercise(dir) {
+  const s = trainState;
+  if (s.complete || s.isResting) return;
+  const total = s.day.exercises.length;
+  let idx = s.exIdx + dir;
+  if (idx < 0 || idx >= total) return;
+  s.exIdx = idx;
+  s.set = 1;
+  const next = s.day.exercises[idx];
+  s.weight = next.weight;
+  s.reps = next.reps;
+  renderTrainingUI();
+}
+
 function adjustReps(delta) {
   trainState.reps = Math.max(0, trainState.reps + delta);
   renderTrainingUI();
@@ -966,6 +1028,37 @@ function renderDataChart(tab) {
         <span>当前 ${last}kg</span>
       </div>`;
     }
+  } else if (tab === 'measure') {
+    if (!measurements || measurements.length === 0) {
+      container.innerHTML = '<div class="text-center text-muted text-sm" style="padding:40px">暂无围度记录<br>在「我的」页面填写围度后自动记录</div>';
+      return;
+    }
+    const fields = [
+      { key: 'chest', label: '胸围' },
+      { key: 'waist', label: '腰围' },
+      { key: 'arm', label: '上臂围' },
+      { key: 'thigh', label: '大腿围' }
+    ];
+    const colors = ['var(--accent)','#f4a261','#2a9d8f','#e76f51'];
+    let html = `<div class="row mb-4"><div class="font-bold text-sm">围度变化趋势</div><div class="flex-gap text-xs">${fields.map((f,i)=>`<span><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${colors[i]};vertical-align:middle;margin-right:3px"></span>${f.label}</span>`).join('')}</div></div>`;
+    fields.forEach((f, i) => {
+      const recs = measurements.filter(r => r[f.key] > 0);
+      if (recs.length === 0) return;
+      const first = recs[0][f.key];
+      const last = recs[recs.length-1][f.key];
+      const diff = (last - first);
+      const arrow = diff > 0 ? '↑' : diff < 0 ? '↓' : '→';
+      html += `<div style="margin-bottom:16px">
+        <div class="row text-xs text-muted mb-1"><span>${f.label}</span><span style="color:${colors[i]}">${first} → ${last}cm ${arrow} ${Math.abs(diff).toFixed(1)}</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:100%;background:${colors[i]};opacity:.35"></div></div>
+        <div class="text-xs text-muted mt-1" style="font-size:12px">最近记录 ${recs[recs.length-1].date}</div>
+      </div>`;
+    });
+    if (html.indexOf('progress-bar') === -1) {
+      container.innerHTML = '<div class="text-center text-muted text-sm" style="padding:40px">暂无围度记录<br>在「我的」页面填写围度后自动记录</div>';
+      return;
+    }
+    container.innerHTML = html;
   } else {
     const allEx = {};
     sessions.forEach(s => {
@@ -1005,11 +1098,18 @@ function updateWeekStats() {
   const totalTime = ws.reduce((s, sess) => s + (sess.duration||0), 0);
   const statsEl = document.getElementById('weekStats');
   if (statsEl) {
+    const target = Math.max(1, profile.trainingDays);
+    const pct = Math.min(100, Math.round(ws.length / target * 100));
     statsEl.innerHTML = `
       <div class="stat-item-2"><div class="val">${ws.length}</div><div class="lbl">完成训练</div></div>
       <div class="stat-item-2"><div class="val">${totalSets}</div><div class="lbl">总组数</div></div>
       <div class="stat-item-2"><div class="val">${totalVol.toLocaleString()}</div><div class="lbl">总容量 kg</div></div>
-      <div class="stat-item-2"><div class="val">${(totalTime/3600).toFixed(1)}h</div><div class="lbl">总时长</div></div>`;
+      <div class="stat-item-2"><div class="val">${(totalTime/3600).toFixed(1)}h</div><div class="lbl">总时长</div></div>
+      <div class="stat-item-2" style="grid-column:1/-1;text-align:left">
+        <div class="row mb-1"><span class="lbl" style="font-size:14px">本周完成率</span><span class="font-bold text-accent" style="font-size:18px">${pct}%</span></div>
+        <div class="progress-bar" style="height:10px"><div class="progress-fill" style="width:${pct}%;background:var(--accent)"></div></div>
+        <div class="lbl" style="font-size:12px;margin-top:4px">目标 ${target} 次/周 · 已完成 ${ws.length} 次</div>
+      </div>`;
   }
 }
 
@@ -1054,6 +1154,15 @@ function renderProfileContent(tab) {
           <div class="field-group"><span class="field-label">每周训练天数</span><input class="field-value" id="pf-days" type="number" min="1" max="7" value="${profile.trainingDays}" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);font-size:17px"></div>
         </div>
       </div>
+      <div class="card"><div class="section-title">身体围度 (cm)</div>
+        <div class="grid-2">
+          <div class="field-group"><span class="field-label">胸围</span><input class="field-value" id="pf-chest" type="number" step="0.1" value="${profile.chest||0}" placeholder="0" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);font-size:17px"></div>
+          <div class="field-group"><span class="field-label">腰围</span><input class="field-value" id="pf-waist" type="number" step="0.1" value="${profile.waist||0}" placeholder="0" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);font-size:17px"></div>
+          <div class="field-group"><span class="field-label">上臂围</span><input class="field-value" id="pf-arm" type="number" step="0.1" value="${profile.arm||0}" placeholder="0" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);font-size:17px"></div>
+          <div class="field-group"><span class="field-label">大腿围</span><input class="field-value" id="pf-thigh" type="number" step="0.1" value="${profile.thigh||0}" placeholder="0" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);font-size:17px"></div>
+        </div>
+        <div class="text-xs text-muted mt-2">保存后可在「数据追踪」查看围度变化趋势</div>
+      </div>
       <div class="card"><div class="section-title">训练偏好</div>
         <div class="field-group"><span class="field-label">训练目标</span>
           <select class="field-value" id="pf-goal" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);appearance:none;font-size:17px">
@@ -1080,6 +1189,18 @@ function renderProfileContent(tab) {
         </div>
         <div class="text-xs text-muted mt-2">切换模板会重置训练计划，但保留历史训练记录</div>
       </div>
+      <div class="card"><div class="section-title">可用器械</div>
+        <div class="text-xs text-muted mb-3">勾选你健身房可用的器械，AI 生成计划时会参考</div>
+        <div class="flex-gap" id="pf-equipment">
+          ${EQUIPMENT_OPTIONS.map(opt => `
+            <span data-eq="${opt}" class="eq-chip ${profile.equipment.includes(opt)?'eq-on':''}" onclick="toggleEquipment('${opt}')">${opt}</span>
+          `).join('')}
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <input class="field-value" id="pf-eq-new" type="text" placeholder="添加自定义器械" style="flex:1;border:none;outline:none;color:var(--text);background:var(--bg);font-size:16px">
+          <button onclick="addEquipment()" style="padding:8px 18px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:15px;cursor:pointer;min-height:44px;white-space:nowrap">添加</button>
+        </div>
+      </div>
       <div class="card"><div class="section-title">AI 设置</div>
         <div class="field-group"><span class="field-label">DeepSeek API Key（所有用户共享）</span>
           <div style="display:flex;gap:8px">
@@ -1102,6 +1223,31 @@ function renderProfileContent(tab) {
   }
 }
 
+function toggleEquipment(name) {
+  if (!profile.equipment) profile.equipment = [];
+  const idx = profile.equipment.indexOf(name);
+  if (idx >= 0) profile.equipment.splice(idx, 1);
+  else profile.equipment.push(name);
+  // 更新 UI 选中态
+  const chip = document.querySelector('[data-eq="' + name + '"]');
+  if (chip) chip.classList.toggle('eq-on');
+}
+
+function addEquipment() {
+  const input = document.getElementById('pf-eq-new');
+  const name = input.value.trim();
+  if (!name) return;
+  if (!EQUIPMENT_OPTIONS.includes(name)) EQUIPMENT_OPTIONS.push(name);
+  if (!profile.equipment) profile.equipment = [];
+  if (!profile.equipment.includes(name)) profile.equipment.push(name);
+  input.value = '';
+  // 重新渲染器械卡片
+  const eqEl = document.getElementById('pf-equipment');
+  eqEl.innerHTML = EQUIPMENT_OPTIONS.map(opt => `
+    <span data-eq="${opt}" class="eq-chip ${profile.equipment.includes(opt)?'eq-on':''}" onclick="toggleEquipment('${opt}')">${opt}</span>
+  `).join('');
+}
+
 function saveProfile() {
   profile.height = parseFloat(document.getElementById('pf-height').value) || profile.height;
   profile.weight = parseFloat(document.getElementById('pf-weight').value) || profile.weight;
@@ -1109,6 +1255,29 @@ function saveProfile() {
   profile.trainingDays = parseInt(document.getElementById('pf-days').value) || profile.trainingDays;
   profile.goal = document.getElementById('pf-goal').value;
   profile.experience = document.getElementById('pf-exp').value;
+
+  // 保存围度记录（仅在非空时记录，用于趋势追踪）
+  const chest = parseFloat(document.getElementById('pf-chest').value);
+  const waist = parseFloat(document.getElementById('pf-waist').value);
+  const arm = parseFloat(document.getElementById('pf-arm').value);
+  const thigh = parseFloat(document.getElementById('pf-thigh').value);
+  if (!isNaN(chest)) profile.chest = chest;
+  if (!isNaN(waist)) profile.waist = waist;
+  if (!isNaN(arm)) profile.arm = arm;
+  if (!isNaN(thigh)) profile.thigh = thigh;
+  if (chest > 0 || waist > 0 || arm > 0 || thigh > 0) {
+    var now = new Date();
+    var rec = { date: now.getFullYear()+'-'+(now.getMonth()+1).toString().padStart(2,'0')+'-'+now.getDate().toString().padStart(2,'0') };
+    if (chest > 0) rec.chest = chest;
+    if (waist > 0) rec.waist = waist;
+    if (arm > 0) rec.arm = arm;
+    if (thigh > 0) rec.thigh = thigh;
+    var mrecs = LS.get('measurements', []);
+    mrecs.push(rec);
+    if (mrecs.length > 200) mrecs = mrecs.slice(-200);
+    LS.set('measurements', mrecs);
+  }
+
   LS.set('profile', profile);
 
   // API Key 保存到全局
@@ -1240,6 +1409,21 @@ async function generatePlan() {
     btn.disabled = false;
   }
 }
+
+// ============ 训练页滑动切换 ============
+let touchStartX = 0, touchStartY = 0;
+document.getElementById('page-training').addEventListener('touchstart', function(e) {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+document.getElementById('page-training').addEventListener('touchend', function(e) {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    if (dx < 0) switchExercise(1);   // 左滑 -> 下一个动作
+    else switchExercise(-1);         // 右滑 -> 上一个动作
+  }
+}, { passive: true });
 
 // ============ 初始化 ============
 // 显示登录页面
