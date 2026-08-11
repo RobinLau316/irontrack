@@ -1244,6 +1244,8 @@ function renderWorkoutOnly() {
   const ui = document.getElementById('trainingContent');
   ui.querySelector('.exercise-target').textContent = `目标 ${ex.weight}kg · ${ex.sets}组×${ex.reps}次`;
   ui.querySelector('.num-control .big').textContent = s.weight;
+  const small = ui.querySelector('.num-control .small');
+  if (small) small.textContent = s.reps;
   ui.querySelector('.set-indicator').textContent = `第 ${s.set} 组 / 共 ${ex.sets} 组 · 动作 ${s.exIdx+1}/${s.day.exercises.length}`;
   const sh = ui.querySelector('.set-history');
   if (sh) sh.innerHTML = recs.length > 0 ? recs.map(r=>`<span class="set-dot">组${r.set}:${r.w}×${r.r}</span>`).join('') : '';
