@@ -170,6 +170,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .setup-subtitle{font-size:16px;color:var(--muted);margin-bottom:22px}
 .setup-group{margin-bottom:20px}
 .setup-label{font-size:15px;color:var(--muted);margin-bottom:10px;display:block}
+.setup-recommend{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);color:var(--accent);border-radius:12px;padding:10px 12px;font-size:15px;margin-bottom:10px;line-height:1.5}
 .opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .opt-chip{padding:14px 10px;border-radius:14px;background:var(--bg);border:2px solid var(--border);color:var(--text);font-size:16px;text-align:center;cursor:pointer;transition:all .2s;min-height:52px;display:flex;align-items:center;justify-content:center}
 .opt-chip.sel{border-color:var(--accent);background:rgba(255,107,53,.12);color:var(--accent);font-weight:700}
@@ -655,11 +656,11 @@ function enterTraining() {
 function renderTrainingSetup() {
   if (!currentUser) return;
   setupSel = { focus:'', state:'', time:'', env:'' };
-  // 推荐今日部位（基于连贯性：从未练过的或上次间隔最久的）
+  // 按分化方式 + 最近记录自动推荐今天该练的部位
   const suggested = suggestTodayFocus();
-  setupSel.focus = suggested;
+  setupSel.focus = suggested.focus;
   const focusChips = FOCUS_OPTIONS.map(f =>
-    `<div class="opt-chip ${f===suggested?'sel':''}" onclick="pickFocus('${f}')">${f}</div>`
+    `<div class="opt-chip ${f===suggested.focus?'sel':''}" onclick="pickFocus('${f}')">${f}</div>`
   ).join('');
   const stateChips = STATE_OPTIONS.map(o => `<div class="opt-chip" onclick="setState('${o.k}')"><span class="opt-emoji">${o.e}</span><span class="opt-text">${o.k}</span></div>`).join('');
   const timeChips = TIME_OPTIONS.map(o => `<div class="opt-chip" onclick="setTime('${o.k}')"><span class="opt-emoji">${o.e}</span><span class="opt-text">${o.k}</span></div>`).join('');
@@ -674,7 +675,8 @@ function renderTrainingSetup() {
       <div class="setup-title">开始今天的训练</div>
       <div class="setup-subtitle">告诉我你今天的状况，为你生成个性化计划</div>
       <div class="setup-group">
-        <span class="setup-label">今日想练的部位</span>
+        <span class="setup-label">今日想练的部位（已自动推荐）</span>
+        <div class="setup-recommend">💡 ${suggested.reason}</div>
         <div class="opt-grid" id="setupFocus" style="grid-template-columns:repeat(3,1fr)">${focusChips}</div>
       </div>
       <div class="setup-group">
@@ -708,15 +710,21 @@ function markSel(id) {
 }
 
 function suggestTodayFocus() {
-  // 优先考虑未在最近训练中覆盖的部位，保证连贯性
-  const recent = sessions.slice(0, 4);
-  const recentText = recent.map(s => s.focusArea || s.dayName).join('');
-  const focusMap = { '胸':'胸','肩':'肩','三头':'手臂','背':'背','二头':'手臂','腿':'腿','腹部':'核心' };
-  const covered = new Set();
-  recentText.split('+').forEach(p => p.trim() && covered.add(p.trim()));
-  // 简单启发：若最近练过手臂/肩，则优先推其他，否则按套餐顺序
-  const order = ['胸','背','腿','肩','手臂','全身'];
-  return order[0];
+  // 基于用户的分化方式 + 最近训练记录，自动推荐今天该练的部位（保持循环连贯）
+  const last = sessions[0];
+  const tmpl = (profile.planTemplate) || 'ppl';
+  const cycleName = PLAN_TEMPLATES[tmpl] ? PLAN_TEMPLATES[tmpl].name : 'PPL 推拉腿三分化';
+  let focus = '胸';
+  let reason = '你是首次训练，按「'+cycleName+'」建议从推日（胸、肩、三头）开始';
+  if (last && last.focusArea) {
+    const f = last.focusArea;
+    if (f.indexOf('胸') >= 0 || f.indexOf('肩') >= 0) { focus = '背'; reason = '上次是推日，按「'+cycleName+'」循环建议今天练拉日（背、二头）'; }
+    else if (f.indexOf('背') >= 0) { focus = '腿'; reason = '上次是拉日，按「'+cycleName+'」循环建议今天练腿日（腿、腹部）'; }
+    else if (f.indexOf('腿') >= 0) { focus = '胸'; reason = '上次是腿日，按「'+cycleName+'」循环建议今天练推日（胸、肩、三头）'; }
+    else if (f.indexOf('手臂') >= 0) { focus = '胸'; reason = '上次练了手臂，建议今天练推日（胸、肩）均衡各部位'; }
+    else { focus = '胸'; reason = '按「'+cycleName+'」循环建议今天从推日（胸、肩、三头）开始'; }
+  }
+  return { focus: focus, reason: reason };
 }
 
 async function confirmSetup() {
