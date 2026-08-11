@@ -165,13 +165,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .api-status.set{background:rgba(42,157,143,.15);color:#2a9d8f}
 .api-status.unset{background:rgba(244,162,97,.15);color:#f4a261}
 
-/* 训练前设置弹窗 */
-.setup-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:90;background:rgba(10,10,20,.72);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:0}
-.setup-overlay.hidden{display:none}
-.setup-sheet{background:var(--card);width:100%;max-width:430px;border-radius:24px 24px 0 0;padding:26px 22px 34px;max-height:92vh;overflow-y:auto;animation:slideUp .3s ease}
-@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
-.setup-title{font-size:22px;font-weight:700;text-align:center;margin-bottom:4px}
-.setup-subtitle{font-size:15px;color:var(--muted);text-align:center;margin-bottom:22px}
+/* 训练前设置（内嵌引导） */
+.setup-title{font-size:24px;font-weight:700;margin-bottom:4px}
+.setup-subtitle{font-size:16px;color:var(--muted);margin-bottom:22px}
 .setup-group{margin-bottom:20px}
 .setup-label{font-size:15px;color:var(--muted);margin-bottom:10px;display:block}
 .opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -207,33 +203,6 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   <div id="existingUsers" style="width:100%;max-width:300px"></div>
   <input class="login-input" id="loginInput" type="text" placeholder="输入你的名字" maxlength="12" autocomplete="off">
   <button class="btn btn-accent" style="max-width:300px" onclick="doLogin()">进入</button>
-</div>
-
-<!-- 训练前设置弹窗 -->
-<div id="setupOverlay" class="setup-overlay hidden">
-  <div class="setup-sheet">
-    <div class="setup-title">开始今天的训练</div>
-    <div class="setup-subtitle">告诉我你今天的状况，为你生成个性化计划</div>
-    <div class="setup-group">
-      <span class="setup-label">今日想练的部位</span>
-      <div class="opt-grid" id="setupFocus"></div>
-    </div>
-    <div class="setup-group">
-      <span class="setup-label">身体状态</span>
-      <div class="opt-grid" id="setupState"></div>
-    </div>
-    <div class="setup-group">
-      <span class="setup-label">可用时间</span>
-      <div class="opt-grid" id="setupTime"></div>
-    </div>
-    <div class="setup-group">
-      <span class="setup-label">训练环境</span>
-      <div class="opt-grid" id="setupEnv"></div>
-    </div>
-    <div id="setupMsg" class="text-center text-muted text-sm" style="margin-bottom:14px"></div>
-    <button class="btn btn-accent" onclick="confirmSetup()">生成今日计划</button>
-    <button class="btn btn-outline mt-3" onclick="closeSetup()">取消</button>
-  </div>
 </div>
 
 <div id="app">
@@ -680,29 +649,49 @@ function enterTraining() {
     renderTrainingPage();
     return;
   }
-  showTrainingSetup();
+  renderTrainingSetup();
 }
 
-function showTrainingSetup() {
+function renderTrainingSetup() {
   if (!currentUser) return;
   setupSel = { focus:'', state:'', time:'', env:'' };
   // 推荐今日部位（基于连贯性：从未练过的或上次间隔最久的）
   const suggested = suggestTodayFocus();
   setupSel.focus = suggested;
-  const focusEl = document.getElementById('setupFocus');
-  focusEl.innerHTML = FOCUS_OPTIONS.map(f =>
+  const focusChips = FOCUS_OPTIONS.map(f =>
     `<div class="opt-chip ${f===suggested?'sel':''}" onclick="pickFocus('${f}')">${f}</div>`
   ).join('');
-  renderState('state', STATE_OPTIONS, 'setState');
-  renderState('time', TIME_OPTIONS, 'setTime');
-  renderState('env', ENV_OPTIONS, 'setEnv');
-  document.getElementById('setupMsg').textContent = '';
-  document.getElementById('setupOverlay').classList.remove('hidden');
-}
-
-function renderState(id, options, fn) {
-  document.getElementById('setup'+id.charAt(0).toUpperCase()+id.slice(1)).innerHTML =
-    options.map(o => `<div class="opt-chip" onclick="${fn}('${o.k}')"><span class="opt-emoji">${o.e}</span><span class="opt-text">${o.k}</span></div>`).join('');
+  const stateChips = STATE_OPTIONS.map(o => `<div class="opt-chip" onclick="setState('${o.k}')"><span class="opt-emoji">${o.e}</span><span class="opt-text">${o.k}</span></div>`).join('');
+  const timeChips = TIME_OPTIONS.map(o => `<div class="opt-chip" onclick="setTime('${o.k}')"><span class="opt-emoji">${o.e}</span><span class="opt-text">${o.k}</span></div>`).join('');
+  const envChips = ENV_OPTIONS.map(o => `<div class="opt-chip" onclick="setEnv('${o.k}')"><span class="opt-emoji">${o.e}</span><span class="opt-text">${o.k}</span></div>`).join('');
+  const container = document.getElementById('trainingContent');
+  container.innerHTML = `
+    <div class="training-header">
+      <span class="text-accent font-bold">训练</span>
+      <span class="text-muted text-sm">${formatTime(trainState.sessionTime||0)}</span>
+    </div>
+    <div class="card">
+      <div class="setup-title">开始今天的训练</div>
+      <div class="setup-subtitle">告诉我你今天的状况，为你生成个性化计划</div>
+      <div class="setup-group">
+        <span class="setup-label">今日想练的部位</span>
+        <div class="opt-grid" id="setupFocus" style="grid-template-columns:repeat(3,1fr)">${focusChips}</div>
+      </div>
+      <div class="setup-group">
+        <span class="setup-label">身体状态</span>
+        <div class="opt-grid" id="setupState">${stateChips}</div>
+      </div>
+      <div class="setup-group">
+        <span class="setup-label">可用时间</span>
+        <div class="opt-grid" id="setupTime">${timeChips}</div>
+      </div>
+      <div class="setup-group">
+        <span class="setup-label">训练环境</span>
+        <div class="opt-grid" id="setupEnv">${envChips}</div>
+      </div>
+      <div id="setupMsg" class="text-center text-muted text-sm" style="margin-bottom:14px"></div>
+      <button class="btn btn-accent" onclick="confirmSetup()">生成今日计划</button>
+    </div>`;
 }
 
 function pickFocus(f) { setupSel.focus = f; document.querySelectorAll('#setupFocus .opt-chip').forEach(c=>c.classList.toggle('sel',c.textContent===f)); }
@@ -716,11 +705,6 @@ function markSel(id) {
     const selObj = { setupState:setupSel.state, setupTime:setupSel.time, setupEnv:setupSel.env }[id];
     c.classList.toggle('sel', key === selObj);
   });
-}
-
-function closeSetup() {
-  document.getElementById('setupOverlay').classList.add('hidden');
-  if (currentPage === 'training') navigate('home');
 }
 
 function suggestTodayFocus() {
@@ -744,12 +728,11 @@ async function confirmSetup() {
   if (!apiKey) { alert('请先在「我的」页面设置 DeepSeek API Key'); return; }
   const msg = document.getElementById('setupMsg');
   msg.textContent = 'AI 正在生成今日计划，请稍候...';
-  const btn = document.querySelector('#setupOverlay .btn-accent');
-  btn.disabled = true;
+  const btn = document.querySelector('#trainingContent .btn-accent');
+  if (btn) btn.disabled = true;
   const plan = await generateTodayPlan();
-  btn.disabled = false;
+  if (btn) btn.disabled = false;
   if (plan) {
-    document.getElementById('setupOverlay').classList.add('hidden');
     renderTrainingPage();
   } else {
     msg.textContent = '生成失败，请重试';
@@ -1084,7 +1067,7 @@ function startRestTimer() {
 
 function renderTrainingPage() {
   if (!currentUser) return;
-  if (!todayPlan) { showTrainingSetup(); return; }
+  if (!todayPlan) { renderTrainingSetup(); return; }
   const s = trainState;
   if (s.complete) { renderComplete(); return; }
   if (s.isResting) { renderRestOverlay(); return; }
