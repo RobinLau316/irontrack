@@ -123,6 +123,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .num-display .big{font-size:52px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent);line-height:1}
 .num-display .unit{font-size:17px;color:var(--muted)}
 .num-display .small{font-size:40px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.reps-input{width:92px;border:0;border-bottom:1px solid transparent;background:transparent;color:var(--text);font:inherit;text-align:center;outline:none;border-radius:0;padding:0;appearance:textfield;-moz-appearance:textfield}
+.reps-input::-webkit-outer-spin-button,.reps-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.reps-input:focus{border-bottom-color:var(--accent)}
 .set-indicator{color:var(--muted);font-size:16px;text-align:center;margin-bottom:18px}
 .set-history{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:28px}
 .set-dot{padding:6px 16px;border-radius:20px;background:var(--card);border:1px solid var(--border);font-size:15px;color:var(--muted)}
@@ -1119,6 +1122,7 @@ function renderWarmup() {
 function renderWorkout() {
   const s = trainState;
   const ex = s.day.exercises[s.exIdx];
+  s.reps = validReps(s.reps, validReps(ex.reps, 8));
   const recs = s.records[ex.id] || [];
   return `
     <div class="training-container">
@@ -1131,7 +1135,7 @@ function renderWorkout() {
       </div>
       <div class="num-control">
         <div class="num-btn" onclick="adjustReps(-1)">−</div>
-        <div class="num-display"><div class="small">${s.reps}</div><div class="unit">次</div></div>
+        <div class="num-display"><input class="small reps-input" type="text" inputmode="numeric" pattern="[0-9]*" value="${s.reps}" aria-label="训练次数" onfocus="this.select()" onkeydown="handleRepsKey(event,this)" onblur="commitRepsInput(this)"><div class="unit">次</div></div>
         <div class="num-btn" onclick="adjustReps(1)">+</div>
       </div>
       <div class="set-indicator">第 ${s.set} 组 / 共 ${ex.sets} 组 · 动作 ${s.exIdx+1}/${s.day.exercises.length}</div>
@@ -1240,12 +1244,13 @@ function adjustWeight(delta) {
 function renderWorkoutOnly() {
   const s = trainState;
   const ex = s.day.exercises[s.exIdx];
+  s.reps = validReps(s.reps, validReps(ex.reps, 8));
   const recs = s.records[ex.id] || [];
   const ui = document.getElementById('trainingContent');
   ui.querySelector('.exercise-target').textContent = `目标 ${ex.weight}kg · ${ex.sets}组×${ex.reps}次`;
   ui.querySelector('.num-control .big').textContent = s.weight;
   const small = ui.querySelector('.num-control .small');
-  if (small) small.textContent = s.reps;
+  if (small) small.value = s.reps;
   ui.querySelector('.set-indicator').textContent = `第 ${s.set} 组 / 共 ${ex.sets} 组 · 动作 ${s.exIdx+1}/${s.day.exercises.length}`;
   const sh = ui.querySelector('.set-history');
   if (sh) sh.innerHTML = recs.length > 0 ? recs.map(r=>`<span class="set-dot">组${r.set}:${r.w}×${r.r}</span>`).join('') : '';
@@ -1267,13 +1272,40 @@ function switchExercise(dir) {
 }
 
 function adjustReps(delta) {
-  trainState.reps = Math.max(0, trainState.reps + delta);
+  const ex = trainState.day.exercises[trainState.exIdx];
+  trainState.reps = Math.max(0, validReps(trainState.reps, validReps(ex.reps, 8)) + delta);
   renderWorkoutOnly();
+}
+
+function validReps(value, fallback) {
+  const normalized = typeof value === 'string' ? value.trim() : value;
+  if (normalized === '') return fallback;
+  const parsed = typeof normalized === 'number' ? normalized : Number(normalized);
+  return Number.isInteger(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
+function commitRepsInput(input) {
+  const ex = trainState.day.exercises[trainState.exIdx];
+  const previous = validReps(trainState.reps, validReps(ex.reps, 8));
+  trainState.reps = validReps(input.value, previous);
+  input.value = trainState.reps;
+}
+
+function handleRepsKey(event, input) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    commitRepsInput(input);
+    input.blur();
+  } else if (event.key === 'Escape') {
+    input.value = validReps(trainState.reps, 8);
+    input.blur();
+  }
 }
 
 function completeSet() {
   const s = trainState;
   const ex = s.day.exercises[s.exIdx];
+  s.reps = validReps(s.reps, validReps(ex.reps, 8));
   if (!s.records[ex.id]) s.records[ex.id] = [];
   s.records[ex.id].push({set:s.set, w:s.weight, r:s.reps});
   if (s.set < ex.sets) {
