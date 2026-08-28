@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "python3 -m http.server 4173",
+    "build": "npm run check",
+    "start": "python3 -m http.server 4173",
+    "check": "node scripts/check-static.mjs"
   },
   "dependencies": {
     "next": "14.2.29",
