@@ -1,7 +1,7 @@
 # IronTrack V1.1 UI 视觉改版设计规格
 
 日期：2026-08-31
-状态：规格已通过，实施中
+状态：已实现、验收并上线
 对应 PRD：`docs/superpowers/specs/2026-08-28-irontrack-prd.md` 第 14 章
 
 ## 1. 目的与范围
