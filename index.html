@@ -171,10 +171,6 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .field-label{color:var(--muted);font-size:14px;margin-bottom:6px;display:block}
 .field-value{background:var(--bg);border-radius:12px;padding:12px 14px;font-size:17px;min-height:44px}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.knowledge-item{display:flex;align-items:flex-start;gap:14px;padding:16px;cursor:pointer;transition:border-color .2s}
-.knowledge-item:hover{border-color:rgba(255,107,53,.3)}
-.knowledge-icon{font-size:28px;flex-shrink:0}
-
 /* 用户切换区域 */
 .user-section{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--card);border-radius:14px;border:1px solid var(--border);margin-bottom:14px}
 .user-section .user-name{font-size:18px;font-weight:600}
@@ -476,10 +472,6 @@ body.keyboard-active #app{padding-bottom:24px}
   <div id="page-profile" class="page">
     <h1 class="section-title" style="font-size:24px;margin-bottom:18px">我的</h1>
     <div id="userSection"></div>
-    <div class="tab-bar mb-4">
-      <button class="tab-btn active" onclick="switchProfileTab('profile',this)">个人档案</button>
-      <button class="tab-btn" onclick="switchProfileTab('knowledge',this)">知识库</button>
-    </div>
     <div id="profileContent"></div>
   </div>
 </div>
@@ -667,15 +659,6 @@ const PLAN_TEMPLATES = {
   }
 };
 
-const knowledge = [
-  {icon:"📈",title:"渐进超负荷原理",desc:"增肌的核心原则：逐步增加训练压力"},
-  {icon:"🧮",title:"训练容量怎么算",desc:"组数×次数×重量，一次看懂你的训练量"},
-  {icon:"🥩",title:"蛋白摄入指南",desc:"每天吃多少蛋白质才够增肌？"},
-  {icon:"⏱",title:"组间休息多久",desc:"不同目标的最佳休息时间"},
-  {icon:"🏋️",title:"复合动作 vs 孤立动作",desc:"如何平衡训练计划中的动作选择"},
-  {icon:"🔓",title:"平台期突破策略",desc:"当力量不再增长时该怎么办"}
-];
-
 const EQUIPMENT_OPTIONS = ['杠铃','哑铃','卧推架','深蹲架','史密斯机','腿举机','高位下拉','绳索机','蝴蝶机','划船机','推肩器','腿弯举','腿屈伸','跑步机','椭圆机','龙门架','引体架','壶铃'];
 
 // 动作库：规则引擎先搭骨架，AI 只在这些边界内做适配。
@@ -763,40 +746,166 @@ const BODYWEIGHT_LIBRARY = {
 
 const BACKUP_VERSION = 1;
 const USER_DATA_KEYS = ['profile','plan','sessions','body_records','measurements','today_index','today_plan','active_training','cycle_variants','core_locks','training_phase','setup_draft'];
+const DEFAULT_CYCLE_VARIANTS = { push:'A', pull:'A', legs:'A' };
+const DEFAULT_SETUP_STATE = { focus:'', state:'', time:'', env:'', discomfort:[], avoid:'' };
+
+function cloneData(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function isPlainRecord(value) {
+  return !!value && typeof value === 'object' && !Array.isArray(value);
+}
+
+function sameData(a, b) {
+  try { return JSON.stringify(a) === JSON.stringify(b); }
+  catch(e) { return false; }
+}
+
+function isValidPlanData(value) {
+  return isPlainRecord(value) && Array.isArray(value.days) && value.days.length > 0 && value.days.every(day =>
+    isPlainRecord(day) && typeof day.name === 'string' && day.name.trim() && typeof day.focus === 'string' && Array.isArray(day.exercises)
+  );
+}
+
+function rememberCompatibilityData(recovery) {
+  const keys = Object.keys(recovery);
+  if (!keys.length) return;
+  const existing = LS.get('compat_recovery', null);
+  if (isPlainRecord(existing) && isPlainRecord(existing.data)) {
+    LS.set('compat_recovery', Object.assign({}, existing, { updatedAt:new Date().toISOString(), data:Object.assign({}, existing.data, recovery) }));
+  } else {
+    LS.set('compat_recovery', { savedAt:new Date().toISOString(), data:recovery });
+  }
+}
+
+function normalizeTodayPlanData(value) {
+  if (!isPlainRecord(value) || !Array.isArray(value.workout) || value.workout.length === 0) return null;
+  const normalized = Object.assign({}, value);
+  normalized.status = value.status === 'preview' ? 'preview' : 'active';
+  normalized.factors = isPlainRecord(value.factors) ? value.factors : {};
+  normalized.warmup = Array.isArray(value.warmup) ? value.warmup : [];
+  normalized.stretch = Array.isArray(value.stretch) ? value.stretch : [];
+  normalized.id = value.id || ('recovered-plan-' + Date.now());
+  return normalized;
+}
+
+function ensureUserDataCompatibility() {
+  const recovery = {};
+
+  const rawProfile = LS.get('profile', null);
+  profile = Object.assign({}, cloneData(DEFAULT_PROFILE), isPlainRecord(rawProfile) ? rawProfile : {});
+  if (!Array.isArray(profile.equipment)) profile.equipment = cloneData(DEFAULT_PROFILE.equipment);
+  if (!PLAN_TEMPLATES[profile.planTemplate]) profile.planTemplate = 'ppl';
+  if (!sameData(rawProfile, profile)) {
+    if (rawProfile != null && !isPlainRecord(rawProfile)) recovery.profile = rawProfile;
+    LS.set('profile', profile);
+  }
+
+  const rawPlan = LS.get('plan', null);
+  if (isValidPlanData(rawPlan)) {
+    plan = rawPlan;
+  } else {
+    if (rawPlan != null) recovery.plan = rawPlan;
+    const tmpl = PLAN_TEMPLATES[profile.planTemplate] || PLAN_TEMPLATES.ppl;
+    plan = { name:tmpl.name, cycle:tmpl.cycle, days:cloneData(tmpl.days) };
+    LS.set('plan', plan);
+  }
+
+  const rawSessions = LS.get('sessions', []);
+  sessions = Array.isArray(rawSessions) ? rawSessions.filter(item => isPlainRecord(item) && Array.isArray(item.exercises)) : [];
+  if (!sameData(rawSessions, sessions)) {
+    if (rawSessions != null) recovery.sessions = rawSessions;
+    LS.set('sessions', sessions);
+  }
+
+  const rawBodyRecords = LS.get('body_records', []);
+  bodyRecords = Array.isArray(rawBodyRecords) ? rawBodyRecords : [];
+  if (!Array.isArray(rawBodyRecords)) {
+    if (rawBodyRecords != null) recovery.body_records = rawBodyRecords;
+    LS.set('body_records', bodyRecords);
+  }
+
+  const rawMeasurements = LS.get('measurements', []);
+  measurements = Array.isArray(rawMeasurements) ? rawMeasurements : [];
+  if (!Array.isArray(rawMeasurements)) {
+    if (rawMeasurements != null) recovery.measurements = rawMeasurements;
+    LS.set('measurements', measurements);
+  }
+
+  const rawIndex = Number(LS.get('today_index', 0));
+  todayIndex = Number.isInteger(rawIndex) && rawIndex >= 0 ? rawIndex : 0;
+  if (todayIndex !== rawIndex) LS.set('today_index', todayIndex);
+
+  const rawVariants = LS.get('cycle_variants', null);
+  const variants = isPlainRecord(rawVariants) ? rawVariants : {};
+  cycleVariants = Object.assign({}, variants, {
+    push:variants.push === 'B' ? 'B' : 'A',
+    pull:variants.pull === 'B' ? 'B' : 'A',
+    legs:variants.legs === 'B' ? 'B' : 'A'
+  });
+  if (!sameData(rawVariants, cycleVariants)) {
+    if (rawVariants != null && !isPlainRecord(rawVariants)) recovery.cycle_variants = rawVariants;
+    LS.set('cycle_variants', cycleVariants);
+  }
+
+  const rawLocks = LS.get('core_locks', null);
+  coreLocks = isPlainRecord(rawLocks) ? rawLocks : {};
+  if (!sameData(rawLocks, coreLocks)) {
+    if (rawLocks != null) recovery.core_locks = rawLocks;
+    LS.set('core_locks', coreLocks);
+  }
+
+  const rawPhase = LS.get('training_phase', null);
+  const phase = isPlainRecord(rawPhase) ? rawPhase : {};
+  trainingPhase = {
+    startedAt:typeof phase.startedAt === 'string' && phase.startedAt ? phase.startedAt : getTodayStr(),
+    completedSessions:Number.isFinite(Number(phase.completedSessions)) && Number(phase.completedSessions) >= 0 ? Math.floor(Number(phase.completedSessions)) : 0
+  };
+  if (!sameData(rawPhase, trainingPhase)) {
+    if (rawPhase != null && !isPlainRecord(rawPhase)) recovery.training_phase = rawPhase;
+    LS.set('training_phase', trainingPhase);
+  }
+
+  const rawDraft = LS.get('setup_draft', null);
+  if (rawDraft != null) {
+    const draft = Object.assign({}, DEFAULT_SETUP_STATE, isPlainRecord(rawDraft) ? rawDraft : {});
+    draft.discomfort = Array.isArray(draft.discomfort) ? draft.discomfort : [];
+    draft.avoid = typeof draft.avoid === 'string' ? draft.avoid : '';
+    if (!sameData(rawDraft, draft)) {
+      if (!isPlainRecord(rawDraft)) recovery.setup_draft = rawDraft;
+      LS.set('setup_draft', draft);
+    }
+  }
+
+  rememberCompatibilityData(recovery);
+}
 
 // ============ 全局变量（登录后初始化）============
 let profile, plan, sessions, bodyRecords, measurements, todayIndex, cycleVariants, coreLocks, trainingPhase;
 
 function initUserData() {
   trainState = {};
-  profile = LS.get('profile', JSON.parse(JSON.stringify(DEFAULT_PROFILE)));
-  if (!profile.planTemplate) profile.planTemplate = 'ppl';
-
-  if (!LS.get('plan', null)) {
-    const tmpl = PLAN_TEMPLATES[profile.planTemplate] || PLAN_TEMPLATES['ppl'];
-    plan = { name: tmpl.name, cycle: tmpl.cycle, days: JSON.parse(JSON.stringify(tmpl.days)) };
-    LS.set('plan', plan);
-  } else {
-    plan = LS.get('plan', DEFAULT_PLAN);
-  }
-
-  sessions = LS.get('sessions', []);
-  bodyRecords = LS.get('body_records', []);
-  measurements = LS.get('measurements', []);
-  todayIndex = LS.get('today_index', 0);
-  cycleVariants = LS.get('cycle_variants', { push:'A', pull:'A', legs:'A' });
-  coreLocks = LS.get('core_locks', {});
-  trainingPhase = LS.get('training_phase', { startedAt:getTodayStr(), completedSessions:0 });
+  ensureUserDataCompatibility();
 
   // 恢复今日动态计划（若存在）
-  todayPlan = LS.get('today_plan', null);
+  const rawTodayPlan = LS.get('today_plan', null);
+  todayPlan = normalizeTodayPlanData(rawTodayPlan);
   if (!todayPlan || todayPlan.date !== getTodayStr()) {
+    if (rawTodayPlan != null && (!todayPlan || rawTodayPlan.date === getTodayStr())) rememberCompatibilityData({ today_plan:rawTodayPlan });
     todayPlan = null;
     LS.set('today_plan', null);
     LS.set('active_training', null);
   } else {
-    if (!todayPlan.status) todayPlan.status = 'active';
-    if (todayPlan.status === 'active') restoreDynamicTraining();
+    if (!sameData(rawTodayPlan, todayPlan)) LS.set('today_plan', todayPlan);
+    if (todayPlan.status === 'active') {
+      try { restoreDynamicTraining(); }
+      catch(e) {
+        console.warn('进行中训练恢复失败，已从今日计划重新开始:', e);
+        LS.set('active_training', null);
+        initDynamicTraining();
+      }
+    }
   }
 
   if (bodyRecords.length === 0 && profile.weight) {
@@ -923,8 +1032,8 @@ function applyPrevRecords() {
     day.exercises.forEach(ex => {
       const lastSession = [...sessions].reverse().find(s => s.dayName === day.name);
       if (lastSession) {
-        const lastEx = lastSession.exercises.find(e => e.name === ex.name);
-        if (lastEx && lastEx.sets.length > 0) {
+        const lastEx = (lastSession.exercises || []).find(e => e.name === ex.name);
+        if (lastEx && Array.isArray(lastEx.sets) && lastEx.sets.length > 0) {
           const lastSet = lastEx.sets[lastEx.sets.length - 1];
           ex.prevW = lastSet.w;
           ex.prevR = lastSet.r;
@@ -953,6 +1062,8 @@ function switchPlan(templateKey) {
 let currentPage = 'home';
 
 function navigate(page) {
+  document.body.classList.remove('keyboard-active');
+  if (page !== 'training') setTrainingFixedAction(false);
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const target = document.getElementById('page-' + page);
   if (target) target.classList.add('active');
@@ -960,17 +1071,40 @@ function navigate(page) {
   document.querySelectorAll('.nav-item').forEach(n => {
     n.classList.toggle('active', n.dataset.page === page);
   });
-  if (page === 'home') renderHomePage();
-  if (page === 'plan') renderPlanPage();
-  if (page === 'training') enterTraining();
-  if (page === 'data') renderDataChart('weight');
-  if (page === 'profile') renderProfilePage();
-  window.scrollTo(0, 0);
+  try {
+    if (page === 'home') renderHomePage();
+    if (page === 'plan') renderPlanPage();
+    if (page === 'training') enterTraining();
+    if (page === 'data') renderDataChart('weight');
+    if (page === 'profile') renderProfilePage();
+  } catch(e) {
+    console.error('页面加载失败:', page, e);
+    renderPageRecovery(page);
+  } finally {
+    window.scrollTo({ top:0, left:0, behavior:'auto' });
+  }
+}
+
+function renderPageRecovery(page) {
+  const target = document.getElementById('page-' + page);
+  if (!target) return;
+  const host = target.querySelector('[id$="Content"]') || target;
+  host.innerHTML = `
+    <div class="card" style="margin-top:18px">
+      <div class="section-title">页面需要恢复</div>
+      <div class="text-muted text-sm" style="line-height:1.6;margin-bottom:16px">检测到旧数据不完整，系统会保留训练历史并修复运行状态。</div>
+      <button class="btn btn-accent" onclick="repairAndRetryPage('${page}')">修复并重新加载</button>
+    </div>`;
+}
+
+function repairAndRetryPage(page) {
+  ensureUserDataCompatibility();
+  navigate(page);
 }
 
 // ============ 训练入口：动态生成今日计划 ============
 let todayPlan = null;   // 今日动态计划
-let setupSel = { focus:'', state:'', time:'', env:'', discomfort:[], avoid:'' };
+let setupSel = cloneData(DEFAULT_SETUP_STATE);
 
 const FOCUS_OPTIONS = ['胸','背','腿','肩','手臂','全身'];
 const STATE_OPTIONS = [
@@ -1004,7 +1138,9 @@ function renderTrainingSetup() {
   // 按分化方式 + 最近记录自动推荐今天该练的部位
   const suggested = suggestTodayFocus();
   const savedDraft = LS.get('setup_draft', null);
-  setupSel = savedDraft ? Object.assign({ focus:'', state:'', time:'', env:'', discomfort:[], avoid:'' }, savedDraft) : { focus:suggested.focus, state:'', time:'', env:'', discomfort:[], avoid:'' };
+  setupSel = isPlainRecord(savedDraft) ? Object.assign(cloneData(DEFAULT_SETUP_STATE), savedDraft) : Object.assign(cloneData(DEFAULT_SETUP_STATE), { focus:suggested.focus });
+  setupSel.discomfort = Array.isArray(setupSel.discomfort) ? setupSel.discomfort : [];
+  setupSel.avoid = typeof setupSel.avoid === 'string' ? setupSel.avoid : '';
   if (!setupSel.focus) setupSel.focus = suggested.focus;
   const focusChips = FOCUS_OPTIONS.map(f =>
     `<div class="opt-chip ${f===setupSel.focus?'sel':''}" onclick="pickFocus('${f}')">${f}</div>`
@@ -1099,12 +1235,20 @@ async function confirmSetup() {
   msg.textContent = getGlobalApiKey() ? '正在生成并校验今日计划...' : '未设置 API，正在生成本地备用计划...';
   const btn = document.querySelector('#trainingContent .btn-accent');
   if (btn) btn.disabled = true;
-  const generated = await generateTodayPlan();
-  if (btn) btn.disabled = false;
+  let generated = null;
+  try {
+    ensureUserDataCompatibility();
+    generated = await generateTodayPlan();
+  } catch(e) {
+    console.error('今日计划生成失败:', e);
+    msg.textContent = '计划生成遇到异常，已保留你的设置，请重试';
+  } finally {
+    if (btn) btn.disabled = false;
+  }
   if (generated) {
     renderTrainingPage();
     window.scrollTo(0, 0);
-  } else {
+  } else if (!msg.textContent.includes('异常')) {
     msg.textContent = '生成失败，请检查设置后重试';
   }
 }
@@ -1293,7 +1437,14 @@ function normalizeAIPlan(raw, skeleton) {
 }
 
 async function generateTodayPlan() {
-  const skeleton = createLocalPlan();
+  let skeleton;
+  try {
+    skeleton = createLocalPlan();
+  } catch(e) {
+    console.warn('本地计划首次生成失败，正在修复兼容数据:', e);
+    ensureUserDataCompatibility();
+    skeleton = createLocalPlan();
+  }
   let generated = skeleton;
   if (getGlobalApiKey()) {
     for (let attempt=0; attempt<2; attempt++) {
@@ -1375,6 +1526,16 @@ function renderHomePage() {
 // ============ 训练体系页 ============
 function renderPlanPage() {
   if (!currentUser) return;
+  try {
+    ensureUserDataCompatibility();
+    renderPlanPageContent();
+  } catch(e) {
+    console.error('训练体系加载失败:', e);
+    renderPageRecovery('plan');
+  }
+}
+
+function renderPlanPageContent() {
   const tmpl = PLAN_TEMPLATES[profile.planTemplate] || PLAN_TEMPLATES['ppl'];
   const sugg = suggestTodayFocus();
   const todayDay = plan.days.find(d => d.focus.indexOf(sugg.focus) >= 0) || plan.days[0];
@@ -2238,8 +2399,7 @@ function updateWeekStats() {
 function renderProfilePage() {
   if (!currentUser) return;
   renderUserSection();
-  document.querySelectorAll('#page-profile .tab-btn').forEach((b,i) => b.classList.toggle('active', i===0));
-  renderProfileContent('profile');
+  renderProfileContent();
 }
 
 function renderUserSection() {
@@ -2256,17 +2416,10 @@ function renderUserSection() {
     </div>`;
 }
 
-function switchProfileTab(tab, btn) {
-  document.querySelectorAll('#page-profile .tab-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderProfileContent(tab);
-}
-
-function renderProfileContent(tab) {
+function renderProfileContent() {
   const container = document.getElementById('profileContent');
-  if (tab === 'profile') {
-    const apiKey = getGlobalApiKey();
-    container.innerHTML = `
+  const apiKey = getGlobalApiKey();
+  container.innerHTML = `
       <div class="card"><div class="section-title">身体数据</div>
         <div class="grid-2">
           <div class="field-group"><span class="field-label">身高 (cm)</span><input class="field-value" id="pf-height" type="number" value="${profile.height}" style="width:100%;border:none;outline:none;color:var(--text);background:var(--bg);font-size:17px"></div>
@@ -2343,14 +2496,6 @@ function renderProfileContent(tab) {
       </div>
       <button class="btn btn-accent" onclick="saveProfile()">保存修改</button>
       <div class="text-center text-xs text-muted mt-3" id="saveMsg"></div>`;
-  } else {
-    container.innerHTML = knowledge.map(a => `
-      <div class="card knowledge-item">
-        <span class="knowledge-icon">${a.icon}</span>
-        <div><div class="font-bold text-sm">${a.title}</div><div class="text-muted text-xs mt-0.5">${a.desc}</div></div>
-      </div>
-    `).join('');
-  }
 }
 
 function toggleEquipment(name) {
