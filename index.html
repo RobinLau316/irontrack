@@ -11,11 +11,13 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#1a1a2e;--card:#2d2d44;--border:#3d3d54;--accent:#ff6b35;
-  --accent-light:#ff8c42;--text:#e8e8e8;--muted:#999
+  --bg:#0b0b0a;--card:#171714;--surface:#171714;--surface-2:#20201c;
+  --border:#292925;--accent:#d9ff43;--accent-light:#e5ff7a;
+  --text:#f3f2ea;--muted:#92948d;--danger:#ff8b68;--success:#63d6b5;
+  --nav-height:72px;--page-gutter:18px;--action-zone-height:112px
 }
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-#app{max-width:430px;margin:0 auto;min-height:100vh;padding:16px 16px 100px;position:relative;padding-top:max(16px,env(safe-area-inset-top,16px))}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,'PingFang SC',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+#app{max-width:430px;margin:0 auto;min-height:100svh;padding:18px var(--page-gutter) calc(var(--nav-height) + env(safe-area-inset-bottom,0px) + 34px);position:relative;padding-top:max(18px,env(safe-area-inset-top,18px))}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
@@ -25,20 +27,20 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 /* 底部导航 */
-#bottomNav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(29,29,44,.95);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0)}
-#bottomNav .nav-inner{display:flex;align-items:center;justify-content:space-around;height:70px;max-width:430px;margin:0 auto}
+#bottomNav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(11,11,10,.94);backdrop-filter:blur(18px);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0)}
+#bottomNav .nav-inner{display:flex;align-items:center;justify-content:space-around;height:var(--nav-height);max-width:430px;margin:0 auto}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;cursor:pointer;border:none;background:none;color:var(--muted);font-size:14px;transition:color .2s;position:relative;min-height:44px;justify-content:center}
 .nav-item.active{color:var(--accent);font-weight:600}
 .nav-item svg{width:24px;height:24px}
 .nav-item.primary{margin-top:-28px}
-.nav-item.primary .nav-btn-circle{width:56px;height:56px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(255,107,53,.3);transition:transform .2s}
+.nav-item.primary .nav-btn-circle{width:56px;height:56px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(217,255,67,.2);transition:transform .2s}
 .nav-item.primary:hover .nav-btn-circle{transform:scale(1.08)}
 .nav-item.primary svg{width:28px;height:28px}
 
 /* 通用组件 */
 .card{background:var(--card);border-radius:16px;border:1px solid var(--border);padding:18px;margin-bottom:14px}
 .btn{display:block;width:100%;padding:16px;border-radius:14px;border:none;font-size:18px;font-weight:700;cursor:pointer;text-align:center;transition:opacity .2s;text-decoration:none;min-height:50px}
-.btn-accent{background:var(--accent);color:#fff;box-shadow:0 0 0 0 rgba(255,107,53,.4);animation:pulse 2s infinite}
+.btn-accent{background:var(--accent);color:#0b0b0a;box-shadow:none;animation:none}
 .btn-accent:hover{opacity:.9}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,53,.4)}50%{box-shadow:0 0 0 12px rgba(255,107,53,0)}}
 .btn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
@@ -236,19 +238,198 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .reason-note{font-size:13px;color:var(--muted);line-height:1.5;margin-top:5px}
 .danger-note{font-size:13px;color:#f4a261;line-height:1.5;margin-top:8px}
 
+/* V1.1 午夜竞技视觉系统 */
+button,input,select{font:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.page.active{animation:pageEnter .42s cubic-bezier(.22,1,.36,1)}
+@keyframes pageEnter{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+#page-training.has-fixed-action.active{animation:fadeOnly .28s ease}
+@keyframes fadeOnly{from{opacity:0}to{opacity:1}}
+.section-title{font-size:20px;font-weight:850;letter-spacing:-.035em}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:none}
+.btn{min-height:52px;border-radius:999px;font-size:16px;font-weight:850;letter-spacing:-.01em;transition:transform .18s ease,opacity .18s ease,background .18s ease}
+.btn:active{transform:scale(.975)}
+.btn-outline{border-color:#3b3b34;background:rgba(23,23,20,.72)}
+.tag,.badge{background:#131311;border-color:var(--border);color:#b8bab1}
+.text-accent{color:var(--accent)}
+.stat-value,.stat-item-2 .val{font-variant-numeric:tabular-nums;color:var(--accent);letter-spacing:-.045em}
+
+/* 品牌登录页 */
+.login-overlay{align-items:stretch;justify-content:flex-end;padding:0;background:#080807 url('public/irontrack-hero.jpg') center/cover no-repeat;overflow:hidden}
+@supports(background-image:image-set(url('public/irontrack-hero.webp') type('image/webp'))){.login-overlay{background-image:image-set(url('public/irontrack-hero.webp') type('image/webp'),url('public/irontrack-hero.jpg') type('image/jpeg'))}}
+.login-overlay::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.18) 0%,rgba(6,6,5,.35) 38%,rgba(6,6,5,.98) 86%)}
+.login-brand{position:absolute;top:max(28px,env(safe-area-inset-top,28px));left:24px;z-index:1;font-size:24px;font-weight:950;letter-spacing:-.055em}
+.login-content{position:relative;z-index:1;width:100%;max-width:430px;margin:0 auto;padding:24px 24px max(30px,env(safe-area-inset-bottom,30px));animation:heroEnter .7s cubic-bezier(.22,1,.36,1)}
+.login-kicker{font-size:11px;color:var(--accent);font-weight:800;letter-spacing:.18em;margin-bottom:10px}
+.login-title{font-size:clamp(34px,10vw,46px);line-height:.98;font-weight:950;letter-spacing:-.065em;margin-bottom:8px;max-width:330px}
+.login-subtitle{color:#c6c8bd;font-size:15px;margin-bottom:18px}
+.login-logo{display:none}
+.login-input{max-width:none;min-height:52px;border-radius:14px;border-color:#3a3a34;background:rgba(17,17,15,.9);text-align:left;margin-bottom:12px;padding:14px 16px}
+.login-content>.btn{max-width:none!important}
+.login-user-chip{background:rgba(17,17,15,.78);border-color:#35352f;color:var(--text);border-radius:12px;padding:10px 14px}
+.login-user-chip:hover{border-color:var(--accent)}
+.login-divider{color:#777970;margin:12px 0}
+
+/* 顶部与首页 */
+.app-masthead{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.brand-word{font-size:22px;font-weight:950;letter-spacing:-.055em;line-height:1}
+.brand-meta{font-size:11px;color:var(--muted);margin-top:5px}
+.user-pill{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--text);font-size:12px;padding:0 12px;border:1px solid var(--border);border-radius:999px;background:#121210}
+.user-pill b{color:var(--accent);font-size:13px}
+.home-hero{min-height:330px;border-radius:24px;padding:22px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;cursor:pointer;background:#0a0a09 url('public/irontrack-hero.jpg') 63% 50%/cover no-repeat;isolation:isolate}
+@supports(background-image:image-set(url('public/irontrack-hero.webp') type('image/webp'))){.home-hero{background-image:image-set(url('public/irontrack-hero.webp') type('image/webp'),url('public/irontrack-hero.jpg') type('image/jpeg'))}}
+.home-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.03) 8%,rgba(5,5,4,.22) 43%,rgba(5,5,4,.96) 100%);z-index:-1}
+.hero-kicker{font-size:10px;color:var(--accent);font-weight:850;letter-spacing:.18em;margin-bottom:9px}
+.hero-title{font-size:clamp(34px,10vw,45px);line-height:.94;font-weight:950;letter-spacing:-.07em;max-width:320px;margin-bottom:10px;text-wrap:balance}
+.hero-summary{color:#c4c6bd;font-size:13px;line-height:1.45;max-width:310px}
+.hero-action{display:flex;align-items:center;justify-content:space-between;margin-top:18px;min-height:48px;border-radius:999px;background:var(--accent);color:#0b0b0a;padding:0 16px;font-size:14px;font-weight:900}
+.hero-action span:last-child{font-size:20px}
+.home-section-label{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);margin:24px 0 10px}
+.home-metrics{display:grid;grid-template-columns:1.15fr .85fr;gap:10px}
+.home-metric{min-height:92px;padding:16px;background:var(--surface);border-radius:16px;border:1px solid var(--border)}
+.home-metric small{font-size:11px;color:var(--muted)}
+.home-metric strong{display:block;margin-top:7px;font-size:clamp(24px,7vw,32px);font-variant-numeric:tabular-nums;letter-spacing:-.055em}
+.home-metric.primary strong{color:var(--accent)}
+.home-progress{height:4px;background:#31312b;border-radius:99px;overflow:hidden;margin-top:10px}
+.home-progress i{display:block;height:100%;background:var(--accent);border-radius:inherit;transition:width .6s cubic-bezier(.22,1,.36,1)}
+.home-list{border-top:1px solid var(--border)}
+.home-row{min-height:66px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--border);cursor:pointer}
+.home-row-label{font-size:12px;color:var(--muted);margin-bottom:4px}
+.home-row-value{font-size:15px;font-weight:750}
+.home-row-side{font-size:13px;color:#bfc1b7;text-align:right;white-space:nowrap}
+.home-row-arrow{color:var(--accent);font-size:18px}
+
+/* 导航 */
+.nav-item{font-size:11px;gap:4px;color:#777970;padding:5px 8px;min-width:58px}
+.nav-item.active{color:var(--accent)}
+.nav-item svg{width:21px;height:21px}
+.nav-item.primary{margin-top:-24px}
+.nav-item.primary span{color:var(--accent)!important;font-size:11px;font-weight:750}
+.nav-item.primary .nav-btn-circle{width:54px;height:54px}
+.nav-item.primary .nav-btn-circle svg{stroke:#0b0b0a;width:25px;height:25px}
+
+/* 内容页减少卡片堆叠 */
+#page-plan>.row,#page-data>h1,#page-profile>h1{margin-top:3px}
+#page-plan .card{background:transparent;border:0;border-bottom:1px solid var(--border);border-radius:0;padding:22px 0;margin:0}
+#page-plan .card:first-of-type{padding-top:8px}
+#page-plan .cycle-chain{padding:12px 0 6px}
+.cycle-step .cycle-dot{background:var(--bg)}
+.cycle-step.active .cycle-dot{box-shadow:0 0 0 5px rgba(217,255,67,.14)}
+.setup-recommend{background:rgba(217,255,67,.07);border-color:rgba(217,255,67,.24);color:#dfe4ce}
+.lib-item{padding:16px 0}
+.prog-list li::before{color:var(--accent)}
+
+/* 生成前设置与计划预览 */
+#page-training .card{box-shadow:none}
+#page-training .setup-title{font-size:clamp(30px,9vw,40px);line-height:.98;letter-spacing:-.06em;font-weight:950;margin-bottom:8px}
+#page-training .setup-subtitle{font-size:14px;color:var(--muted);margin-bottom:26px}
+#page-training .setup-group{padding:0 0 24px;margin-bottom:24px;border-bottom:1px solid var(--border)}
+#page-training .setup-label{font-size:12px;color:#bfc1b8;letter-spacing:.02em;margin-bottom:10px}
+#page-training .opt-grid{gap:9px}
+.opt-chip{min-height:50px;border:1px solid var(--border);border-radius:14px;background:#121210;color:#c9cbc0;padding:12px 8px}
+.opt-chip.sel{border-color:var(--accent);background:rgba(217,255,67,.08);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.setup-input,.field-value{background:#121210!important;border:1px solid var(--border)!important;color:var(--text)!important;border-radius:13px!important}
+.danger-note{color:var(--danger)}
+.preview-item{padding:18px 0}
+.preview-role{background:rgba(217,255,67,.1);color:var(--accent)}
+.preview-role.aux{background:#20201c;color:#b2b4aa}
+.edit-grid{gap:6px}
+.edit-field input{border-color:var(--border);background:#11110f;border-radius:11px;color:var(--text)}
+.mini-btn{background:#121210;border-color:#34342f;color:#c8cac0;border-radius:999px}
+.mini-btn.on{border-color:var(--accent);color:var(--accent)}
+.plan-source{background:rgba(99,214,181,.1);color:var(--success)}
+.plan-source.local{background:rgba(255,139,104,.1);color:#ffad92}
+.resume-banner{background:rgba(99,214,181,.08);border-color:rgba(99,214,181,.24);color:var(--success)}
+
+/* 正式训练：单组专注 */
+.training-header{margin-bottom:14px;font-size:13px;letter-spacing:.02em}
+.section-tabs{gap:7px;margin-bottom:20px}
+.section-tab{min-height:42px;border-radius:999px;background:#121210;font-size:12px;border-color:var(--border)}
+.section-tab.active{background:var(--accent);border-color:var(--accent);color:#0b0b0a}
+.training-container{min-height:0;justify-content:flex-start;padding:2px 0 6px}
+.exercise-name{font-size:clamp(29px,9vw,40px);line-height:1.02;letter-spacing:-.06em;font-weight:950;text-wrap:balance;overflow-wrap:anywhere;max-width:100%;margin:2px auto 6px}
+.exercise-target{font-size:13px;margin-bottom:18px}
+.control-label{font-size:9px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-bottom:7px}
+.num-control{display:grid;grid-template-columns:52px minmax(0,1fr) 52px;gap:8px;margin:0 auto 14px;max-width:330px;width:100%;padding-top:13px;border-top:1px solid var(--border)}
+.num-btn{width:48px;height:48px;background:#121210;border-color:#383832;font-size:24px}
+.num-display{min-width:0}
+.num-display .big{font-size:clamp(43px,15vw,60px);color:var(--text);font-weight:950;letter-spacing:-.065em}
+.num-display .small{font-size:clamp(40px,14vw,56px);font-weight:950;letter-spacing:-.06em}
+.reps-input{max-width:100%;width:100%}
+.weight-input{width:100%;color:var(--text)}
+.num-display .unit{font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-top:3px}
+.set-indicator{font-size:12px;margin:4px 0 8px}
+.reason-note{font-size:12px}
+.set-history{margin:10px 0 4px;gap:6px}
+.set-dot{font-size:11px;padding:6px 10px;background:#131311}
+#page-training.has-fixed-action{padding-bottom:calc(var(--action-zone-height) + 28px)}
+.training-actions{position:fixed;z-index:46;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-height) + env(safe-area-inset-bottom,0px) + 28px);width:min(calc(100vw - 32px),398px);padding:10px 0 0;background:linear-gradient(180deg,rgba(11,11,10,0),rgba(11,11,10,.96) 26%)}
+.training-actions .btn{margin:0}
+.training-more-toggle{display:block;margin:0 auto 8px;padding:7px 14px;border:0;background:transparent;color:var(--muted);font-size:12px;min-height:36px;cursor:pointer}
+.workout-more{display:none;gap:8px;margin-bottom:8px}
+.workout-more.open{display:grid;grid-template-columns:1fr 1fr;animation:quickReveal .2s ease}
+.workout-more .btn{min-height:42px;font-size:12px;padding:10px;border-radius:12px}
+@keyframes quickReveal{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+body.keyboard-active #bottomNav,body.keyboard-active .training-actions{display:none}
+body.keyboard-active #app{padding-bottom:24px}
+.rest-overlay{min-height:calc(100svh - var(--nav-height) - 145px)}
+.rest-circle{width:154px;height:154px;border-color:var(--accent);box-shadow:0 0 0 12px rgba(217,255,67,.045)}
+.rest-time{color:var(--accent);font-size:52px;font-weight:950}
+.feedback-btn{background:#121210;border-color:var(--border);border-radius:15px}
+.feedback-btn:active{background:rgba(217,255,67,.08)}
+.complete-icon{width:76px;height:76px;display:grid;place-items:center;border-radius:50%;background:var(--accent);color:#0b0b0a;font-size:40px;animation:completePop .55s cubic-bezier(.22,1,.36,1)}
+@keyframes completePop{from{opacity:0;transform:scale(.45) rotate(-8deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+.complete-title{font-size:clamp(30px,9vw,40px);font-weight:950;letter-spacing:-.055em}
+
+/* 数据与设置 */
+.tab-bar{background:#121210;border-color:var(--border);border-radius:999px}
+.tab-btn{border-radius:999px;font-size:12px;color:#92948d}
+.tab-btn.active{background:var(--accent);color:#0b0b0a}
+#page-data>.card,#page-profile .card{background:transparent;border:0;border-bottom:1px solid var(--border);border-radius:0;padding:22px 0;margin:0}
+#page-data .stat-grid-2{gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+#page-data .stat-item-2{background:#151513;border-radius:0;min-height:96px}
+.bar{background:#181816}
+.bar-inner.fill{background:var(--accent)}
+.progress-bar{background:#292925}
+.user-section{background:#121210;border-color:var(--border);border-radius:16px}
+.user-section .user-action{color:var(--accent);border-color:var(--accent);border-radius:999px}
+.eq-chip{background:#121210;border-color:var(--border);border-radius:999px}
+.eq-chip.eq-on{background:rgba(217,255,67,.08);border-color:var(--accent);color:var(--accent)}
+.api-status.set{background:rgba(99,214,181,.12);color:var(--success)}
+.api-status.unset{background:rgba(255,139,104,.1);color:#ffad92}
+
+@keyframes heroEnter{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.home-hero{animation:heroEnter .65s cubic-bezier(.22,1,.36,1)}
+.home-metrics{animation:heroEnter .65s .1s both cubic-bezier(.22,1,.36,1)}
+.home-list{animation:heroEnter .65s .18s both cubic-bezier(.22,1,.36,1)}
+
+@media(max-height:650px){
+  .training-header{margin-bottom:8px}.section-tabs{margin-bottom:10px}.section-tab{min-height:36px}
+  .exercise-name{font-size:clamp(26px,8vw,34px)}.exercise-target{margin-bottom:10px}
+  .num-control{padding-top:8px;margin-bottom:8px}.num-display .big{font-size:clamp(39px,13vw,50px)}.num-display .small{font-size:clamp(37px,12vw,48px)}
+  .set-indicator{margin:2px 0 4px}.reason-note{line-height:1.25}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
+}
+
 /* 响应式 */
-@media(min-width:768px){.page{padding:0 20px}}
+@media(min-width:768px){.page{padding:0 10px}}
 </style>
 </head>
 <body>
 <!-- 登录遮罩 -->
 <div id="loginOverlay" class="login-overlay">
-  <div class="login-logo">🏋️</div>
-  <div class="login-title">IronTrack</div>
-  <div class="login-subtitle">智能健身伴侣</div>
-  <div id="existingUsers" style="width:100%;max-width:300px"></div>
-  <input class="login-input" id="loginInput" type="text" placeholder="输入你的名字" maxlength="12" autocomplete="off">
-  <button class="btn btn-accent" style="max-width:300px" onclick="doLogin()">进入</button>
+  <div class="login-brand">IRONTRACK</div>
+  <div class="login-content">
+    <div class="login-kicker">PERSONAL PERFORMANCE</div>
+    <div class="login-title">今天，继续向上。</div>
+    <div class="login-subtitle">选择本地用户，进入你的训练记录。</div>
+    <div id="existingUsers" style="width:100%"></div>
+    <input class="login-input" id="loginInput" type="text" placeholder="输入你的名字" maxlength="12" autocomplete="off">
+    <button class="btn btn-accent" onclick="doLogin()">进入训练</button>
+  </div>
 </div>
 
 <div id="app">
@@ -316,9 +497,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
     </button>
     <button class="nav-item primary" onclick="navigate('training')" data-page="training">
       <div class="nav-btn-circle">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><rect x="14" y="14" width="8" height="8" rx="1"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 4v16M17 4v16M4 8h3M4 16h3M17 8h3M17 16h3M7 12h10"/></svg>
       </div>
-      <span style="color:#ff6b35">训练</span>
+      <span>训练</span>
     </button>
     <button class="nav-item" onclick="navigate('data')" data-page="data">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -811,8 +992,15 @@ function enterTraining() {
   renderTrainingSetup();
 }
 
+function setTrainingFixedAction(enabled) {
+  const page = document.getElementById('page-training');
+  if (page) page.classList.toggle('has-fixed-action', !!enabled);
+  if (!enabled) document.body.classList.remove('keyboard-active');
+}
+
 function renderTrainingSetup() {
   if (!currentUser) return;
+  setTrainingFixedAction(false);
   // 按分化方式 + 最近记录自动推荐今天该练的部位
   const suggested = suggestTodayFocus();
   const savedDraft = LS.get('setup_draft', null);
@@ -915,6 +1103,7 @@ async function confirmSetup() {
   if (btn) btn.disabled = false;
   if (generated) {
     renderTrainingPage();
+    window.scrollTo(0, 0);
   } else {
     msg.textContent = '生成失败，请检查设置后重试';
   }
@@ -1150,64 +1339,36 @@ function renderHomePage() {
   const lastS = getLastSessionSummary();
   const weekTarget = Math.max(1, profile.trainingDays);
   const weekPct = Math.min(100, Math.round(weekDone / weekTarget * 100));
+  const suggested = suggestTodayFocus();
+  const focusKey = todayPlan?.focusKey || suggested.key;
+  const focusCode = {push:'PUSH DAY',pull:'PULL DAY',legs:'LEG DAY'}[focusKey] || 'TRAINING DAY';
+  const variant = todayPlan?.variant || cycleVariants[focusKey] || 'A';
+  const heroDetail = todayPlan
+    ? `${todayPlan.workout.length} 个动作 · ${todayPlan.factors.time} · ${todayPlan.factors.env}`
+    : `${suggested.day.name} · ${suggested.day.focus}，根据今天状态生成可执行计划`;
+  const heroAction = todayPlan ? (todayPlan.status === 'preview' ? '继续确认计划' : '继续今日训练') : '生成今日计划';
   const container = document.getElementById('homeContent');
   container.innerHTML = `
-    <div class="greeting">
-      <div>
-        <div class="user-badge">${currentUser}</div>
-        <h1>IronTrack</h1>
-        <p class="text-muted text-sm">准备开始今天的训练吗？</p>
-      </div>
-      <div class="avatar">${profile.weight}kg</div>
+    <header class="app-masthead">
+      <div><div class="brand-word">IRONTRACK</div><div class="brand-meta">个人训练 · ${escapeHtml(plan.name)}</div></div>
+      <div class="user-pill"><span>${escapeHtml(currentUser)}</span><b>${profile.weight}kg</b></div>
+    </header>
+    <section class="home-hero" onclick="navigate('training')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();navigate('training')}">
+      <div class="hero-kicker">${focusCode} · ${variant} 方案</div>
+      <div class="hero-title">今天，<br>继续向上。</div>
+      <div class="hero-summary">${escapeHtml(heroDetail)}</div>
+      <div class="hero-action"><span>${heroAction}</span><span>→</span></div>
+    </section>
+    <div class="home-section-label">本周状态</div>
+    <div class="home-metrics">
+      <div class="home-metric primary" onclick="navigate('data')" style="cursor:pointer"><small>训练进度</small><strong>${weekDone} / ${weekTarget}</strong><div class="home-progress"><i style="width:${weekPct}%"></i></div></div>
+      <div class="home-metric"><small>连续训练</small><strong>${streak}<span style="font-size:13px;color:var(--muted);margin-left:4px">天</span></strong></div>
     </div>
-    <div class="card today-card" onclick="navigate('training')" style="cursor:pointer">
-      <div class="card-header"><span class="text-accent text-sm font-bold">今日训练</span><span class="text-muted text-xs">本周已完成 ${weekDone} 次</span></div>
-      <div class="today-day-name">${todayPlan ? todayPlan.focus+'训练' : '按需生成今日计划'}</div>
-      <div class="today-day-focus">${todayPlan
-        ? `${todayPlan.workout.length}个动作 · ${todayPlan.factors.time} · ${todayPlan.factors.env}`
-        : '告诉我今天的身体状态、时间与环境，AI 为你生成含热身、正式训练、拉伸和饮食建议的个性化计划'}</div>
-      <div class="exercise-tags">
-        ${todayPlan
-          ? todayPlan.workout.slice(0,4).map(e=>`<span class="tag">${e.name}</span>`).join('') + (todayPlan.workout.length>4?`<span class="tag">+${todayPlan.workout.length-4}</span>`:'')
-          : `<span class="tag">⚡ 身体状态</span><span class="tag">⏱ 可用时间</span><span class="tag">🏢 训练环境</span>`}
-      </div>
-      <div class="btn btn-accent mt-3">${todayPlan ? '继续训练' : '开始训练'}</div>
-    </div>
-    <div class="card" style="cursor:pointer" onclick="navigate('data')">
-      <div class="row mb-3">
-        <span class="section-title" style="margin-bottom:0">本周进度</span>
-        <span class="text-accent font-bold" style="font-size:18px">${weekPct}%</span>
-      </div>
-      <div class="progress-bar" style="height:14px"><div class="progress-fill" style="width:${weekPct}%;background:var(--accent)"></div></div>
-      <div class="text-sm text-muted mb-3" style="margin-top:8px">已完成 ${weekDone}/${weekTarget} 次训练</div>
-      ${lastS ? `
-      <div class="last-session" style="border-top:1px solid var(--border);padding-top:14px">
-        <div class="text-muted text-sm mb-2">上次训练 · ${lastS.date}</div>
-        <div class="stat-grid-2">
-          <div class="stat-item-2"><div class="val">${lastS.dayName}</div><div class="lbl">训练课</div></div>
-          <div class="stat-item-2"><div class="val">${lastS.totalVol.toLocaleString()}</div><div class="lbl">总容量 kg</div></div>
-          <div class="stat-item-2"><div class="val">${lastS.totalSets}</div><div class="lbl">总组数</div></div>
-          <div class="stat-item-2"><div class="val">${lastS.duration}</div><div class="lbl">时长</div></div>
-        </div>
-      </div>` : `
-      <div class="text-muted text-sm" style="padding-top:8px">完成第一次训练后，这里会显示上次训练总结</div>`}
-    </div>
-    <div class="stat-grid">
-      <div class="stat-item"><div class="stat-value">${weekDone}/${profile.trainingDays}</div><div class="stat-label">本周训练</div></div>
-      <div class="stat-item"><div class="stat-value">${profile.weight}</div><div class="stat-label">体重 kg</div></div>
-      <div class="stat-item"><div class="stat-value">${streak}</div><div class="stat-label">连续天数</div></div>
-    </div>
-    <div class="flex-gap mt-4">
-      <div class="card" style="flex:1;cursor:pointer" onclick="navigate('plan')">
-        <div style="font-size:28px;margin-bottom:6px">📋</div>
-        <div class="font-bold text-sm">训练计划</div>
-        <div class="text-muted text-xs">${plan.name}</div>
-      </div>
-      <div class="card" style="flex:1;cursor:pointer" onclick="navigate('data')">
-        <div style="font-size:28px;margin-bottom:6px">📊</div>
-        <div class="font-bold text-sm">数据追踪</div>
-        <div class="text-muted text-xs">${sessions.length}次训练记录</div>
-      </div>
+    <div class="home-section-label">训练概览</div>
+    <div class="home-list">
+      ${lastS ? `<div class="home-row" onclick="navigate('data')"><div><div class="home-row-label">上次训练 · ${escapeHtml(lastS.date)}</div><div class="home-row-value">${escapeHtml(lastS.dayName)} · ${lastS.totalSets} 组</div></div><div class="home-row-side">${lastS.totalVol.toLocaleString()}kg<br>${lastS.duration}</div></div>` : `<div class="home-row" onclick="navigate('training')"><div><div class="home-row-label">上次训练</div><div class="home-row-value">完成第一次训练后显示摘要</div></div><span class="home-row-arrow">→</span></div>`}
+      <div class="home-row" onclick="navigate('plan')"><div><div class="home-row-label">训练体系</div><div class="home-row-value">${escapeHtml(plan.name)} · 下一项 ${escapeHtml(suggested.day.name)}</div></div><span class="home-row-arrow">→</span></div>
+      <div class="home-row" onclick="navigate('data')"><div><div class="home-row-label">数据记录</div><div class="home-row-value">已保存 ${sessions.length} 次训练</div></div><span class="home-row-arrow">→</span></div>
     </div>`;
 }
 
@@ -1322,6 +1483,7 @@ function resetTraining() {
 }
 
 function renderPlanPreview() {
+  setTrainingFixedAction(false);
   const sourceClass = todayPlan.source === 'ai' ? '' : ' local';
   const sourceText = todayPlan.source === 'ai' ? '规则 + AI 适配' : '本地备用计划';
   const items = todayPlan.workout.map((ex,index) => `
@@ -1396,6 +1558,7 @@ function startConfirmedPlan() {
   LS.set('setup_draft', null);
   initDynamicTraining();
   renderTrainingPage();
+  window.scrollTo(0, 0);
 }
 
 function discardTodayPlan() {
@@ -1404,6 +1567,7 @@ function discardTodayPlan() {
   LS.set('today_plan', null);
   LS.set('active_training', null);
   renderTrainingSetup();
+  window.scrollTo(0, 0);
 }
 
 function initDynamicTraining() {
@@ -1502,6 +1666,7 @@ function setSection(sec) {
   trainState.section = sec;
   persistTrainingState();
   renderTrainingUI();
+  window.scrollTo(0, 0);
 }
 
 function renderSectionTabs() {
@@ -1551,26 +1716,39 @@ function renderWorkout() {
   s.reps = validReps(s.reps, validReps(ex.reps, 8));
   const recs = s.records[ex.id] || [];
   return `
-    <div class="training-container">
-      <div class="exercise-name">${ex.name}</div>
+    <div class="training-container workout-focus">
+      <div class="hero-kicker text-center">动作 ${s.exIdx+1} / ${s.day.exercises.length} · ${escapeHtml(ex.role||'辅助')}</div>
+      <div class="exercise-name">${escapeHtml(ex.name)}</div>
       <div class="exercise-target">目标 ${ex.weight}kg · ${ex.sets}组×${ex.reps}次</div>
+      <div class="control-label text-center">本组重量</div>
       <div class="num-control">
         <div class="num-btn" onclick="adjustWeight(-2.5)">−</div>
-        <div class="num-display"><input class="big reps-input weight-input" type="text" inputmode="decimal" value="${s.weight}" aria-label="训练重量" onfocus="this.select()" onkeydown="handleWeightKey(event,this)" onblur="commitWeightInput(this)"><div class="unit">kg</div></div>
+        <div class="num-display"><input class="big reps-input weight-input" type="text" inputmode="decimal" value="${s.weight}" aria-label="训练重量" onfocus="focusTrainingInput(this)" onkeydown="handleWeightKey(event,this)" onblur="commitWeightInput(this)"><div class="unit">kg</div></div>
         <div class="num-btn" onclick="adjustWeight(2.5)">+</div>
       </div>
+      <div class="control-label text-center">本组次数</div>
       <div class="num-control">
         <div class="num-btn" onclick="adjustReps(-1)">−</div>
-        <div class="num-display"><input class="small reps-input" type="text" inputmode="numeric" pattern="[0-9]*" value="${s.reps}" aria-label="训练次数" onfocus="this.select()" onkeydown="handleRepsKey(event,this)" onblur="commitRepsInput(this)"><div class="unit">次</div></div>
+        <div class="num-display"><input class="small reps-input" type="text" inputmode="numeric" pattern="[0-9]*" value="${s.reps}" aria-label="训练次数" onfocus="focusTrainingInput(this)" onkeydown="handleRepsKey(event,this)" onblur="commitRepsInput(this)"><div class="unit">次</div></div>
         <div class="num-btn" onclick="adjustReps(1)">+</div>
       </div>
       <div class="set-indicator">第 ${s.set} 组 / 共 ${ex.sets} 组 · 动作 ${s.exIdx+1}/${s.day.exercises.length}</div>
       <div class="reason-note text-center">${escapeHtml(ex.reason||'按今日计划执行')}</div>
       ${recs.length > 0 ? `<div class="set-history">${recs.map(r=>`<span class="set-dot">组${r.set}:${r.w}×${r.r}</span>`).join('')}</div>` : ''}
     </div>
-    <div class="btn btn-accent" onclick="completeSet()">完成本组</div>
-    <button class="btn btn-outline mt-3" onclick="skipExercise()">跳过当前动作</button>
-    <button class="btn btn-outline mt-3" onclick="setSection('stretch')">跳过剩余，去拉伸</button>`;
+    <div class="training-actions">
+      <div id="workoutMore" class="workout-more">
+        <button class="btn btn-outline" onclick="skipExercise()">跳过当前动作</button>
+        <button class="btn btn-outline" onclick="setSection('stretch')">跳过剩余训练</button>
+      </div>
+      <button class="training-more-toggle" onclick="toggleWorkoutActions()">更多操作 · 跳过动作</button>
+      <button class="btn btn-accent" onclick="completeSet()">完成第 ${s.set} 组</button>
+    </div>`;
+}
+
+function toggleWorkoutActions() {
+  const panel = document.getElementById('workoutMore');
+  if (panel) panel.classList.toggle('open');
 }
 
 function renderStretch() {
@@ -1606,6 +1784,7 @@ function renderNutrition() {
 
 function renderTrainingUI() {
   const s = trainState;
+  setTrainingFixedAction(s.section === 'workout');
   const container = document.getElementById('trainingContent');
   let body = '';
   if (s.section === 'warmup') body = renderWarmup();
@@ -1631,6 +1810,7 @@ function toggleGuide(which, idx) {
 }
 
 function renderFeedbackPrompt() {
+  setTrainingFixedAction(false);
   const s = trainState;
   const ex = s.day.exercises.find(item=>item.id===s.pendingFeedback);
   if (!ex) { s.pendingFeedback = null; renderTrainingPage(); return; }
@@ -1691,6 +1871,7 @@ function skipExercise() {
 }
 
 function renderRestOverlay() {
+  setTrainingFixedAction(false);
   const s = trainState;
   const ex = s.day.exercises[s.exIdx];
   const container = document.getElementById('trainingContent');
@@ -1705,6 +1886,7 @@ function renderRestOverlay() {
 }
 
 function renderComplete() {
+  setTrainingFixedAction(false);
   const s = trainState;
   const container = document.getElementById('trainingContent');
   let summary = s.day.exercises.map(ex => {
@@ -1783,10 +1965,17 @@ function validWeight(value, fallback) {
   return Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed*2)/2 : fallback;
 }
 
+function focusTrainingInput(input) {
+  document.body.classList.add('keyboard-active');
+  input.select();
+  setTimeout(() => input.scrollIntoView({ block:'center', behavior:'smooth' }), 120);
+}
+
 function commitWeightInput(input) {
   const previous = validWeight(trainState.weight, 0);
   trainState.weight = validWeight(input.value, previous);
   input.value = trainState.weight;
+  document.body.classList.remove('keyboard-active');
   persistTrainingState();
 }
 
@@ -1806,6 +1995,7 @@ function commitRepsInput(input) {
   const previous = validReps(trainState.reps, validReps(ex.reps, 8));
   trainState.reps = validReps(input.value, previous);
   input.value = trainState.reps;
+  document.body.classList.remove('keyboard-active');
   persistTrainingState();
 }
 

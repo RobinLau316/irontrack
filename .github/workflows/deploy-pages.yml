@@ -23,9 +23,10 @@ jobs:
 
       - name: Prepare static site
         run: |
-          mkdir -p out
+          mkdir -p out/public
           cp index.html out/
           cp -r public/. out/ 2>/dev/null || true
+          cp -r public/. out/public/ 2>/dev/null || true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
