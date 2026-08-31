@@ -1,7 +1,7 @@
 # IronTrack 旧数据兼容与页面恢复设计
 
 日期：2026-09-01  
-状态：已实现并通过本地验收，待线上发布
+状态：已实现、验收并上线
 对应 PRD：`docs/superpowers/specs/2026-08-28-irontrack-prd.md`
 
 ## 1. 问题
