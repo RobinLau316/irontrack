@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">IronTrack 力量杠铃图标</title>
+  <desc id="desc">近黑背景上的荧光绿杠铃与暖白中心标记</desc>
+  <rect width="1024" height="1024" fill="#090A0A"/>
+  <g fill="#D9FF43">
+    <rect x="128" y="412" width="54" height="200" rx="27"/>
+    <rect x="182" y="350" width="104" height="324" rx="36"/>
+    <rect x="286" y="400" width="48" height="224" rx="20"/>
+    <rect x="310" y="456" width="404" height="112" rx="30"/>
+    <rect x="690" y="400" width="48" height="224" rx="20"/>
+    <rect x="738" y="350" width="104" height="324" rx="36"/>
+    <rect x="842" y="412" width="54" height="200" rx="27"/>
+  </g>
+  <circle cx="512" cy="512" r="43" fill="#F3F2EA"/>
+</svg>

@@ -1,6 +1,7 @@
 import fs from "node:fs";
 
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const manifest = JSON.parse(fs.readFileSync(new URL("../public/manifest.json", import.meta.url), "utf8"));
 const scripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map((match) => match[1]);
 
 if (scripts.length === 0) {
@@ -28,6 +29,8 @@ const requiredMarkers = [
   "ensureUserDataCompatibility",
   "rememberCompatibilityData",
   "repairAndRetryPage",
+  'rel="apple-touch-icon"',
+  'href="./manifest.json"',
 ];
 
 for (const marker of requiredMarkers) {
@@ -38,6 +41,43 @@ for (const asset of ["irontrack-hero.webp", "irontrack-hero.jpg"]) {
   if (!fs.existsSync(new URL(`../public/${asset}`, import.meta.url))) {
     throw new Error(`缺少本地主视觉资源：${asset}`);
   }
+}
+
+const pngAssets = [
+  ["apple-touch-icon.png", 180, 180],
+  ["icon-192.png", 192, 192],
+  ["icon-512.png", 512, 512],
+  ["icon-maskable-512.png", 512, 512],
+];
+
+for (const [asset, expectedWidth, expectedHeight] of pngAssets) {
+  const path = new URL(`../public/${asset}`, import.meta.url);
+  if (!fs.existsSync(path)) throw new Error(`缺少主屏幕图标资源：${asset}`);
+  const png = fs.readFileSync(path);
+  const signature = png.subarray(0, 8).toString("hex");
+  if (signature !== "89504e470d0a1a0a") throw new Error(`主屏幕图标不是有效 PNG：${asset}`);
+  const width = png.readUInt32BE(16);
+  const height = png.readUInt32BE(20);
+  if (width !== expectedWidth || height !== expectedHeight) {
+    throw new Error(`主屏幕图标尺寸错误：${asset} 应为 ${expectedWidth}×${expectedHeight}，实际为 ${width}×${height}`);
+  }
+}
+
+if (manifest.name !== "IronTrack - 智能健身伴侣" || manifest.short_name !== "IronTrack") {
+  throw new Error("Web App 清单中的应用名称不正确");
+}
+
+if (manifest.start_url !== "./" || manifest.scope !== "./") {
+  throw new Error("Web App 清单必须使用适配 GitHub Pages 子目录的相对入口");
+}
+
+const manifestIcons = new Map(manifest.icons.map((icon) => [icon.src, icon]));
+for (const src of ["./icon-192.png", "./icon-512.png", "./icon-maskable-512.png"]) {
+  if (!manifestIcons.has(src)) throw new Error(`Web App 清单缺少图标引用：${src}`);
+}
+
+if (manifestIcons.get("./icon-maskable-512.png")?.purpose !== "maskable") {
+  throw new Error("Web App 清单缺少 maskable 图标用途声明");
 }
 
 for (const removedMarker of ["switchProfileTab('knowledge'", "const knowledge =", "knowledge-item"]) {
