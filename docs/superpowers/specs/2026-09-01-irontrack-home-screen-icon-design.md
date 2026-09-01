@@ -1,7 +1,7 @@
 # IronTrack iPhone 主屏幕图标整改设计
 
 日期：2026-09-01  
-状态：已实现、验收并上线  
+状态：已实现、验收并上线
 对应 PRD：`docs/superpowers/specs/2026-08-28-irontrack-prd.md` 第 9.1、14.2、14.3、14.10 节
 
 ## 1. 问题与原因
