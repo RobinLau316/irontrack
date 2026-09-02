@@ -25,6 +25,11 @@ IronTrack 是一个手机优先的个人 AI 训练助手。它按 PPL 周期推�
 - V1.1 午夜竞技界面：首页品牌主视觉、单组专注训练页和荧光绿关键操作
 - 320×568、375×667、390×844 小屏安全区适配，底部导航不再遮挡训练按钮
 
+## 已验收、待接入
+
+- 207 个精选动作及中文步骤已完成分类验收，相关本地资源和检查工具已经生成。
+- 当前线上 `index.html` 尚未加载新动作库，智能变式、历史编号迁移和新动作说明仍属于阶段二工作。
+
 ## 本地运行
 
 ```bash
@@ -39,7 +44,7 @@ npm run dev
 npm run build
 ```
 
-当前静态检查会验证 `index.html` 中的脚本语法和关键能力标记。完整交互仍需按 [运行与发布手册](docs/runbook.md) 做浏览器冒烟测试。
+当前检查会验证 `index.html` 的脚本语法和关键能力标记，同时校验精选动作数量、字段、中文步骤、旧动作映射、资源体积和媒体排除边界。完整交互仍需按 [运行与发布手册](docs/runbook.md) 做浏览器冒烟测试。
 
 ## 数据与密钥
 
@@ -52,3 +57,4 @@ npm run build
 - [产品需求文档](docs/superpowers/specs/2026-08-28-irontrack-prd.md)
 - [系统架构](docs/architecture.md)
 - [运行与发布手册](docs/runbook.md)
+- [阶段一动作库分类审核报告](docs/superpowers/reviews/2026-09-02-exercise-catalog-review.md)
