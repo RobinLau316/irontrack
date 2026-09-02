@@ -1,7 +1,7 @@
 # IronTrack 精选动作库与智能变式设计规格
 
 日期：2026-09-02
-状态：讨论内容已通过，待书面规格确认
+状态：规格已确认，待实施计划批准
 对应 PRD：`docs/superpowers/specs/2026-08-28-irontrack-prd.md` 第 15 章
 数据来源：`hasaneyldrm/exercises-dataset`，审计版本 `7455efae41b330c265e7cd4b78dfa848e7ce5ebd`
 
