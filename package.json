@@ -6,7 +6,7 @@
     "dev": "python3 -m http.server 4173",
     "build": "npm run check",
     "start": "python3 -m http.server 4173",
-    "check": "node scripts/check-static.mjs && node scripts/check-exercise-catalog.mjs"
+    "check": "node scripts/check-static.mjs && node scripts/check-exercise-catalog.mjs && node scripts/check-exercise-engine.mjs"
   },
   "dependencies": {
     "next": "14.2.29",

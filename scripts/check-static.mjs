@@ -29,12 +29,40 @@ const requiredMarkers = [
   "ensureUserDataCompatibility",
   "rememberCompatibilityData",
   "repairAndRetryPage",
+  './public/exercise-engine.js',
+  "EXERCISE_CATALOG_URL",
+  "exercise_preferences",
+  "toggleExerciseInstructions",
+  "restorePausedExercise",
+  "replacementMuscle",
+  "normalizeCatalogAIPlan",
   'rel="apple-touch-icon"',
   'href="./manifest.json"',
 ];
 
 for (const marker of requiredMarkers) {
   if (!html.includes(marker)) throw new Error(`缺少关键能力：${marker}`);
+}
+
+if (/<(?:script|link)[^>]+(?:src|href)=["'][^"']*exercise-instructions-zh/i.test(html)) {
+  throw new Error("中文步骤不得在首页通过 script 或 link 预加载");
+}
+
+if (!html.includes("![1,2].includes(Number(payload.version))")) {
+  throw new Error("备份导入未兼容版本 1 与版本 2");
+}
+
+for (const backupKey of ["exercise_preferences", "exercise_catalog_version"]) {
+  const userKeyLine = html.match(/const USER_DATA_KEYS = \[[^\n]+/i)?.[0] || "";
+  if (!userKeyLine.includes(`'${backupKey}'`)) throw new Error(`普通备份缺少 ${backupKey}`);
+}
+
+if (/USER_DATA_KEYS[^\n]+apikey/i.test(html)) {
+  throw new Error("普通备份不应包含 API Key");
+}
+
+if (!fs.existsSync(new URL("../public/exercise-engine.js", import.meta.url))) {
+  throw new Error("缺少本地动作引擎");
 }
 
 for (const asset of ["irontrack-hero.webp", "irontrack-hero.jpg"]) {

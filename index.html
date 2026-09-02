@@ -223,7 +223,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .preview-role{flex-shrink:0;padding:4px 8px;border-radius:10px;background:rgba(255,107,53,.13);color:var(--accent);font-size:12px}
 .preview-role.aux{background:var(--bg);color:var(--muted)}
 .preview-actions{display:flex;gap:8px;margin-top:10px}
-.mini-btn{min-height:38px;padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;cursor:pointer}
+.mini-btn{min-height:44px;padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;cursor:pointer}
 .mini-btn.on{border-color:var(--accent);color:var(--accent)}
 .edit-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .edit-field label{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
@@ -232,6 +232,20 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .feedback-btn{min-height:52px;border:1px solid var(--border);border-radius:13px;background:var(--card);color:var(--text);font-size:16px;cursor:pointer}
 .feedback-btn:active{border-color:var(--accent);color:var(--accent)}
 .resume-banner{padding:12px 14px;border-radius:12px;background:rgba(42,157,143,.12);border:1px solid rgba(42,157,143,.3);color:#54c6b8;font-size:14px;margin-bottom:14px}
+.new-exercise-badge{display:inline-flex;align-items:center;margin-left:7px;padding:3px 7px;border-radius:999px;background:rgba(217,255,67,.1);color:var(--accent);font-size:10px;font-weight:850;vertical-align:2px}
+.instruction-toggle{border:0;background:transparent;color:var(--accent);font-size:12px;min-height:44px;padding:8px 0;cursor:pointer;text-align:left}
+.instruction-panel{display:none;margin:2px 0 10px;padding:12px 14px;border-left:2px solid var(--accent);background:#121210;color:#d4d6cc;font-size:13px;line-height:1.55;border-radius:0 12px 12px 0}
+.instruction-panel.open{display:block;animation:quickReveal .2s ease}
+.instruction-panel ol{padding-left:18px}.instruction-panel li+li{margin-top:6px}
+.light-choice{margin:10px 0 2px;padding:11px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.light-choice-label{font-size:11px;color:var(--muted);margin-bottom:8px}
+.segment-control{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:4px;border-radius:999px;background:#11110f;border:1px solid var(--border)}
+.segment-control button{min-height:44px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-size:12px;font-weight:750;cursor:pointer}
+.segment-control button.active{background:var(--accent);color:#0b0b0a}
+.paused-list{border-top:1px solid var(--border)}
+.paused-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+.paused-row-name{font-size:14px;font-weight:750}.paused-row-note{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4}
+.catalog-status{font-size:11px;color:var(--muted);line-height:1.5;margin-top:10px}
 .history-card{padding:13px 0;border-bottom:1px solid var(--border)}
 .history-card:last-child{border-bottom:none}
 .reason-note{font-size:13px;color:var(--muted);line-height:1.5;margin-top:5px}
@@ -409,6 +423,11 @@ body.keyboard-active #app{padding-bottom:24px}
   .set-indicator{margin:2px 0 4px}.reason-note{line-height:1.25}
 }
 
+@media(max-width:350px){
+  .preview-actions{flex-wrap:wrap}.preview-actions .mini-btn{flex:1 1 130px}
+  .instruction-panel{font-size:12px}.paused-row{align-items:flex-start;flex-direction:column}
+}
+
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
 }
@@ -507,6 +526,7 @@ body.keyboard-active #app{padding-bottom:24px}
   </div>
 </nav>
 
+<script src="./public/exercise-engine.js"></script>
 <script>
 // ============ 全局 API Key（所有用户共享）============
 function getGlobalApiKey() {
@@ -549,9 +569,9 @@ const LS = {
     catch(e) { return fallback; }
   },
   set(key, val) {
-    if (!currentUser) return;
-    try { localStorage.setItem('irontrack_'+currentUser+'_'+key, JSON.stringify(val)); }
-    catch(e) { console.warn('存储失败:', e); }
+    if (!currentUser) return false;
+    try { localStorage.setItem('irontrack_'+currentUser+'_'+key, JSON.stringify(val)); return true; }
+    catch(e) { console.warn('存储失败:', e); return false; }
   }
 };
 
@@ -747,10 +767,18 @@ const BODYWEIGHT_LIBRARY = {
   ]
 };
 
-const BACKUP_VERSION = 1;
-const USER_DATA_KEYS = ['profile','plan','sessions','body_records','measurements','today_index','today_plan','active_training','cycle_variants','core_locks','training_phase','setup_draft'];
+const BACKUP_VERSION = 2;
+const EXERCISE_CATALOG_URL = './public/data/exercise-catalog.v1.json';
+const EXERCISE_INSTRUCTIONS_URL = './public/data/exercise-instructions-zh.v1.json';
+const USER_DATA_KEYS = ['profile','plan','sessions','body_records','measurements','today_index','today_plan','active_training','cycle_variants','core_locks','training_phase','setup_draft','exercise_preferences','exercise_catalog_version'];
 const DEFAULT_CYCLE_VARIANTS = { push:'A', pull:'A', legs:'A' };
 const DEFAULT_SETUP_STATE = { focus:'', state:'', time:'', env:'', discomfort:[], avoid:'' };
+const DEFAULT_EXERCISE_PREFERENCES = { version:1, catalogVersion:'', paused:{}, lightChoices:{} };
+let exerciseCatalog = null;
+let exerciseCatalogStatus = 'idle';
+let exerciseCatalogError = '';
+let exerciseInstructions = null;
+const openInstructionIds = new Set();
 
 function cloneData(value) {
   return JSON.parse(JSON.stringify(value));
@@ -769,6 +797,169 @@ function isValidPlanData(value) {
   return isPlainRecord(value) && Array.isArray(value.days) && value.days.length > 0 && value.days.every(day =>
     isPlainRecord(day) && typeof day.name === 'string' && day.name.trim() && typeof day.focus === 'string' && Array.isArray(day.exercises)
   );
+}
+
+function getExerciseEngine() {
+  return window.IronTrackExerciseEngine || null;
+}
+
+function normalizeExercisePreferences(value) {
+  const source = isPlainRecord(value) ? value : {};
+  return {
+    version:1,
+    catalogVersion:typeof source.catalogVersion === 'string' ? source.catalogVersion : '',
+    paused:isPlainRecord(source.paused) ? source.paused : {},
+    lightChoices:isPlainRecord(source.lightChoices) ? source.lightChoices : {}
+  };
+}
+
+function catalogExerciseFor(reference) {
+  const engine = getExerciseEngine();
+  if (!engine || !exerciseCatalog) return null;
+  const resolved = engine.resolveLegacyExercise(reference, exerciseCatalog);
+  if (!resolved || !resolved.exerciseId?.startsWith('exds:')) return null;
+  return engine.normalizeExercise(resolved);
+}
+
+function stableExerciseId(reference) {
+  const engine = getExerciseEngine();
+  if (!engine || !exerciseCatalog) return reference?.exerciseId || '';
+  const resolved = engine.resolveLegacyExercise(reference, exerciseCatalog);
+  return resolved?.exerciseId || reference?.exerciseId || '';
+}
+
+function inferReplacementMuscle(ex, focusKey) {
+  if (ex.replacementMuscle) return ex.replacementMuscle;
+  const name = String(ex.name || ex.nameZh || '');
+  const pattern = ex.pattern || ex.movementPatterns?.[0] || '';
+  if (focusKey === 'push') {
+    if (pattern === '肘伸' || /三头|窄握|窄距|钻石/.test(name)) return '肱三头肌';
+    if (['垂直推','肩外展','肩后束','肩屈','肩胛控制'].includes(pattern) || /肩|飞鸟/.test(name) && /反向|俯身/.test(name)) return '三角肌';
+    return '胸肌';
+  }
+  if (focusKey === 'pull') {
+    if (pattern === '肘屈' || /弯举/.test(name)) return '肱二头肌';
+    if (/耸肩/.test(name)) return '斜方肌';
+    if (pattern === '垂直拉' || /下拉|引体/.test(name)) return '背阔肌';
+    return '上背';
+  }
+  if (pattern === '核心') return '核心';
+  if (pattern === '提踵') return '小腿肌群';
+  if (pattern === '屈膝' || /腿弯举/.test(name)) return '腘绳肌';
+  if (['膝主导','单腿膝主导','膝伸'].includes(pattern)) return '股四头肌';
+  return '臀肌';
+}
+
+function inferLoadRegions(ex) {
+  const pattern = ex.pattern || ex.movementPatterns?.[0] || '';
+  const regions = [];
+  if (['水平推','垂直推','肩外展','肩后束','肩屈','水平拉','垂直拉','肩胛控制'].includes(pattern)) regions.push('肩');
+  if (['水平推','垂直推','水平拉','垂直拉','肘屈','肘伸'].includes(pattern)) regions.push('肘/腕');
+  if (['髋主导','水平拉'].includes(pattern)) regions.push('腰背');
+  if (['髋主导','膝主导','单腿膝主导'].includes(pattern)) regions.push('髋');
+  if (['膝主导','单腿膝主导','膝伸','屈膝'].includes(pattern)) regions.push('膝');
+  if (pattern === '提踵' || pattern === '单腿膝主导') regions.push('踝');
+  return [...new Set(regions)];
+}
+
+function enrichRuntimeExercise(base, focusKey) {
+  const source = cloneData(base || {});
+  const catalogMatch = catalogExerciseFor(source);
+  const stableId = catalogMatch?.exerciseId || stableExerciseId(source) || source.exerciseId || '';
+  const name = source.name || source.nameZh || catalogMatch?.name || '';
+  const pattern = source.pattern || source.movementPatterns?.[0] || catalogMatch?.pattern || '综合';
+  return Object.assign({}, catalogMatch || {}, source, {
+    exerciseId:stableId,
+    name,
+    nameZh:name,
+    nameSnapshot:source.nameSnapshot || name,
+    pattern,
+    movementPatterns:source.movementPatterns || catalogMatch?.movementPatterns || [pattern],
+    equipment:Array.isArray(source.equipment) && source.equipment.length ? source.equipment : (catalogMatch?.equipment || ['徒手']),
+    replacementMuscle:catalogMatch?.replacementMuscle || inferReplacementMuscle(source, focusKey),
+    loadRegions:catalogMatch?.loadRegions || inferLoadRegions(source),
+    balanceTags:catalogMatch?.balanceTags || [pattern],
+    variantGroup:catalogMatch?.variantGroup || source.variantGroup || pattern,
+    catalogVersion:catalogMatch?.catalogVersion || source.catalogVersion || (stableId.startsWith('exds:') ? exerciseCatalog?.version || '' : '')
+  });
+}
+
+function migrateExerciseReferences() {
+  if (!currentUser || !exerciseCatalog || LS.get('catalog_migration_v1', '') === exerciseCatalog.version) return;
+  const engine = getExerciseEngine();
+  if (!engine?.migrateLegacyData) return;
+  const original = {
+    plan:LS.get('plan', null), sessions:LS.get('sessions', []), today_plan:LS.get('today_plan', null), active_training:LS.get('active_training', null)
+  };
+  const migrated = engine.migrateLegacyData(original, exerciseCatalog);
+  const next = migrated.data;
+  const changes = migrated.changes;
+  if (changes > 0) {
+    const saved = LS.set('catalog_compat_recovery_v1', { savedAt:new Date().toISOString(), catalogVersion:exerciseCatalog.version, data:original });
+    if (!saved) {
+      console.warn('动作编号兼容快照保存失败，本次不迁移旧数据');
+      return;
+    }
+    const writes = [['plan',next.plan],['sessions',next.sessions],['today_plan',next.today_plan],['active_training',next.active_training]];
+    if (!writes.every(([key,value]) => LS.set(key,value))) {
+      Object.entries(original).forEach(([key,value]) => LS.set(key,value));
+      console.warn('动作编号兼容写入失败，已恢复迁移前数据');
+      return;
+    }
+    plan = next.plan;
+    sessions = next.sessions;
+    if (todayPlan) todayPlan = next.today_plan;
+    if (trainState?.day && next.active_training?.state?.day) trainState.day.exercises = next.active_training.state.day.exercises;
+  }
+  exercisePreferences.catalogVersion = exerciseCatalog.version;
+  LS.set('exercise_preferences', exercisePreferences);
+  LS.set('exercise_catalog_version', exerciseCatalog.version);
+  LS.set('catalog_migration_v1', exerciseCatalog.version);
+}
+
+async function ensureExerciseCatalog() {
+  if (exerciseCatalog) return exerciseCatalog;
+  if (exerciseCatalogStatus === 'loading') {
+    while (exerciseCatalogStatus === 'loading') await new Promise(resolve => setTimeout(resolve, 25));
+    return exerciseCatalog;
+  }
+  exerciseCatalogStatus = 'loading';
+  try {
+    const response = await fetch(EXERCISE_CATALOG_URL, { cache:'no-cache' });
+    if (!response.ok) throw new Error(`目录请求失败 ${response.status}`);
+    const catalog = await response.json();
+    if (!catalog || catalog.version !== 'irontrack-exercises-v1' || !Array.isArray(catalog.exercises) || catalog.exercises.length < 200) throw new Error('目录结构或版本不合规');
+    const engine = getExerciseEngine();
+    if (!engine) throw new Error('动作引擎未加载');
+    const normalized = catalog.exercises.map(item => engine.normalizeExercise(item));
+    if (normalized.some(item => !item)) throw new Error('目录包含无效动作');
+    exerciseCatalog = catalog;
+    exerciseCatalogStatus = 'ready';
+    exerciseCatalogError = '';
+    migrateExerciseReferences();
+    return exerciseCatalog;
+  } catch(e) {
+    console.warn('精选动作库加载失败，继续使用原内置动作库:', e);
+    exerciseCatalog = null;
+    exerciseCatalogStatus = 'failed';
+    exerciseCatalogError = e.message || '加载失败';
+    return null;
+  }
+}
+
+async function ensureExerciseInstructions() {
+  if (exerciseInstructions) return exerciseInstructions;
+  try {
+    const response = await fetch(EXERCISE_INSTRUCTIONS_URL, { cache:'force-cache' });
+    if (!response.ok) throw new Error('说明请求失败');
+    const bundle = await response.json();
+    if (!bundle || bundle.version !== exerciseCatalog?.version || !isPlainRecord(bundle.instructions)) throw new Error('说明版本不一致');
+    exerciseInstructions = bundle.instructions;
+    return exerciseInstructions;
+  } catch(e) {
+    console.warn('动作说明加载失败:', e);
+    return null;
+  }
 }
 
 function rememberCompatibilityData(recovery) {
@@ -881,11 +1072,18 @@ function ensureUserDataCompatibility() {
     }
   }
 
+  const rawExercisePreferences = LS.get('exercise_preferences', null);
+  exercisePreferences = normalizeExercisePreferences(rawExercisePreferences);
+  if (!sameData(rawExercisePreferences, exercisePreferences)) {
+    if (rawExercisePreferences != null && !isPlainRecord(rawExercisePreferences)) recovery.exercise_preferences = rawExercisePreferences;
+    LS.set('exercise_preferences', exercisePreferences);
+  }
+
   rememberCompatibilityData(recovery);
 }
 
 // ============ 全局变量（登录后初始化）============
-let profile, plan, sessions, bodyRecords, measurements, todayIndex, cycleVariants, coreLocks, trainingPhase;
+let profile, plan, sessions, bodyRecords, measurements, todayIndex, cycleVariants, coreLocks, trainingPhase, exercisePreferences;
 
 function initUserData() {
   trainState = {};
@@ -918,6 +1116,7 @@ function initUserData() {
   }
 
   applyPrevRecords();
+  if (exerciseCatalog) migrateExerciseReferences();
 }
 
 // ============ 登录逻辑 ============
@@ -1121,6 +1320,9 @@ const DISCOMFORT_OPTIONS = ['无','肩','肘/腕','腰背','髋','膝','踝'];
 
 function enterTraining() {
   if (!currentUser) return;
+  ensureExerciseCatalog().then(() => {
+    if (document.getElementById('page-training')?.classList.contains('active') && !todayPlan) renderTrainingSetup();
+  });
   // 若已有今日计划，进入预览或继续训练。
   if (todayPlan && todayPlan.date === getTodayStr()) {
     renderTrainingPage();
@@ -1152,6 +1354,11 @@ function renderTrainingSetup() {
   const timeChips = TIME_OPTIONS.map(o => `<div class="opt-chip ${setupSel.time===o.k?'sel':''}" onclick="setTime('${o.k}')"><span class="opt-emoji">${o.e}</span><span class="opt-text">${o.k}</span></div>`).join('');
   const envChips = ENV_OPTIONS.map(o => `<div class="opt-chip ${setupSel.env===o.k?'sel':''}" onclick="setEnv('${o.k}')"><span class="opt-emoji">${o.e}</span><span class="opt-text">${o.k}</span></div>`).join('');
   const discomfortChips = DISCOMFORT_OPTIONS.map(o => `<div class="opt-chip ${setupSel.discomfort.includes(o)?'sel':''}" onclick="toggleDiscomfort('${o}')">${o}</div>`).join('');
+  const catalogStatusHtml = exerciseCatalogStatus === 'ready'
+    ? '<div class="catalog-status">精选动作库已就绪 · 计划会优先避开最近两次同类训练动作</div>'
+    : exerciseCatalogStatus === 'failed'
+      ? '<div class="catalog-status" style="color:var(--danger)">精选动作库暂不可用，本次仍可使用原内置动作库</div>'
+      : '<div class="catalog-status">正在准备精选动作库，生成时会自动检查</div>';
   const container = document.getElementById('trainingContent');
   container.innerHTML = `
     <div class="training-header">
@@ -1161,6 +1368,7 @@ function renderTrainingSetup() {
     <div class="card">
       <div class="setup-title">开始今天的训练</div>
       <div class="setup-subtitle">告诉我你今天的状况，为你生成个性化计划</div>
+      ${catalogStatusHtml}
       <div class="setup-group">
         <span class="setup-label">今日想练的部位（已自动推荐）</span>
         <div class="setup-recommend">💡 ${suggested.reason}</div>
@@ -1241,6 +1449,7 @@ async function confirmSetup() {
   let generated = null;
   try {
     ensureUserDataCompatibility();
+    await ensureExerciseCatalog();
     generated = await generateTodayPlan();
   } catch(e) {
     console.error('今日计划生成失败:', e);
@@ -1262,7 +1471,7 @@ function targetExerciseCount(time) {
 
 function allLibraryExercises(key) {
   const lib = EXERCISE_LIBRARY[key] || EXERCISE_LIBRARY.push;
-  return lib.core.concat(lib.auxiliary, BODYWEIGHT_LIBRARY[key] || []);
+  return lib.core.concat(lib.auxiliary, BODYWEIGHT_LIBRARY[key] || []).map(ex => enrichRuntimeExercise(ex, key));
 }
 
 function avoidTerms() {
@@ -1272,7 +1481,10 @@ function avoidTerms() {
 function isExerciseBlocked(ex) {
   const terms = avoidTerms();
   if (terms.some(t => ex.name.includes(t) || t.includes(ex.name))) return true;
+  const exerciseId = ex.exerciseId || stableExerciseId(ex);
+  if (exerciseId && exercisePreferences?.paused?.[exerciseId]) return true;
   const pain = setupSel.discomfort || [];
+  if ((ex.loadRegions || []).some(region => pain.includes(region))) return true;
   if (pain.includes('肩') && ['垂直推','肩外展','肩后束'].includes(ex.pattern)) return true;
   if (pain.includes('肘/腕') && ['肘伸','肘屈'].includes(ex.pattern)) return true;
   if (pain.includes('腰背') && ['髋主导'].includes(ex.pattern)) return true;
@@ -1286,29 +1498,35 @@ function matchesEnvironment(ex) {
   if (setupSel.env === '家用徒手') return ex.equipment.includes('徒手');
   if (setupSel.env === '家用哑铃') return ex.equipment.some(e => e === '哑铃' || e === '徒手');
   const available = new Set((profile.equipment || []).concat(['徒手','杠铃','哑铃']));
-  return ex.equipment.some(e => available.has(e)) || setupSel.env === '健身房';
+  if (available.has('龙门架')) available.add('绳索机');
+  if (available.has('绳索机')) available.add('龙门架');
+  return ex.equipment.some(e => available.has(e));
 }
 
-function getLastExerciseRecord(name) {
+function getLastExerciseRecord(reference) {
+  const name = typeof reference === 'string' ? reference : reference?.name;
+  const exerciseId = typeof reference === 'object' ? (reference.exerciseId || stableExerciseId(reference)) : stableExerciseId({name});
   for (const session of sessions) {
-    const found = (session.exercises || []).find(ex => ex.name === name);
+    const found = (session.exercises || []).find(ex => exerciseId && ex.exerciseId === exerciseId || ex.name === name);
     if (found && found.sets && found.sets.length) return { session, exercise:found };
   }
   return null;
 }
 
-function getExerciseHistory(name, limit=3) {
+function getExerciseHistory(reference, limit=3) {
+  const name = typeof reference === 'string' ? reference : reference?.name;
+  const exerciseId = typeof reference === 'object' ? (reference.exerciseId || stableExerciseId(reference)) : stableExerciseId({name});
   const history = [];
   for (const session of sessions) {
-    const found = (session.exercises || []).find(ex => ex.name === name);
+    const found = (session.exercises || []).find(ex => exerciseId && ex.exerciseId === exerciseId || ex.name === name);
     if (found) history.push(found);
     if (history.length >= limit) break;
   }
   return history;
 }
 
-function hadRecentDiscomfort(name) {
-  const last = getLastExerciseRecord(name);
+function hadRecentDiscomfort(reference) {
+  const last = getLastExerciseRecord(reference);
   return !!(last && last.exercise.feedback === '不适');
 }
 
@@ -1317,12 +1535,25 @@ function roundLoad(value) {
   return Math.max(0, Math.round(value / 2.5) * 2.5);
 }
 
+function hasCompletedExercise(reference) {
+  const exerciseId = reference.exerciseId || stableExerciseId(reference);
+  return sessions.some(session => (session.exercises || []).some(ex =>
+    ((exerciseId && ex.exerciseId === exerciseId) || ex.name === reference.name) && Array.isArray(ex.sets) && ex.sets.length > 0
+  ));
+}
+
+function isNewCatalogExercise(exercise) {
+  return !!exercise.exerciseId?.startsWith('exds:') && !hasCompletedExercise(exercise);
+}
+
 function adaptExercise(base, reason) {
-  const ex = JSON.parse(JSON.stringify(base));
-  const last = getLastExerciseRecord(ex.name);
+  const focusKey = focusKeyFromText(setupSel.focus || base.pplTags?.[0] || '');
+  const ex = enrichRuntimeExercise(base, focusKey);
+  const last = getLastExerciseRecord(ex);
   ex.id = 'dyn-' + Math.random().toString(36).slice(2, 9);
   ex.locked = ex.role === '核心' ? coreLocks[ex.name] !== false : false;
   ex.reason = reason || (ex.role === '核心' ? '训练阶段内保持核心动作稳定' : '按本轮 A/B 方案选择');
+  ex.isNew = isNewCatalogExercise(ex);
   if (last) {
     const maxWeight = Math.max(...last.exercise.sets.map(s => Number(s.w) || 0));
     const feedback = last.exercise.feedback || '';
@@ -1332,9 +1563,10 @@ function adaptExercise(base, reason) {
     else if (feedback === '吃力' && ex.weight > 0) { ex.weight = roundLoad(ex.weight * 0.95); ex.reason += '；上次评价吃力，建议适当减量'; }
     else if (feedback === '不适') ex.reason += '；上次记录不适，本次请重点确认';
     ex.previous = { weight:maxWeight, reps:last.exercise.sets[last.exercise.sets.length-1].r, feedback };
+    if (feedback === '轻松' && ex.role !== '核心') ex.lightChoice = exercisePreferences?.lightChoices?.[ex.exerciseId] || 'progress';
   }
   if (ex.role === '核心') {
-    const recent = getExerciseHistory(ex.name,3);
+    const recent = getExerciseHistory(ex,3);
     if (recent.length === 3 && recent.every(item=>item.completed===false)) ex.reason += '；连续 3 次未完成目标，建议本次确认是否替换';
     const phaseDays = Math.max(1, Math.floor((Date.now()-new Date(trainingPhase.startedAt||getTodayStr()).getTime())/86400000)+1);
     if (phaseDays >= 28) ex.reason += `；当前训练阶段已进入第 ${Math.ceil(phaseDays/7)} 周，可评估是否继续`;
@@ -1350,7 +1582,7 @@ function adaptExercise(base, reason) {
   return ex;
 }
 
-function createLocalPlan() {
+function createLegacyLocalPlan() {
   const key = focusKeyFromText(setupSel.focus);
   const lib = EXERCISE_LIBRARY[key];
   const count = targetExerciseCount(setupSel.time);
@@ -1396,27 +1628,186 @@ function createLocalPlan() {
   };
 }
 
+function catalogAvailableEquipment() {
+  const items = new Set((profile.equipment || []).concat(['徒手','杠铃','哑铃']));
+  if (items.has('龙门架')) items.add('绳索机');
+  if (items.has('绳索机')) items.add('龙门架');
+  return [...items];
+}
+
+function getCatalogCandidates(key) {
+  const engine = getExerciseEngine();
+  if (!engine || !exerciseCatalog) return [];
+  return engine.filterCandidates(exerciseCatalog, {
+    focusKey:key,
+    environment:setupSel.env,
+    availableEquipment:catalogAvailableEquipment(),
+    discomfort:setupSel.discomfort || [],
+    avoidTerms:avoidTerms(),
+    pausedIds:Object.keys(exercisePreferences?.paused || {})
+  });
+}
+
+function getSameFocusSessions(key, limit=2) {
+  return sessions.filter(session => focusKeyFromText(session.focusArea || session.dayName) === key).slice(0, limit);
+}
+
+function catalogHistoryContext(key) {
+  const sameFocus = getSameFocusSessions(key, 20);
+  const recentExerciseIds = [];
+  const lastUsed = {};
+  sameFocus.forEach((session, sessionIndex) => {
+    (session.exercises || []).forEach(exercise => {
+      const id = stableExerciseId(exercise);
+      if (!id) return;
+      if (sessionIndex < 2) recentExerciseIds.push(id);
+      if (!Object.prototype.hasOwnProperty.call(lastUsed, id)) lastUsed[id] = sessionIndex * 20;
+    });
+  });
+  return { sameFocus, recentExerciseIds:[...new Set(recentExerciseIds)], lastUsed };
+}
+
+function createCatalogPlan() {
+  const engine = getExerciseEngine();
+  if (!engine || !exerciseCatalog) throw new Error('精选动作库未就绪');
+  const key = focusKeyFromText(setupSel.focus);
+  const lib = EXERCISE_LIBRARY[key];
+  const count = targetExerciseCount(setupSel.time);
+  const variant = cycleVariants[key] || 'A';
+  const candidates = getCatalogCandidates(key);
+  if (candidates.length < count) throw new Error('当前条件下精选动作候选不足');
+  const selectedCoreIds = new Set();
+  const corePlans = lib.core.slice(0, 2).map(originalValue => {
+    const original = enrichRuntimeExercise(originalValue, key);
+    let chosen = !isExerciseBlocked(original) && matchesEnvironment(original) ? original : candidates.find(ex =>
+      ex.pattern === original.pattern && !selectedCoreIds.has(ex.exerciseId)
+    );
+    if (!chosen) return null;
+    selectedCoreIds.add(chosen.exerciseId || chosen.name);
+    const adapted = adaptExercise(chosen, chosen.name === original.name ? '核心动作锁定，保持训练表现可追踪' : `因环境或身体限制，以“${chosen.name}”替代核心动作“${original.name}”`);
+    adapted.role = '核心';
+    adapted.locked = chosen.name === original.name ? coreLocks[original.name] !== false : false;
+    return adapted;
+  }).filter(Boolean);
+  const context = catalogHistoryContext(key);
+  const eligibleIds = new Set(candidates.map(ex => ex.exerciseId));
+  const previous = (context.sameFocus[0]?.exercises || []).filter(ex => ex.role !== '核心').map(ex => catalogExerciseFor(ex)).filter(ex => ex && eligibleIds.has(ex.exerciseId));
+  const seed = `${currentUser}:${key}:${variant}:${context.sameFocus.length}:${sessions.length}:${exerciseCatalog.version}`;
+  let selection = engine.buildFallbackPlan({
+    core:corePlans,
+    candidates,
+    previous,
+    count,
+    focusKey:key,
+    seed,
+    recentExerciseIds:context.recentExerciseIds,
+    lastUsed:context.lastUsed
+  });
+  let rebuiltForBalance = false;
+  if (!selection.balance.valid) {
+    selection = engine.buildFallbackPlan({
+      core:corePlans,
+      candidates,
+      previous:[],
+      count,
+      focusKey:key,
+      seed:`${seed}:balance`,
+      recentExerciseIds:context.recentExerciseIds,
+      lastUsed:context.lastUsed
+    });
+    rebuiltForBalance = true;
+  }
+  if (selection.workout.length !== count || !selection.balance.valid) throw new Error(`精选动作计划结构不足：${selection.balance.missing.join('、')}`);
+  const previousIds = new Set(previous.map(ex => ex.exerciseId));
+  const coreIdSet = new Set(corePlans.map(ex => ex.exerciseId));
+  const workout = selection.workout.map(item => {
+    if (coreIdSet.has(item.exerciseId)) return corePlans.find(ex => ex.exerciseId === item.exerciseId);
+    const retained = previousIds.has(item.exerciseId);
+    const adapted = adaptExercise(item, retained ? `延续上次辅助动作，保留本轮约 60%～70% 的训练连续性` : `按 ${variant} 轮换阶段选择同肌群变式，并优先避开最近两次同类训练`);
+    adapted.role = '辅助';
+    adapted.locked = false;
+    return adapted;
+  });
+  return {
+    id:'plan-'+Date.now(), date:getTodayStr(), status:'preview', source:'local', variant,
+    catalogVersion:exerciseCatalog.version,
+    focus:lib.focus, focusKey:key,
+    factors:{ focus:setupSel.focus, state:setupSel.state, time:setupSel.time, env:setupSel.env, discomfort:setupSel.discomfort.slice(), avoid:setupSel.avoid },
+    warmup:[
+      {name:'低强度有氧',note:'快走或单车 3 分钟，逐步提高体温'},
+      {name:'关节动态活动',note:'围绕今天训练部位活动 2～3 分钟'},
+      {name:'主项递增热身',note:'从轻重量开始，用 2～3 组逐级接近工作重量'}
+    ],
+    workout,
+    stretch:[
+      {name:'目标肌群放松',note:'主要训练肌群各保持 30 秒，自然呼吸'},
+      {name:'舒缓活动',note:'低强度走动并观察是否有异常不适'}
+    ],
+    nutrition:`训练后优先补充蛋白质和适量碳水，并根据你的“${profile.goal}”目标控制全天总量。`,
+    rotation:{ targetRatio:0.35, rotatedSlots:selection.rotatedSlots, rebuiltForBalance },
+    notice:getGlobalApiKey() ? (rebuiltForBalance ? '为保持整套训练结构，本次已由本地规则重新平衡动作。' : '') : '未设置 API Key，本次使用精选动作库生成本地备用计划。'
+  };
+}
+
+function createLocalPlan() {
+  if (exerciseCatalog && getExerciseEngine()) {
+    try { return createCatalogPlan(); }
+    catch(e) {
+      console.warn('精选动作库计划生成失败，回退原内置动作库:', e);
+      const fallback = createLegacyLocalPlan();
+      fallback.notice = `精选动作库暂不可用，已回退原内置动作库（${e.message}）。`;
+      return fallback;
+    }
+  }
+  const fallback = createLegacyLocalPlan();
+  if (exerciseCatalogStatus === 'failed') fallback.notice = `精选动作库加载失败，已使用原内置动作库（${exerciseCatalogError}）。`;
+  return fallback;
+}
+
 function buildTodayPrompt(skeleton) {
   const recent = sessions.slice(0, 6).map(s => `${s.date} ${s.dayName||s.focusArea||''}: ${(s.exercises||[]).map(e=>`${e.name}[${e.feedback||'无反馈'}]`).join('、')}`).join('\n');
-  const allowed = allLibraryExercises(skeleton.focusKey).filter(ex=>!isExerciseBlocked(ex)).map(ex=>ex.name).join('、');
+  const usesCatalog = !!(skeleton.catalogVersion && exerciseCatalog && getExerciseEngine());
+  const available = usesCatalog
+    ? getCatalogCandidates(skeleton.focusKey).concat(skeleton.workout)
+    : allLibraryExercises(skeleton.focusKey).filter(ex=>!isExerciseBlocked(ex));
+  const allowed = [...new Map(available.map(ex => [ex.exerciseId || ex.name, ex])).values()].map(ex => usesCatalog
+    ? `${ex.exerciseId}|${ex.name}|替代肌群:${ex.replacementMuscle}|动作模式:${ex.pattern}`
+    : ex.name
+  ).join('、');
+  const skeletonSummary = skeleton.workout.map((ex,index) => ({
+    index,
+    exerciseId:ex.exerciseId || '',
+    name:ex.name,
+    pattern:ex.pattern,
+    replacementMuscle:ex.replacementMuscle || '',
+    role:ex.role,
+    locked:!!ex.locked,
+    sets:ex.sets,
+    reps:ex.reps,
+    weight:ex.weight,
+    rest:ex.rest
+  }));
   return `你是力量训练计划适配助手。程序已经生成训练骨架，你只能在规则范围内调整，不得进行伤病诊断。
 用户：${profile.experience}，目标${profile.goal}，器械${(profile.equipment||[]).join('、')}。
 当天：${JSON.stringify(skeleton.factors)}。
 最近记录：${recent||'无'}。
 允许动作：${allowed}。
-骨架：${JSON.stringify(skeleton.workout)}。
+骨架：${JSON.stringify(skeletonSummary)}。
 要求：
 1. 正式动作保持 ${skeleton.workout.length} 个，范围必须是 8-15 个。
-2. locked=true 的动作名称和动作模式不得改变。
+2. locked=true 的动作必须保留在原位置，动作编号和动作模式不得改变。
 3. 不得使用不适部位、避开动作或允许列表以外的动作。
-4. 每个动作必须返回 name、pattern、role、sets、reps、weight、rest、locked、reason。
+4. ${usesCatalog ? '每个动作必须返回 exerciseId、sets、reps、weight、rest、reason；名称由程序按编号读取，不要自创动作。' : '每个动作必须返回 name、pattern、role、sets、reps、weight、rest、locked、reason。'}
 5. sets/reps/rest 必须是正整数，weight 必须是非负数字；reason 用一句中文说明调整依据。
-6. 只输出 JSON：{"warmup":[{"name":"","note":""}],"workout":[],"stretch":[{"name":"","note":""}],"nutrition":""}`;
+6. 如替换辅助动作，只能换成 replacementMuscle 相同的动作，且整套计划仍需满足推拉腿结构平衡。
+7. 只输出 JSON：{"warmup":[{"name":"","note":""}],"workout":[],"stretch":[{"name":"","note":""}],"nutrition":""}`;
 }
 
 function normalizeAIPlan(raw, skeleton) {
   if (!raw || !Array.isArray(raw.workout) || raw.workout.length < 8 || raw.workout.length > 15) throw new Error('动作数量不合规');
   if (raw.workout.length !== skeleton.workout.length) throw new Error('动作数量与时间规则不一致');
+  const usesCatalog = !!(skeleton.catalogVersion && exerciseCatalog && getExerciseEngine());
+  if (usesCatalog) return normalizeCatalogAIPlan(raw, skeleton);
   const allowed = allLibraryExercises(skeleton.focusKey);
   const allowedMap = new Map(allowed.map(ex=>[ex.name,ex]));
   const lockedNames = skeleton.workout.filter(ex=>ex.locked).map(ex=>ex.name);
@@ -1433,6 +1824,41 @@ function normalizeAIPlan(raw, skeleton) {
   });
   return Object.assign({}, skeleton, {
     source:'ai', notice:'AI 已在本地训练规则范围内完成适配。', workout,
+    warmup:Array.isArray(raw.warmup)&&raw.warmup.length?raw.warmup:skeleton.warmup,
+    stretch:Array.isArray(raw.stretch)&&raw.stretch.length?raw.stretch:skeleton.stretch,
+    nutrition:typeof raw.nutrition==='string'&&raw.nutrition.trim()?raw.nutrition:skeleton.nutrition
+  });
+}
+
+function normalizeCatalogAIPlan(raw, skeleton) {
+  const engine = getExerciseEngine();
+  const allowed = getCatalogCandidates(skeleton.focusKey).concat(skeleton.workout);
+  const validation = engine.validateCandidateSequence(raw.workout, skeleton.workout, allowed, skeleton.focusKey);
+  if (!validation.valid) throw new Error(validation.error);
+  const allowedMap = new Map(allowed.map(ex => [ex.exerciseId, enrichRuntimeExercise(ex, skeleton.focusKey)]).filter(([id]) => id));
+  const workout = raw.workout.map((item,index) => {
+    const slot = skeleton.workout[index];
+    const base = allowedMap.get(String(item.exerciseId || ''));
+    if (!base || isExerciseBlocked(base) || !matchesEnvironment(base)) throw new Error('出现范围外动作');
+    const sets = Number(item.sets), reps = Number(item.reps), weight = Number(item.weight), rest = Number(item.rest);
+    if (!Number.isInteger(sets)||sets<1||sets>8||!Number.isInteger(reps)||reps<1||reps>100||!Number.isFinite(weight)||weight<0||!Number.isInteger(rest)||rest<30||rest>300) throw new Error('动作数值不合规');
+    const source = base.exerciseId === slot.exerciseId ? slot : adaptExercise(base, `AI 按当天状态选择同肌群变式，替代“${slot.name}”`);
+    return Object.assign({}, source, {
+      id:'dyn-ai-'+index,
+      sets,
+      reps,
+      weight,
+      rest,
+      reason:String(item.reason || source.reason || 'AI 在本地规则范围内完成适配'),
+      locked:slot.locked,
+      role:slot.role,
+      isNew:isNewCatalogExercise(base)
+    });
+  });
+  return Object.assign({}, skeleton, {
+    source:'ai',
+    notice:'AI 已在精选动作库和本地训练规则范围内完成适配。',
+    workout,
     warmup:Array.isArray(raw.warmup)&&raw.warmup.length?raw.warmup:skeleton.warmup,
     stretch:Array.isArray(raw.stretch)&&raw.stretch.length?raw.stretch:skeleton.stretch,
     nutrition:typeof raw.nutrition==='string'&&raw.nutrition.trim()?raw.nutrition:skeleton.nutrition
@@ -1636,6 +2062,64 @@ function startNewTrainingPhase() {
 // ============ 训练页（动态四板块：热身/正式/拉伸/饮食）============
 let trainState = {};
 
+function exerciseInstructionBlock(exercise, targetId) {
+  if (!exercise?.exerciseId?.startsWith('exds:')) return '';
+  const opened = openInstructionIds.has(exercise.exerciseId);
+  const steps = exerciseInstructions?.[exercise.exerciseId];
+  if (exerciseInstructions && (!Array.isArray(steps) || !steps.length)) return '';
+  const content = Array.isArray(steps) && steps.length
+    ? `<ol>${steps.map(step => `<li>${escapeHtml(step)}</li>`).join('')}</ol>`
+    : '<div class="text-muted">正在加载动作说明…</div>';
+  return `<button id="${targetId}-button" class="instruction-toggle" onclick="toggleExerciseInstructions('${exercise.exerciseId}','${targetId}')">${opened?'收起动作说明':'查看动作说明'}</button>
+    <div id="${targetId}" class="instruction-panel ${opened?'open':''}">${content}</div>`;
+}
+
+async function toggleExerciseInstructions(exerciseId, targetId) {
+  const panel = document.getElementById(targetId);
+  const button = document.getElementById(targetId + '-button');
+  if (!panel || !button) return;
+  if (openInstructionIds.has(exerciseId)) {
+    openInstructionIds.delete(exerciseId);
+    panel.classList.remove('open');
+    button.textContent = '查看动作说明';
+    return;
+  }
+  openInstructionIds.add(exerciseId);
+  panel.classList.add('open');
+  button.textContent = '收起动作说明';
+  const bundle = await ensureExerciseInstructions();
+  const steps = bundle?.[exerciseId];
+  if (!Array.isArray(steps) || !steps.length) {
+    openInstructionIds.delete(exerciseId);
+    button.hidden = true;
+    panel.classList.remove('open');
+    panel.hidden = true;
+    return;
+  }
+  panel.innerHTML = `<ol>${steps.map(step => `<li>${escapeHtml(step)}</li>`).join('')}</ol>`;
+}
+
+function renderLightChoice(exercise, index) {
+  if (exercise.role === '核心' || exercise.previous?.feedback !== '轻松') return '';
+  const choice = exercisePreferences?.lightChoices?.[exercise.exerciseId] || exercise.lightChoice || 'progress';
+  return `<div class="light-choice">
+    <div class="light-choice-label">上次感觉轻松，这次怎么安排？</div>
+    <div class="segment-control">
+      <button class="${choice==='progress'?'active':''}" onclick="setLightExerciseChoice(${index},'progress')">继续进阶</button>
+      <button class="${choice==='variant'?'active':''}" onclick="setLightExerciseChoice(${index},'variant')">换个变式</button>
+    </div>
+  </div>`;
+}
+
+function setLightExerciseChoice(index, choice) {
+  const exercise = todayPlan?.workout?.[index];
+  if (!exercise?.exerciseId) return;
+  exercisePreferences.lightChoices[exercise.exerciseId] = choice === 'variant' ? 'variant' : 'progress';
+  LS.set('exercise_preferences', exercisePreferences);
+  if (choice === 'variant') swapPlanExercise(index, true);
+  else renderPlanPreview();
+}
+
 function resetTraining() {
   if (!currentUser) return;
   if (trainState.timerInterval) clearInterval(trainState.timerInterval);
@@ -1654,7 +2138,7 @@ function renderPlanPreview() {
     <div class="preview-item">
       <div class="preview-head">
         <span class="preview-role ${ex.role==='核心'?'':'aux'}">${ex.role||'辅助'}</span>
-        <div style="flex:1"><div class="font-bold">${index+1}. ${escapeHtml(ex.name)}</div><div class="reason-note">${escapeHtml(ex.pattern||'综合')} · ${escapeHtml(ex.reason||'按训练规则选择')}</div>${ex.previous?`<div class="reason-note">上次：${ex.previous.weight}kg × ${ex.previous.reps}${ex.previous.feedback?' · '+ex.previous.feedback:''}</div>`:''}</div>
+        <div style="flex:1"><div class="font-bold">${index+1}. ${escapeHtml(ex.name)}${ex.isNew?'<span class="new-exercise-badge">新动作</span>':''}</div><div class="reason-note">${escapeHtml(ex.replacementMuscle||'综合')} · ${escapeHtml(ex.pattern||'综合')} · ${escapeHtml(ex.reason||'按训练规则选择')}</div>${ex.previous?`<div class="reason-note">上次：${ex.previous.weight}kg × ${ex.previous.reps}${ex.previous.feedback?' · '+escapeHtml(ex.previous.feedback):''}</div>`:''}${exerciseInstructionBlock(ex,`preview-instruction-${index}`)}${renderLightChoice(ex,index)}</div>
       </div>
       <div class="edit-grid">
         <div class="edit-field"><label>组数</label><input type="number" min="1" max="8" value="${ex.sets}" oninput="updatePreviewField(${index},'sets',this.value)"></div>
@@ -1702,13 +2186,47 @@ function togglePlanLock(index) {
   renderPlanPreview();
 }
 
-function swapPlanExercise(index) {
+function swapPlanExercise(index, preferNew=false) {
   const current = todayPlan.workout[index];
   if (!current || current.locked) return;
-  const used = new Set(todayPlan.workout.map(ex=>ex.name));
-  const choices = allLibraryExercises(todayPlan.focusKey).filter(ex=>ex.pattern===current.pattern&&!used.has(ex.name)&&!isExerciseBlocked(ex)&&matchesEnvironment(ex));
-  if (!choices.length) { alert('当前条件下没有可用的同类替代动作'); return; }
-  const replacement = adaptExercise(choices[0], `替代“${current.name}”，保持${current.pattern}训练目的`);
+  let choice = null;
+  if (todayPlan.catalogVersion && exerciseCatalog && getExerciseEngine()) {
+    const engine = getExerciseEngine();
+    const usedIds = new Set(todayPlan.workout.map(ex => ex.exerciseId));
+    const context = catalogHistoryContext(todayPlan.focusKey);
+    const pool = getCatalogCandidates(todayPlan.focusKey).filter(ex =>
+      ex.replacementMuscle === current.replacementMuscle && !usedIds.has(ex.exerciseId)
+    );
+    const ranked = engine.scoreCandidates(pool, {
+      seed:`${todayPlan.id}:manual:${index}:${preferNew?'new':'any'}`,
+      recentExerciseIds:context.recentExerciseIds,
+      usedIds:[...usedIds],
+      lastUsed:context.lastUsed,
+      replacementMuscle:current.replacementMuscle,
+      currentVariantGroup:current.variantGroup
+    });
+    const ordered = preferNew
+      ? ranked.sort((a,b) => Number(isNewCatalogExercise(b.exercise)) - Number(isNewCatalogExercise(a.exercise)) || b.score-a.score)
+      : ranked;
+    for (const candidate of ordered) {
+      const proposed = todayPlan.workout.slice();
+      proposed[index] = candidate.exercise;
+      if (engine.validatePlanBalance(proposed, todayPlan.focusKey).valid) { choice = candidate.exercise; break; }
+    }
+  } else {
+    const used = new Set(todayPlan.workout.map(ex=>ex.name));
+    choice = allLibraryExercises(todayPlan.focusKey).find(ex=>ex.pattern===current.pattern&&!used.has(ex.name)&&!isExerciseBlocked(ex)&&matchesEnvironment(ex));
+  }
+  if (!choice) {
+    if (current.exerciseId) {
+      exercisePreferences.lightChoices[current.exerciseId] = 'progress';
+      LS.set('exercise_preferences', exercisePreferences);
+    }
+    alert('当前条件下没有既安全又保持训练结构的同类替代动作');
+    renderPlanPreview();
+    return;
+  }
+  const replacement = adaptExercise(choice, `替代“${current.name}”，保持${current.replacementMuscle||current.pattern}训练目的`);
   replacement.role = current.role;
   replacement.locked = false;
   todayPlan.workout[index] = replacement;
@@ -1882,8 +2400,9 @@ function renderWorkout() {
   return `
     <div class="training-container workout-focus">
       <div class="hero-kicker text-center">动作 ${s.exIdx+1} / ${s.day.exercises.length} · ${escapeHtml(ex.role||'辅助')}</div>
-      <div class="exercise-name">${escapeHtml(ex.name)}</div>
+      <div class="exercise-name">${escapeHtml(ex.name)}${ex.isNew?'<span class="new-exercise-badge">新动作</span>':''}</div>
       <div class="exercise-target">目标 ${ex.weight}kg · ${ex.sets}组×${ex.reps}次</div>
+      ${exerciseInstructionBlock(ex,`workout-instruction-${s.exIdx}`)}
       <div class="control-label text-center">本组重量</div>
       <div class="num-control">
         <div class="num-btn" onclick="adjustWeight(-2.5)">−</div>
@@ -1994,8 +2513,18 @@ function renderFeedbackPrompt() {
 function submitExerciseFeedback(value) {
   const s = trainState;
   const exId = s.pendingFeedback;
+  const exercise = s.day.exercises.find(item => item.id === exId);
   const note = (document.getElementById('feedbackNote')?.value || '').trim();
   s.feedback[exId] = { value, note, at:new Date().toISOString() };
+  if (value === '不适' && exercise?.exerciseId) {
+    exercisePreferences.paused[exercise.exerciseId] = {
+      name:exercise.name,
+      note:note || '训练反馈为“不适”',
+      pausedAt:new Date().toISOString()
+    };
+    delete exercisePreferences.lightChoices[exercise.exerciseId];
+    LS.set('exercise_preferences', exercisePreferences);
+  }
   s.pendingFeedback = null;
   advanceAfterExercise();
 }
@@ -2208,17 +2737,19 @@ function finishTraining() {
 function saveSession() {
   const s = trainState;
   const session = {
+    id:'session-'+Date.now(),
     date: getTodayStr(),
     dayName: s.day.name,
     focusArea: todayPlan.focus,
     factors: todayPlan.factors,
     source: todayPlan.source,
     variant: todayPlan.variant,
+    catalogVersion:todayPlan.catalogVersion || '',
     duration: s.sessionTime,
     exercises: s.day.exercises.map(ex => {
       const recs = s.records[ex.id] || [];
       const feedback = s.feedback[ex.id] || {};
-      return { name: ex.name, role:ex.role, pattern:ex.pattern, targetSets:ex.sets, targetReps:ex.reps, completed:recs.length>=ex.sets, skipped:!!(s.skipped||{})[ex.id], feedback:feedback.value||'', feedbackNote:feedback.note||'', sets: recs.map(r => ({ w: r.w, r: r.r })) };
+      return { exerciseId:ex.exerciseId||'', name:ex.name, nameSnapshot:ex.nameSnapshot||ex.name, catalogVersion:ex.catalogVersion||todayPlan.catalogVersion||'', replacementMuscle:ex.replacementMuscle||'', variantGroup:ex.variantGroup||'', role:ex.role, pattern:ex.pattern, targetSets:ex.sets, targetReps:ex.reps, completed:recs.length>=ex.sets, skipped:!!(s.skipped||{})[ex.id], feedback:feedback.value||'', feedbackNote:feedback.note||'', sets: recs.map(r => ({ w: r.w, r: r.r })) };
     }).filter(e => e.sets.length > 0 || e.skipped)
   };
   sessions.unshift(session);
@@ -2419,6 +2950,26 @@ function renderUserSection() {
     </div>`;
 }
 
+function renderPausedExerciseRows() {
+  const paused = Object.entries(exercisePreferences?.paused || {});
+  if (!paused.length) return '<div class="text-muted text-sm">暂无暂停推荐的动作。</div>';
+  return `<div class="paused-list">${paused.map(([exerciseId,item]) => {
+    const date = item?.pausedAt ? String(item.pausedAt).slice(0,10) : '';
+    return `<div class="paused-row">
+      <div><div class="paused-row-name">${escapeHtml(item?.name || '未命名动作')}</div><div class="paused-row-note">${escapeHtml(item?.note || '曾记录不适')}${date?' · '+date:''}</div></div>
+      <button class="mini-btn" onclick="restorePausedExercise('${encodeURIComponent(exerciseId)}')">恢复推荐</button>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function restorePausedExercise(encodedId) {
+  const exerciseId = decodeURIComponent(encodedId);
+  if (!exercisePreferences?.paused?.[exerciseId]) return;
+  delete exercisePreferences.paused[exerciseId];
+  LS.set('exercise_preferences', exercisePreferences);
+  renderProfileContent();
+}
+
 function renderProfileContent() {
   const container = document.getElementById('profileContent');
   const apiKey = getGlobalApiKey();
@@ -2477,6 +3028,10 @@ function renderProfileContent() {
           <input class="field-value" id="pf-eq-new" type="text" placeholder="添加自定义器械" style="flex:1;border:none;outline:none;color:var(--text);background:var(--bg);font-size:16px">
           <button onclick="addEquipment()" style="padding:8px 18px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:15px;cursor:pointer;min-height:44px;white-space:nowrap">添加</button>
         </div>
+      </div>
+      <div class="card"><div class="section-title">暂停推荐的动作</div>
+        <div class="text-xs text-muted mb-3">训练后选择“不适”的动作会暂停出现在新计划中。恢复后才会再次参与推荐。</div>
+        ${renderPausedExerciseRows()}
       </div>
       <div class="card"><div class="section-title">AI 设置</div>
         <div class="field-group"><span class="field-label">DeepSeek API Key（所有用户共享）</span>
@@ -2616,16 +3171,23 @@ async function importBackupFile(file) {
   if (!file) return;
   try {
     const payload = JSON.parse(await file.text());
-    if (payload.app !== 'IronTrack' || payload.version !== BACKUP_VERSION || !payload.data || typeof payload.data !== 'object') throw new Error('文件格式或版本不支持');
+    if (payload.app !== 'IronTrack' || ![1,2].includes(Number(payload.version)) || !payload.data || typeof payload.data !== 'object') throw new Error('文件格式或版本不支持');
     if (!payload.data.profile || typeof payload.data.profile !== 'object' || !payload.data.plan || typeof payload.data.plan !== 'object' || !Array.isArray(payload.data.sessions)) throw new Error('备份缺少个人档案、训练体系或历史记录');
     const sessionCount = Array.isArray(payload.data.sessions) ? payload.data.sessions.length : 0;
     if (!confirm(`备份时间：${payload.exportedAt||'未知'}\n训练记录：${sessionCount} 条\n\n确认恢复并覆盖当前本地数据吗？`)) return;
-    LS.set('pre_import_backup', buildBackupPayload());
-    USER_DATA_KEYS.forEach(key => LS.set(key, payload.data[key] == null ? null : payload.data[key]));
+    const beforeImport = buildBackupPayload();
+    if (!LS.set('pre_import_backup', beforeImport)) throw new Error('无法保存导入前快照');
+    const imported = USER_DATA_KEYS.every(key => LS.set(key, payload.data[key] == null ? null : payload.data[key]));
+    if (!imported) {
+      USER_DATA_KEYS.forEach(key => LS.set(key, beforeImport.data[key] == null ? null : beforeImport.data[key]));
+      throw new Error('本地空间不足，已恢复导入前数据');
+    }
     initUserData();
     renderProfilePage();
     const restoredMsg = document.getElementById('backupMsg');
-    if (restoredMsg) restoredMsg.textContent = '恢复成功；原数据已保存在导入前快照中。';
+    if (restoredMsg) restoredMsg.textContent = Number(payload.version) === 1
+      ? '旧版备份恢复成功并已自动兼容；原数据已保存在导入前快照中。'
+      : '恢复成功；原数据已保存在导入前快照中。';
   } catch(e) {
     if (msg) msg.textContent = '导入失败：' + e.message + '。当前数据未改变。';
   }

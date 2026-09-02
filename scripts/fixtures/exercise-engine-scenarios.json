@@ -1,0 +1,18 @@
+{
+  "push": {
+    "core": [
+      { "exerciseId": "core:bench", "nameZh": "杠铃卧推", "movementPatterns": ["水平推"], "equipment": ["杠铃"], "primaryMuscles": ["胸肌"], "replacementMuscle": "胸肌", "pplTags": ["push"] },
+      { "exerciseId": "core:press", "nameZh": "杠铃推举", "movementPatterns": ["垂直推"], "equipment": ["杠铃"], "primaryMuscles": ["三角肌"], "replacementMuscle": "三角肌", "pplTags": ["push"] }
+    ],
+    "candidates": [
+      { "exerciseId": "push:1", "nameZh": "直杆下压", "movementPatterns": ["肘伸"], "equipment": ["绳索机"], "primaryMuscles": ["肱三头肌"], "replacementMuscle": "肱三头肌", "pplTags": ["push"], "variantGroup": "pushdown" },
+      { "exerciseId": "push:2", "nameZh": "绳索把手下压", "movementPatterns": ["肘伸"], "equipment": ["绳索机"], "primaryMuscles": ["肱三头肌"], "replacementMuscle": "肱三头肌", "pplTags": ["push"], "variantGroup": "pushdown" },
+      { "exerciseId": "push:3", "nameZh": "哑铃侧平举", "movementPatterns": ["肩外展"], "equipment": ["哑铃"], "primaryMuscles": ["三角肌"], "replacementMuscle": "三角肌", "pplTags": ["push"], "variantGroup": "lateral raise" },
+      { "exerciseId": "push:4", "nameZh": "绳索侧平举", "movementPatterns": ["肩外展"], "equipment": ["绳索机"], "primaryMuscles": ["三角肌"], "replacementMuscle": "三角肌", "pplTags": ["push"], "variantGroup": "lateral raise" },
+      { "exerciseId": "push:5", "nameZh": "哑铃飞鸟", "movementPatterns": ["胸内收"], "equipment": ["哑铃"], "primaryMuscles": ["胸肌"], "replacementMuscle": "胸肌", "pplTags": ["push"], "variantGroup": "fly" },
+      { "exerciseId": "push:6", "nameZh": "绳索飞鸟", "movementPatterns": ["胸内收"], "equipment": ["绳索机"], "primaryMuscles": ["胸肌"], "replacementMuscle": "胸肌", "pplTags": ["push"], "variantGroup": "fly" },
+      { "exerciseId": "push:7", "nameZh": "坐姿哑铃推肩", "movementPatterns": ["垂直推"], "equipment": ["哑铃"], "primaryMuscles": ["三角肌"], "replacementMuscle": "三角肌", "pplTags": ["push"], "variantGroup": "shoulder press" },
+      { "exerciseId": "push:8", "nameZh": "窄握哑铃卧推", "movementPatterns": ["肘伸"], "equipment": ["哑铃"], "primaryMuscles": ["肱三头肌"], "replacementMuscle": "肱三头肌", "pplTags": ["push"], "variantGroup": "press" }
+    ]
+  }
+}
