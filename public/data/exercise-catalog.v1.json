@@ -1,0 +1,9055 @@
+{
+  "version": "irontrack-exercises-v1",
+  "source": {
+    "repository": "https://github.com/hasaneyldrm/exercises-dataset",
+    "commit": "7455efae41b330c265e7cd4b78dfa848e7ce5ebd",
+    "license": "MIT"
+  },
+  "generatedAt": "2026-09-02",
+  "exercises": [
+    {
+      "exerciseId": "exds:0025",
+      "sourceId": "0025",
+      "nameZh": "杠铃卧推",
+      "nameEn": "barbell bench press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "核心",
+        "辅助"
+      ],
+      "variantGroup": "bench press",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 4,
+        "reps": 6,
+        "rest": 120
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0047",
+      "sourceId": "0047",
+      "nameZh": "上斜杠铃卧推",
+      "nameEn": "barbell incline bench press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肩部肌群",
+        "肱三头肌"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "核心",
+        "辅助"
+      ],
+      "variantGroup": "bench press",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 4,
+        "reps": 6,
+        "rest": 120
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0757",
+      "sourceId": "0757",
+      "nameZh": "史密斯上斜卧推",
+      "nameEn": "smith incline bench press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肩部肌群",
+        "肱三头肌"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "史密斯机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "bench press",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0279",
+      "sourceId": "0279",
+      "nameZh": "下斜俯卧撑",
+      "nameEn": "decline push-up",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "push-up",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0251",
+      "sourceId": "0251",
+      "nameZh": "双杠臂屈伸",
+      "nameEn": "chest dip",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "chest dip",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0308",
+      "sourceId": "0308",
+      "nameZh": "哑铃飞鸟",
+      "nameEn": "dumbbell fly",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "胸内收"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "fly",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "胸内收"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0319",
+      "sourceId": "0319",
+      "nameZh": "上斜哑铃飞鸟",
+      "nameEn": "dumbbell incline fly",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "胸内收"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "fly",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "胸内收"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0289",
+      "sourceId": "0289",
+      "nameZh": "哑铃卧推",
+      "nameEn": "dumbbell bench press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "bench press",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0033",
+      "sourceId": "0033",
+      "nameZh": "下斜杠铃卧推",
+      "nameEn": "barbell decline bench press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "bench press",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1624",
+      "sourceId": "1624",
+      "nameZh": "反握哑铃卧推",
+      "nameEn": "dumbbell reverse bench press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "bench press",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0493",
+      "sourceId": "0493",
+      "nameZh": "上斜俯卧撑",
+      "nameEn": "incline push-up",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "push-up",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0662",
+      "sourceId": "0662",
+      "nameZh": "标准俯卧撑",
+      "nameEn": "push-up",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "三角肌",
+        "核心"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "push-up",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:3211",
+      "sourceId": "3211",
+      "nameZh": "跪姿俯卧撑",
+      "nameEn": "kneeling push-up (male)",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "push-up",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0171",
+      "sourceId": "0171",
+      "nameZh": "上斜绳索飞鸟",
+      "nameEn": "cable incline fly",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "三角肌",
+        "肱三头肌"
+      ],
+      "movementPatterns": [
+        "胸内收"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "fly",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "胸内收"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0179",
+      "sourceId": "0179",
+      "nameZh": "低位绳索飞鸟",
+      "nameEn": "cable low fly",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "三角肌",
+        "肱三头肌"
+      ],
+      "movementPatterns": [
+        "胸内收"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "fly",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "胸内收"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0227",
+      "sourceId": "0227",
+      "nameZh": "站姿绳索飞鸟",
+      "nameEn": "cable standing fly",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "三角肌",
+        "肱三头肌"
+      ],
+      "movementPatterns": [
+        "胸内收"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "fly",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "胸内收"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0122",
+      "sourceId": "0122",
+      "nameZh": "杠铃宽距卧推",
+      "nameEn": "barbell wide bench press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肩部肌群",
+        "肱三头肌"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "bench press",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0151",
+      "sourceId": "0151",
+      "nameZh": "绳索卧推",
+      "nameEn": "cable bench press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "bench press",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0301",
+      "sourceId": "0301",
+      "nameZh": "哑铃下斜卧推",
+      "nameEn": "dumbbell decline bench press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "bench press",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0314",
+      "sourceId": "0314",
+      "nameZh": "哑铃上斜卧推",
+      "nameEn": "dumbbell incline bench press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肩部肌群",
+        "肱三头肌"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "bench press",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0169",
+      "sourceId": "0169",
+      "nameZh": "绳索上斜卧推",
+      "nameEn": "cable incline bench press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "三角肌",
+        "肱三头肌"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "bench press",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0748",
+      "sourceId": "0748",
+      "nameZh": "史密斯卧推",
+      "nameEn": "smith bench press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "胸肌"
+      ],
+      "replacementMuscle": "胸肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "史密斯机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "bench press",
+      "substitutionGroup": "push:胸肌",
+      "balanceTags": [
+        "水平推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0091",
+      "sourceId": "0091",
+      "nameZh": "坐姿杠铃推举",
+      "nameEn": "barbell seated overhead press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "上背"
+      ],
+      "movementPatterns": [
+        "垂直推"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "核心",
+        "辅助"
+      ],
+      "variantGroup": "overhead press",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "垂直推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 4,
+        "reps": 6,
+        "rest": 120
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0334",
+      "sourceId": "0334",
+      "nameZh": "哑铃侧平举",
+      "nameEn": "dumbbell lateral raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "斜方肌"
+      ],
+      "movementPatterns": [
+        "肩外展"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "lateral raise",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "肩外展"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0383",
+      "sourceId": "0383",
+      "nameZh": "哑铃反向飞鸟",
+      "nameEn": "dumbbell reverse fly",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "斜方肌",
+        "菱形肌"
+      ],
+      "movementPatterns": [
+        "肩后束"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "fly",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "肩后束"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0203",
+      "sourceId": "0203",
+      "nameZh": "绳索把手后束划船",
+      "nameEn": "cable rear delt row (with rope)",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "斜方肌",
+        "菱形肌",
+        "肱二头肌"
+      ],
+      "movementPatterns": [
+        "肩后束"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "rear delt",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "肩后束"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0225",
+      "sourceId": "0225",
+      "nameZh": "高位绳索反向飞鸟",
+      "nameEn": "cable standing cross-over high reverse fly",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "斜方肌",
+        "菱形肌",
+        "三角肌后束"
+      ],
+      "movementPatterns": [
+        "肩后束"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "fly",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "肩后束"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0405",
+      "sourceId": "0405",
+      "nameZh": "哑铃坐姿肩推",
+      "nameEn": "dumbbell seated shoulder press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "上背"
+      ],
+      "movementPatterns": [
+        "垂直推"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "shoulder press",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "垂直推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0404",
+      "sourceId": "0404",
+      "nameZh": "对握坐姿哑铃推肩",
+      "nameEn": "dumbbell seated shoulder press (parallel grip)",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "上背"
+      ],
+      "movementPatterns": [
+        "垂直推"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "shoulder press",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "垂直推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:2137",
+      "sourceId": "2137",
+      "nameZh": "阿诺德推举",
+      "nameEn": "dumbbell arnold press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "上胸"
+      ],
+      "movementPatterns": [
+        "垂直推"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "arnold press",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "垂直推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:3237",
+      "sourceId": "3237",
+      "nameZh": "地雷管侧平举",
+      "nameEn": "landmine lateral raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "斜方肌",
+        "上背"
+      ],
+      "movementPatterns": [
+        "肩外展"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "lateral raise",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "肩外展"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0178",
+      "sourceId": "0178",
+      "nameZh": "绳索侧平举",
+      "nameEn": "cable lateral raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "斜方肌",
+        "肱三头肌"
+      ],
+      "movementPatterns": [
+        "肩外展"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "lateral raise",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "肩外展"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0310",
+      "sourceId": "0310",
+      "nameZh": "哑铃前平举",
+      "nameEn": "dumbbell front raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "斜方肌"
+      ],
+      "movementPatterns": [
+        "肩屈"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "front raise",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "肩屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0290",
+      "sourceId": "0290",
+      "nameZh": "坐姿哑铃推肩",
+      "nameEn": "dumbbell bench seated press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "胸肌"
+      ],
+      "movementPatterns": [
+        "垂直推"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "垂直推",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "垂直推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0219",
+      "sourceId": "0219",
+      "nameZh": "绳索肩推",
+      "nameEn": "cable shoulder press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "上背"
+      ],
+      "movementPatterns": [
+        "垂直推"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "shoulder press",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "垂直推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0426",
+      "sourceId": "0426",
+      "nameZh": "哑铃站姿过顶推举",
+      "nameEn": "dumbbell standing overhead press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "上背"
+      ],
+      "movementPatterns": [
+        "垂直推"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "overhead press",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "垂直推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0766",
+      "sourceId": "0766",
+      "nameZh": "史密斯肩推",
+      "nameEn": "smith shoulder press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "上背"
+      ],
+      "movementPatterns": [
+        "垂直推"
+      ],
+      "equipment": [
+        "史密斯机"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "shoulder press",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "垂直推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0148",
+      "sourceId": "0148",
+      "nameZh": "绳索交替肩推",
+      "nameEn": "cable alternate shoulder press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "上背"
+      ],
+      "movementPatterns": [
+        "垂直推"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "shoulder press",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "垂直推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0361",
+      "sourceId": "0361",
+      "nameZh": "哑铃单臂肩推",
+      "nameEn": "dumbbell one arm shoulder press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "上背"
+      ],
+      "movementPatterns": [
+        "垂直推"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "shoulder press",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "垂直推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0765",
+      "sourceId": "0765",
+      "nameZh": "史密斯坐姿肩推",
+      "nameEn": "smith seated shoulder press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "上背"
+      ],
+      "movementPatterns": [
+        "垂直推"
+      ],
+      "equipment": [
+        "史密斯机"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "shoulder press",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "垂直推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0414",
+      "sourceId": "0414",
+      "nameZh": "哑铃站姿交替过顶推举",
+      "nameEn": "dumbbell standing alternate overhead press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "核心"
+      ],
+      "movementPatterns": [
+        "垂直推"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "overhead press",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "垂直推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1457",
+      "sourceId": "1457",
+      "nameZh": "杠铃站姿宽距军事推举",
+      "nameEn": "barbell standing wide military press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "上背"
+      ],
+      "movementPatterns": [
+        "垂直推"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "military press",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "垂直推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1456",
+      "sourceId": "1456",
+      "nameZh": "杠铃站姿窄握军事推举",
+      "nameEn": "barbell standing close grip military press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "上背"
+      ],
+      "movementPatterns": [
+        "垂直推"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "military press",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "垂直推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0774",
+      "sourceId": "0774",
+      "nameZh": "史密斯站姿军事推举",
+      "nameEn": "smith standing military press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "三角肌"
+      ],
+      "replacementMuscle": "三角肌",
+      "secondaryMuscles": [
+        "肱三头肌",
+        "上背"
+      ],
+      "movementPatterns": [
+        "垂直推"
+      ],
+      "equipment": [
+        "史密斯机"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "military press",
+      "substitutionGroup": "push:三角肌",
+      "balanceTags": [
+        "垂直推"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0030",
+      "sourceId": "0030",
+      "nameZh": "窄握杠铃卧推",
+      "nameEn": "barbell close-grip bench press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "胸肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "bench press",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "水平推",
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0201",
+      "sourceId": "0201",
+      "nameZh": "直杆绳索下压",
+      "nameEn": "cable pushdown",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘伸"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pushdown",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0200",
+      "sourceId": "0200",
+      "nameZh": "绳索把手下压",
+      "nameEn": "cable pushdown (with rope attachment)",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘伸"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pushdown",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0194",
+      "sourceId": "0194",
+      "nameZh": "过顶绳索臂屈伸",
+      "nameEn": "cable overhead triceps extension (rope attachment)",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "肘伸"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "triceps extension",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0860",
+      "sourceId": "0860",
+      "nameZh": "绳索臂屈伸",
+      "nameEn": "cable kickback",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "肘伸"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "kickback",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0296",
+      "sourceId": "0296",
+      "nameZh": "窄握哑铃卧推",
+      "nameEn": "dumbbell close-grip press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "胸肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "肘伸"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "肘伸",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0207",
+      "sourceId": "0207",
+      "nameZh": "反握绳索下压",
+      "nameEn": "cable reverse-grip pushdown",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘伸"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pushdown",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0241",
+      "sourceId": "0241",
+      "nameZh": "三角把绳索下压",
+      "nameEn": "cable triceps pushdown (v-bar)",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘伸"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pushdown",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0373",
+      "sourceId": "0373",
+      "nameZh": "正握哑铃臂屈伸",
+      "nameEn": "dumbbell pronate-grip triceps extension",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘伸"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "triceps extension",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:2189",
+      "sourceId": "2189",
+      "nameZh": "坐姿哑铃臂屈伸",
+      "nameEn": "dumbbells seated triceps extension",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "肘伸"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "triceps extension",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0283",
+      "sourceId": "0283",
+      "nameZh": "钻石俯卧撑",
+      "nameEn": "diamond push-up",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "胸肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "push-up",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "水平推",
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0751",
+      "sourceId": "0751",
+      "nameZh": "史密斯窄握卧推",
+      "nameEn": "smith close-grip bench press",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "胸肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平推"
+      ],
+      "equipment": [
+        "史密斯机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "bench press",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "水平推",
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0061",
+      "sourceId": "0061",
+      "nameZh": "杠铃仰卧臂屈伸",
+      "nameEn": "barbell lying triceps extension",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "肘伸"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "triceps extension",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0306",
+      "sourceId": "0306",
+      "nameZh": "哑铃下斜臂屈伸",
+      "nameEn": "dumbbell decline triceps extension",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "肘伸"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "triceps extension",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0330",
+      "sourceId": "0330",
+      "nameZh": "哑铃上斜臂屈伸",
+      "nameEn": "dumbbell incline triceps extension",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "肘伸"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "triceps extension",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0351",
+      "sourceId": "0351",
+      "nameZh": "哑铃仰卧臂屈伸",
+      "nameEn": "dumbbell lying triceps extension",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "肘伸"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "triceps extension",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0430",
+      "sourceId": "0430",
+      "nameZh": "哑铃站姿臂屈伸",
+      "nameEn": "dumbbell standing triceps extension",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "肘伸"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "triceps extension",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:2188",
+      "sourceId": "2188",
+      "nameZh": "哑铃坐姿臂屈伸",
+      "nameEn": "dumbbell seated triceps extension",
+      "aliasesZh": [],
+      "pplTags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "肱三头肌"
+      ],
+      "replacementMuscle": "肱三头肌",
+      "secondaryMuscles": [
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "肘伸"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "triceps extension",
+      "substitutionGroup": "push:肱三头肌",
+      "balanceTags": [
+        "肘伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0238",
+      "sourceId": "0238",
+      "nameZh": "直臂下压",
+      "nameEn": "cable straight arm pulldown",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肩部肌群",
+        "肱二头肌"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pulldown",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1326",
+      "sourceId": "1326",
+      "nameZh": "反手引体向上",
+      "nameEn": "chin-up",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "chin-up",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0198",
+      "sourceId": "0198",
+      "nameZh": "高位下拉",
+      "nameEn": "cable pulldown",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "高位下拉"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pulldown",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1429",
+      "sourceId": "1429",
+      "nameZh": "宽握引体向上",
+      "nameEn": "wide grip pull-up",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pull-up",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0818",
+      "sourceId": "0818",
+      "nameZh": "双把对握高位下拉",
+      "nameEn": "twin handle parallel grip lat pulldown",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "菱形肌",
+        "三角肌后束"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "高位下拉"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pulldown",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:2330",
+      "sourceId": "2330",
+      "nameZh": "全程绳索高位下拉",
+      "nameEn": "cable lat pulldown full range of motion",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "菱形肌",
+        "三角肌后束"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "高位下拉"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pulldown",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0237",
+      "sourceId": "0237",
+      "nameZh": "绳索把手直臂下压",
+      "nameEn": "cable straight arm pulldown (with rope)",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pulldown",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0652",
+      "sourceId": "0652",
+      "nameZh": "引体向上",
+      "nameEn": "pull-up",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "核心",
+        "辅助"
+      ],
+      "variantGroup": "pull-up",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 4,
+        "reps": 6,
+        "rest": 120
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1763",
+      "sourceId": "1763",
+      "nameZh": "肩宽握距引体向上",
+      "nameEn": "shoulder grip pull-up",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pull-up",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:3019",
+      "sourceId": "3019",
+      "nameZh": "低杠反向划船",
+      "nameEn": "bench pull-ups",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pull-up",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0245",
+      "sourceId": "0245",
+      "nameZh": "反手高位下拉",
+      "nameEn": "cable underhand pulldown",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "高位下拉"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pulldown",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0015",
+      "sourceId": "0015",
+      "nameZh": "辅助对握窄距引体向上",
+      "nameEn": "assisted parallel close grip pull-up",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "高位下拉"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pull-up",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0150",
+      "sourceId": "0150",
+      "nameZh": "直杆高位下拉",
+      "nameEn": "cable bar lateral pulldown",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "菱形肌",
+        "三角肌后束"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pulldown",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0674",
+      "sourceId": "0674",
+      "nameZh": "反握引体向上",
+      "nameEn": "reverse grip pull-up",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pull-up",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1327",
+      "sourceId": "1327",
+      "nameZh": "窄握反手引体向上",
+      "nameEn": "close grip chin-up",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "chin-up",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0017",
+      "sourceId": "0017",
+      "nameZh": "辅助引体向上",
+      "nameEn": "assisted pull-up",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "高位下拉"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pull-up",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0572",
+      "sourceId": "0572",
+      "nameZh": "器械辅助反手引体向上",
+      "nameEn": "lever assisted chin-up",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "高位下拉"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "chin-up",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0153",
+      "sourceId": "0153",
+      "nameZh": "绳索夹胸高位下拉",
+      "nameEn": "cable cross-over lateral pulldown",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "背阔肌"
+      ],
+      "replacementMuscle": "背阔肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "菱形肌",
+        "三角肌后束"
+      ],
+      "movementPatterns": [
+        "胸内收"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pulldown",
+      "substitutionGroup": "pull:背阔肌",
+      "balanceTags": [
+        "胸内收"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0027",
+      "sourceId": "0027",
+      "nameZh": "杠铃划船",
+      "nameEn": "barbell bent over row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "核心",
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 4,
+        "reps": 6,
+        "rest": 120
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0861",
+      "sourceId": "0861",
+      "nameZh": "坐姿绳索划船",
+      "nameEn": "cable seated row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:3017",
+      "sourceId": "3017",
+      "nameZh": "潘德雷划船",
+      "nameEn": "barbell pendlay row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0292",
+      "sourceId": "0292",
+      "nameZh": "单臂哑铃划船",
+      "nameEn": "dumbbell one arm bent-over row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0180",
+      "sourceId": "0180",
+      "nameZh": "低位坐姿绳索划船",
+      "nameEn": "cable low seated row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0327",
+      "sourceId": "0327",
+      "nameZh": "胸托哑铃划船",
+      "nameEn": "dumbbell incline row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1323",
+      "sourceId": "1323",
+      "nameZh": "绳索把手坐姿划船",
+      "nameEn": "cable rope seated row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1320",
+      "sourceId": "1320",
+      "nameZh": "交叉绳索坐姿划船",
+      "nameEn": "cable rope crossover seated row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1321",
+      "sourceId": "1321",
+      "nameZh": "高位绳索把手坐姿划船",
+      "nameEn": "cable rope elevated seated row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0293",
+      "sourceId": "0293",
+      "nameZh": "哑铃俯身划船",
+      "nameEn": "dumbbell bent over row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0574",
+      "sourceId": "0574",
+      "nameZh": "器械俯身划船",
+      "nameEn": "lever bent over row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "划船机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1329",
+      "sourceId": "1329",
+      "nameZh": "哑铃旋转握法俯身划船",
+      "nameEn": "dumbbell palm rotational bent over row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0118",
+      "sourceId": "0118",
+      "nameZh": "杠铃反握俯身划船",
+      "nameEn": "barbell reverse grip bent over row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0049",
+      "sourceId": "0049",
+      "nameZh": "杠铃胸托划船",
+      "nameEn": "barbell incline row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1359",
+      "sourceId": "1359",
+      "nameZh": "史密斯俯身划船",
+      "nameEn": "smith bent over row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "史密斯机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0064",
+      "sourceId": "0064",
+      "nameZh": "杠铃单臂俯身划船",
+      "nameEn": "barbell one arm bent over row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0589",
+      "sourceId": "0589",
+      "nameZh": "器械单臂俯身划船",
+      "nameEn": "lever one arm bent over row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "划船机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0239",
+      "sourceId": "0239",
+      "nameZh": "绳索直背坐姿划船",
+      "nameEn": "cable straight back seated row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0189",
+      "sourceId": "0189",
+      "nameZh": "绳索单臂俯身划船",
+      "nameEn": "cable one arm bent over row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1361",
+      "sourceId": "1361",
+      "nameZh": "史密斯反握俯身划船",
+      "nameEn": "smith reverse grip bent over row",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "上背"
+      ],
+      "replacementMuscle": "上背",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "前臂"
+      ],
+      "movementPatterns": [
+        "水平拉"
+      ],
+      "equipment": [
+        "史密斯机"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕",
+        "腰背"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "row",
+      "substitutionGroup": "pull:上背",
+      "balanceTags": [
+        "水平拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0031",
+      "sourceId": "0031",
+      "nameZh": "杠铃弯举",
+      "nameEn": "barbell curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0447",
+      "sourceId": "0447",
+      "nameZh": "曲杆弯举",
+      "nameEn": "ez barbell curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0165",
+      "sourceId": "0165",
+      "nameZh": "绳索锤式弯举",
+      "nameEn": "cable hammer curl (with rope)",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "hammer curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0297",
+      "sourceId": "0297",
+      "nameZh": "哑铃集中弯举",
+      "nameEn": "dumbbell concentration curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "concentration curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0195",
+      "sourceId": "0195",
+      "nameZh": "绳索牧师凳弯举",
+      "nameEn": "cable preacher curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "preacher curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0294",
+      "sourceId": "0294",
+      "nameZh": "哑铃弯举",
+      "nameEn": "dumbbell biceps curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1654",
+      "sourceId": "1654",
+      "nameZh": "反握哑铃弯举",
+      "nameEn": "dumbbell biceps curl reverse",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:5201",
+      "sourceId": "5201",
+      "nameZh": "托盘式哑铃弯举",
+      "nameEn": "dumbbell waiter biceps curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0322",
+      "sourceId": "0322",
+      "nameZh": "上斜内旋哑铃弯举",
+      "nameEn": "dumbbell incline inner biceps curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0382",
+      "sourceId": "0382",
+      "nameZh": "坐姿反握哑铃弯举",
+      "nameEn": "dumbbell revers grip biceps curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0393",
+      "sourceId": "0393",
+      "nameZh": "坐姿内旋哑铃弯举",
+      "nameEn": "dumbbell seated inner biceps curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1661",
+      "sourceId": "1661",
+      "nameZh": "仰卧哑铃弯举",
+      "nameEn": "dumbbell lying supine biceps curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0313",
+      "sourceId": "0313",
+      "nameZh": "锤式弯举",
+      "nameEn": "dumbbell hammer curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "hammer curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0070",
+      "sourceId": "0070",
+      "nameZh": "杠铃牧师凳弯举",
+      "nameEn": "barbell preacher curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "preacher curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0372",
+      "sourceId": "0372",
+      "nameZh": "哑铃牧师凳弯举",
+      "nameEn": "dumbbell preacher curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "preacher curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0868",
+      "sourceId": "0868",
+      "nameZh": "绳索弯举",
+      "nameEn": "cable curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0315",
+      "sourceId": "0315",
+      "nameZh": "哑铃上斜弯举",
+      "nameEn": "dumbbell incline biceps curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0416",
+      "sourceId": "0416",
+      "nameZh": "哑铃站姿弯举",
+      "nameEn": "dumbbell standing biceps curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "肱二头肌"
+      ],
+      "replacementMuscle": "肱二头肌",
+      "secondaryMuscles": [
+        "前臂"
+      ],
+      "movementPatterns": [
+        "肘屈"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "pull:肱二头肌",
+      "balanceTags": [
+        "肘屈"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0095",
+      "sourceId": "0095",
+      "nameZh": "杠铃耸肩",
+      "nameEn": "barbell shrug",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "斜方肌"
+      ],
+      "replacementMuscle": "斜方肌",
+      "secondaryMuscles": [
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "肩胛控制"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "shrug",
+      "substitutionGroup": "pull:斜方肌",
+      "balanceTags": [
+        "肩胛控制"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0406",
+      "sourceId": "0406",
+      "nameZh": "哑铃耸肩",
+      "nameEn": "dumbbell shrug",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "斜方肌"
+      ],
+      "replacementMuscle": "斜方肌",
+      "secondaryMuscles": [
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "肩胛控制"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "shrug",
+      "substitutionGroup": "pull:斜方肌",
+      "balanceTags": [
+        "肩胛控制"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0688",
+      "sourceId": "0688",
+      "nameZh": "肩胛引体",
+      "nameEn": "scapular pull-up",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "斜方肌"
+      ],
+      "replacementMuscle": "斜方肌",
+      "secondaryMuscles": [
+        "肱二头肌",
+        "菱形肌",
+        "三角肌后束"
+      ],
+      "movementPatterns": [
+        "垂直拉"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "肩",
+        "肘/腕"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pull-up",
+      "substitutionGroup": "pull:斜方肌",
+      "balanceTags": [
+        "垂直拉"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0305",
+      "sourceId": "0305",
+      "nameZh": "哑铃下斜耸肩",
+      "nameEn": "dumbbell decline shrug",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "斜方肌"
+      ],
+      "replacementMuscle": "斜方肌",
+      "secondaryMuscles": [
+        "肩部肌群",
+        "菱形肌"
+      ],
+      "movementPatterns": [
+        "肩胛控制"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "shrug",
+      "substitutionGroup": "pull:斜方肌",
+      "balanceTags": [
+        "肩胛控制"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0329",
+      "sourceId": "0329",
+      "nameZh": "哑铃上斜耸肩",
+      "nameEn": "dumbbell incline shrug",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "斜方肌"
+      ],
+      "replacementMuscle": "斜方肌",
+      "secondaryMuscles": [
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "肩胛控制"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "shrug",
+      "substitutionGroup": "pull:斜方肌",
+      "balanceTags": [
+        "肩胛控制"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0220",
+      "sourceId": "0220",
+      "nameZh": "绳索耸肩",
+      "nameEn": "cable shrug",
+      "aliasesZh": [],
+      "pplTags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "斜方肌"
+      ],
+      "replacementMuscle": "斜方肌",
+      "secondaryMuscles": [
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "肩胛控制"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "肩"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "shrug",
+      "substitutionGroup": "pull:斜方肌",
+      "balanceTags": [
+        "肩胛控制"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1760",
+      "sourceId": "1760",
+      "nameZh": "高脚杯深蹲",
+      "nameEn": "dumbbell goblet squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "股四头肌"
+      ],
+      "replacementMuscle": "股四头肌",
+      "secondaryMuscles": [
+        "臀肌",
+        "腘绳肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "膝主导"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "goblet squat",
+      "substitutionGroup": "legs:股四头肌",
+      "balanceTags": [
+        "膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:2368",
+      "sourceId": "2368",
+      "nameZh": "徒手分腿蹲",
+      "nameEn": "split squats",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "股四头肌"
+      ],
+      "replacementMuscle": "股四头肌",
+      "secondaryMuscles": [
+        "臀肌",
+        "腘绳肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "单腿膝主导"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "split squat",
+      "substitutionGroup": "legs:股四头肌",
+      "balanceTags": [
+        "单腿膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0024",
+      "sourceId": "0024",
+      "nameZh": "箱式杠铃前蹲",
+      "nameEn": "barbell bench front squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "股四头肌"
+      ],
+      "replacementMuscle": "股四头肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "臀肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "膝主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "front squat",
+      "substitutionGroup": "legs:股四头肌",
+      "balanceTags": [
+        "膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0585",
+      "sourceId": "0585",
+      "nameZh": "器械腿屈伸",
+      "nameEn": "lever leg extension",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "股四头肌"
+      ],
+      "replacementMuscle": "股四头肌",
+      "secondaryMuscles": [
+        "腘绳肌"
+      ],
+      "movementPatterns": [
+        "膝伸"
+      ],
+      "equipment": [
+        "腿屈伸"
+      ],
+      "loadRegions": [
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "leg extension",
+      "substitutionGroup": "legs:股四头肌",
+      "balanceTags": [
+        "膝伸"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0026",
+      "sourceId": "0026",
+      "nameZh": "箱式杠铃深蹲",
+      "nameEn": "barbell bench squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "股四头肌"
+      ],
+      "replacementMuscle": "股四头肌",
+      "secondaryMuscles": [
+        "臀肌",
+        "腘绳肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "膝主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "squat",
+      "substitutionGroup": "legs:股四头肌",
+      "balanceTags": [
+        "膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:2812",
+      "sourceId": "2812",
+      "nameZh": "哑铃台阶登阶分腿蹲",
+      "nameEn": "dumbbell step-up split squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "股四头肌"
+      ],
+      "replacementMuscle": "股四头肌",
+      "secondaryMuscles": [
+        "臀肌",
+        "腘绳肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "单腿膝主导"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "split squat",
+      "substitutionGroup": "legs:股四头肌",
+      "balanceTags": [
+        "单腿膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:2796",
+      "sourceId": "2796",
+      "nameZh": "哑铃台阶登阶箭步蹲",
+      "nameEn": "dumbbell step-up lunge",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "股四头肌"
+      ],
+      "replacementMuscle": "股四头肌",
+      "secondaryMuscles": [
+        "臀肌",
+        "腘绳肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "单腿膝主导"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "lunge",
+      "substitutionGroup": "legs:股四头肌",
+      "balanceTags": [
+        "单腿膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0098",
+      "sourceId": "0098",
+      "nameZh": "杠铃侧向分腿蹲",
+      "nameEn": "barbell side split squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "股四头肌"
+      ],
+      "replacementMuscle": "股四头肌",
+      "secondaryMuscles": [
+        "臀肌",
+        "腘绳肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "单腿膝主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "split squat",
+      "substitutionGroup": "legs:股四头肌",
+      "balanceTags": [
+        "单腿膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0099",
+      "sourceId": "0099",
+      "nameZh": "杠铃单腿分腿蹲",
+      "nameEn": "barbell single leg split squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "股四头肌"
+      ],
+      "replacementMuscle": "股四头肌",
+      "secondaryMuscles": [
+        "臀肌",
+        "腘绳肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "单腿膝主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "split squat",
+      "substitutionGroup": "legs:股四头肌",
+      "balanceTags": [
+        "单腿膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0410",
+      "sourceId": "0410",
+      "nameZh": "哑铃单腿分腿蹲",
+      "nameEn": "dumbbell single leg split squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "股四头肌"
+      ],
+      "replacementMuscle": "股四头肌",
+      "secondaryMuscles": [
+        "臀肌",
+        "腘绳肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "单腿膝主导"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "split squat",
+      "substitutionGroup": "legs:股四头肌",
+      "balanceTags": [
+        "单腿膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0768",
+      "sourceId": "0768",
+      "nameZh": "史密斯单腿分腿蹲",
+      "nameEn": "smith single leg split squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "股四头肌"
+      ],
+      "replacementMuscle": "股四头肌",
+      "secondaryMuscles": [
+        "臀肌",
+        "腘绳肌"
+      ],
+      "movementPatterns": [
+        "单腿膝主导"
+      ],
+      "equipment": [
+        "史密斯机"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "split squat",
+      "substitutionGroup": "legs:股四头肌",
+      "balanceTags": [
+        "单腿膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:2287",
+      "sourceId": "2287",
+      "nameZh": "器械交替腿举",
+      "nameEn": "lever alternate leg press",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "股四头肌"
+      ],
+      "replacementMuscle": "股四头肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "臀肌"
+      ],
+      "movementPatterns": [
+        "膝主导"
+      ],
+      "equipment": [
+        "腿举机"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "leg press",
+      "substitutionGroup": "legs:股四头肌",
+      "balanceTags": [
+        "膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0124",
+      "sourceId": "0124",
+      "nameZh": "杠铃宽距深蹲",
+      "nameEn": "barbell wide squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "股四头肌"
+      ],
+      "replacementMuscle": "股四头肌",
+      "secondaryMuscles": [
+        "臀肌",
+        "腘绳肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "膝主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "squat",
+      "substitutionGroup": "legs:股四头肌",
+      "balanceTags": [
+        "膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:2803",
+      "sourceId": "2803",
+      "nameZh": "哑铃支撑式深蹲",
+      "nameEn": "dumbbell supported squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "股四头肌"
+      ],
+      "replacementMuscle": "股四头肌",
+      "secondaryMuscles": [
+        "臀肌",
+        "腘绳肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "膝主导"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "squat",
+      "substitutionGroup": "legs:股四头肌",
+      "balanceTags": [
+        "膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0044",
+      "sourceId": "0044",
+      "nameZh": "杠铃早安式",
+      "nameEn": "barbell good morning",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "腘绳肌"
+      ],
+      "replacementMuscle": "腘绳肌",
+      "secondaryMuscles": [
+        "下背"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "good morning",
+      "substitutionGroup": "legs:腘绳肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0586",
+      "sourceId": "0586",
+      "nameZh": "俯卧器械腿弯举",
+      "nameEn": "lever lying leg curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "腘绳肌"
+      ],
+      "replacementMuscle": "腘绳肌",
+      "secondaryMuscles": [
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "屈膝"
+      ],
+      "equipment": [
+        "腿弯举"
+      ],
+      "loadRegions": [
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "legs:腘绳肌",
+      "balanceTags": [
+        "屈膝"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0599",
+      "sourceId": "0599",
+      "nameZh": "坐姿器械腿弯举",
+      "nameEn": "lever seated leg curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "腘绳肌"
+      ],
+      "replacementMuscle": "腘绳肌",
+      "secondaryMuscles": [
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "屈膝"
+      ],
+      "equipment": [
+        "腿弯举"
+      ],
+      "loadRegions": [
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "legs:腘绳肌",
+      "balanceTags": [
+        "屈膝"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:3235",
+      "sourceId": "3235",
+      "nameZh": "绳索俯卧腿弯举",
+      "nameEn": "cable assisted inverse leg curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "腘绳肌"
+      ],
+      "replacementMuscle": "腘绳肌",
+      "secondaryMuscles": [
+        "臀肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "屈膝"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "legs:腘绳肌",
+      "balanceTags": [
+        "屈膝"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0496",
+      "sourceId": "0496",
+      "nameZh": "凳上俯卧腿弯举",
+      "nameEn": "inverse leg curl (bench support)",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "腘绳肌"
+      ],
+      "replacementMuscle": "腘绳肌",
+      "secondaryMuscles": [
+        "臀肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "屈膝"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "legs:腘绳肌",
+      "balanceTags": [
+        "屈膝"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0582",
+      "sourceId": "0582",
+      "nameZh": "跪姿器械腿弯举",
+      "nameEn": "lever kneeling leg curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "腘绳肌"
+      ],
+      "replacementMuscle": "腘绳肌",
+      "secondaryMuscles": [
+        "臀肌"
+      ],
+      "movementPatterns": [
+        "屈膝"
+      ],
+      "equipment": [
+        "腿弯举"
+      ],
+      "loadRegions": [
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "legs:腘绳肌",
+      "balanceTags": [
+        "屈膝"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0795",
+      "sourceId": "0795",
+      "nameZh": "站姿单腿弯举",
+      "nameEn": "standing single leg curl",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "腘绳肌"
+      ],
+      "replacementMuscle": "腘绳肌",
+      "secondaryMuscles": [
+        "臀肌"
+      ],
+      "movementPatterns": [
+        "屈膝"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "curl",
+      "substitutionGroup": "legs:腘绳肌",
+      "balanceTags": [
+        "屈膝"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0116",
+      "sourceId": "0116",
+      "nameZh": "杠铃直腿硬拉",
+      "nameEn": "barbell straight leg deadlift",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "腘绳肌"
+      ],
+      "replacementMuscle": "腘绳肌",
+      "secondaryMuscles": [
+        "臀肌",
+        "下背"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "deadlift",
+      "substitutionGroup": "legs:腘绳肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:3193",
+      "sourceId": "3193",
+      "nameZh": "臀腿挺身",
+      "nameEn": "glute-ham raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "腘绳肌"
+      ],
+      "replacementMuscle": "腘绳肌",
+      "secondaryMuscles": [
+        "臀肌",
+        "下背"
+      ],
+      "movementPatterns": [
+        "屈膝"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "屈膝",
+      "substitutionGroup": "legs:腘绳肌",
+      "balanceTags": [
+        "屈膝"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0085",
+      "sourceId": "0085",
+      "nameZh": "罗马尼亚硬拉",
+      "nameEn": "barbell romanian deadlift",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "下背"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "核心",
+        "辅助"
+      ],
+      "variantGroup": "romanian deadlift",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 4,
+        "reps": 6,
+        "rest": 120
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0043",
+      "sourceId": "0043",
+      "nameZh": "杠铃深蹲",
+      "nameEn": "barbell full squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "股四头肌",
+        "腘绳肌",
+        "小腿肌群",
+        "核心"
+      ],
+      "movementPatterns": [
+        "膝主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "核心",
+        "辅助"
+      ],
+      "variantGroup": "squat",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 4,
+        "reps": 6,
+        "rest": 120
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1409",
+      "sourceId": "1409",
+      "nameZh": "杠铃臀桥",
+      "nameEn": "barbell glute bridge",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "下背"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "glute bridge",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0336",
+      "sourceId": "0336",
+      "nameZh": "哑铃箭步蹲",
+      "nameEn": "dumbbell lunge",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "股四头肌",
+        "腘绳肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "单腿膝主导"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "lunge",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "单腿膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0431",
+      "sourceId": "0431",
+      "nameZh": "哑铃台阶登阶",
+      "nameEn": "dumbbell step-up",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "股四头肌",
+        "腘绳肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "单腿膝主导"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "step-up",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "单腿膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:3013",
+      "sourceId": "3013",
+      "nameZh": "地板臀桥",
+      "nameEn": "low glute bridge on floor",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "核心"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "glute bridge",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0042",
+      "sourceId": "0042",
+      "nameZh": "杠铃前蹲",
+      "nameEn": "barbell front squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "股四头肌",
+        "腘绳肌",
+        "小腿肌群",
+        "核心"
+      ],
+      "movementPatterns": [
+        "膝主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "front squat",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0196",
+      "sourceId": "0196",
+      "nameZh": "绳索拉臀",
+      "nameEn": "cable pull through (with rope)",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "下背"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "pull through",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1436",
+      "sourceId": "1436",
+      "nameZh": "高杠深蹲",
+      "nameEn": "barbell high bar squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "股四头肌",
+        "腘绳肌",
+        "小腿肌群",
+        "核心"
+      ],
+      "movementPatterns": [
+        "膝主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "squat",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1435",
+      "sourceId": "1435",
+      "nameZh": "低杠深蹲",
+      "nameEn": "barbell low bar squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "股四头肌",
+        "腘绳肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "膝主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "squat",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0032",
+      "sourceId": "0032",
+      "nameZh": "杠铃硬拉",
+      "nameEn": "barbell deadlift",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "下背"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "核心",
+        "辅助"
+      ],
+      "variantGroup": "deadlift",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 4,
+        "reps": 6,
+        "rest": 120
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0117",
+      "sourceId": "0117",
+      "nameZh": "相扑杠铃硬拉",
+      "nameEn": "barbell sumo deadlift",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "股四头肌",
+        "下背"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "deadlift",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1434",
+      "sourceId": "1434",
+      "nameZh": "史密斯低杠深蹲",
+      "nameEn": "smith low bar squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "股四头肌",
+        "腘绳肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "膝主导"
+      ],
+      "equipment": [
+        "史密斯机"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "squat",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:2805",
+      "sourceId": "2805",
+      "nameZh": "台阶支撑单腿哑铃硬拉",
+      "nameEn": "dumbbell single leg deadlift with stepbox support",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "下背"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "deadlift",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:3561",
+      "sourceId": "3561",
+      "nameZh": "交替抬腿臀桥",
+      "nameEn": "glute bridge march",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "股四头肌"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "glute bridge",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1459",
+      "sourceId": "1459",
+      "nameZh": "哑铃罗马尼亚硬拉",
+      "nameEn": "dumbbell romanian deadlift",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "下背"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "romanian deadlift",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:3281",
+      "sourceId": "3281",
+      "nameZh": "史密斯深蹲",
+      "nameEn": "smith full squat",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "股四头肌",
+        "腘绳肌",
+        "小腿肌群"
+      ],
+      "movementPatterns": [
+        "膝主导"
+      ],
+      "equipment": [
+        "史密斯机"
+      ],
+      "loadRegions": [
+        "髋",
+        "膝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "squat",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "膝主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0300",
+      "sourceId": "0300",
+      "nameZh": "哑铃硬拉",
+      "nameEn": "dumbbell deadlift",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "下背"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "deadlift",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0157",
+      "sourceId": "0157",
+      "nameZh": "绳索硬拉",
+      "nameEn": "cable deadlift",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "股四头肌",
+        "下背"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "deadlift",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0434",
+      "sourceId": "0434",
+      "nameZh": "哑铃直腿硬拉",
+      "nameEn": "dumbbell straight leg deadlift",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "下背"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "deadlift",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1756",
+      "sourceId": "1756",
+      "nameZh": "杠铃单腿硬拉",
+      "nameEn": "barbell single leg deadlift",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "下背"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "deadlift",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1757",
+      "sourceId": "1757",
+      "nameZh": "哑铃单腿硬拉",
+      "nameEn": "dumbbell single leg deadlift",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "臀肌"
+      ],
+      "replacementMuscle": "臀肌",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "下背"
+      ],
+      "movementPatterns": [
+        "髋主导"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "腰背",
+        "髋"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "deadlift",
+      "substitutionGroup": "legs:臀肌",
+      "balanceTags": [
+        "髋主导"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 10,
+        "rest": 90
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0417",
+      "sourceId": "0417",
+      "nameZh": "哑铃站姿提踵",
+      "nameEn": "dumbbell standing calf raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "小腿肌群"
+      ],
+      "replacementMuscle": "小腿肌群",
+      "secondaryMuscles": [
+        "踝部肌群"
+      ],
+      "movementPatterns": [
+        "提踵"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "踝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "calf",
+      "substitutionGroup": "legs:小腿肌群",
+      "balanceTags": [
+        "提踵",
+        "小腿"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1372",
+      "sourceId": "1372",
+      "nameZh": "杠铃站姿提踵",
+      "nameEn": "barbell standing calf raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "小腿肌群"
+      ],
+      "replacementMuscle": "小腿肌群",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "臀肌"
+      ],
+      "movementPatterns": [
+        "提踵"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "踝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "calf",
+      "substitutionGroup": "legs:小腿肌群",
+      "balanceTags": [
+        "提踵",
+        "小腿"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1379",
+      "sourceId": "1379",
+      "nameZh": "哑铃坐姿提踵",
+      "nameEn": "dumbbell seated calf raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "小腿肌群"
+      ],
+      "replacementMuscle": "小腿肌群",
+      "secondaryMuscles": [
+        "腘绳肌"
+      ],
+      "movementPatterns": [
+        "提踵"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "踝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "calf",
+      "substitutionGroup": "legs:小腿肌群",
+      "balanceTags": [
+        "提踵",
+        "小腿"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1490",
+      "sourceId": "1490",
+      "nameZh": "台阶站姿提踵",
+      "nameEn": "standing calf raise (on a staircase)",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "小腿肌群"
+      ],
+      "replacementMuscle": "小腿肌群",
+      "secondaryMuscles": [
+        "踝部肌群",
+        "足部肌群"
+      ],
+      "movementPatterns": [
+        "提踵"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "踝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "calf",
+      "substitutionGroup": "legs:小腿肌群",
+      "balanceTags": [
+        "提踵",
+        "小腿"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1375",
+      "sourceId": "1375",
+      "nameZh": "绳索站姿提踵",
+      "nameEn": "cable standing calf raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "小腿肌群"
+      ],
+      "replacementMuscle": "小腿肌群",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "臀肌"
+      ],
+      "movementPatterns": [
+        "提踵"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [
+        "踝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "calf",
+      "substitutionGroup": "legs:小腿肌群",
+      "balanceTags": [
+        "提踵",
+        "小腿"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:1373",
+      "sourceId": "1373",
+      "nameZh": "徒手站姿提踵",
+      "nameEn": "bodyweight standing calf raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "小腿肌群"
+      ],
+      "replacementMuscle": "小腿肌群",
+      "secondaryMuscles": [
+        "踝部肌群",
+        "足部肌群"
+      ],
+      "movementPatterns": [
+        "提踵"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [
+        "踝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "calf",
+      "substitutionGroup": "legs:小腿肌群",
+      "balanceTags": [
+        "提踵",
+        "小腿"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0088",
+      "sourceId": "0088",
+      "nameZh": "杠铃坐姿提踵",
+      "nameEn": "barbell seated calf raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "小腿肌群"
+      ],
+      "replacementMuscle": "小腿肌群",
+      "secondaryMuscles": [
+        "腘绳肌",
+        "股四头肌"
+      ],
+      "movementPatterns": [
+        "提踵"
+      ],
+      "equipment": [
+        "杠铃"
+      ],
+      "loadRegions": [
+        "踝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "calf",
+      "substitutionGroup": "legs:小腿肌群",
+      "balanceTags": [
+        "提踵",
+        "小腿"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0605",
+      "sourceId": "0605",
+      "nameZh": "器械站姿提踵",
+      "nameEn": "lever standing calf raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "小腿肌群"
+      ],
+      "replacementMuscle": "小腿肌群",
+      "secondaryMuscles": [
+        "比目鱼肌",
+        "踝稳定肌群"
+      ],
+      "movementPatterns": [
+        "提踵"
+      ],
+      "equipment": [
+        "腿举机"
+      ],
+      "loadRegions": [
+        "踝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "calf",
+      "substitutionGroup": "legs:小腿肌群",
+      "balanceTags": [
+        "提踵",
+        "小腿"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0409",
+      "sourceId": "0409",
+      "nameZh": "哑铃单腿提踵",
+      "nameEn": "dumbbell single leg calf raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "小腿肌群"
+      ],
+      "replacementMuscle": "小腿肌群",
+      "secondaryMuscles": [
+        "踝部肌群"
+      ],
+      "movementPatterns": [
+        "提踵"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [
+        "踝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "calf",
+      "substitutionGroup": "legs:小腿肌群",
+      "balanceTags": [
+        "提踵",
+        "小腿"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0594",
+      "sourceId": "0594",
+      "nameZh": "器械坐姿提踵",
+      "nameEn": "lever seated calf raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "小腿肌群"
+      ],
+      "replacementMuscle": "小腿肌群",
+      "secondaryMuscles": [
+        "比目鱼肌",
+        "踝稳定肌群"
+      ],
+      "movementPatterns": [
+        "提踵"
+      ],
+      "equipment": [
+        "腿举机"
+      ],
+      "loadRegions": [
+        "踝"
+      ],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "calf",
+      "substitutionGroup": "legs:小腿肌群",
+      "balanceTags": [
+        "提踵",
+        "小腿"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0274",
+      "sourceId": "0274",
+      "nameZh": "卷腹",
+      "nameEn": "crunch floor",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "髋屈肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0472",
+      "sourceId": "0472",
+      "nameZh": "悬垂举腿",
+      "nameEn": "hanging leg raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "髋屈肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "leg raise",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0276",
+      "sourceId": "0276",
+      "nameZh": "死虫式",
+      "nameEn": "dead bug",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "髋屈肌",
+        "下背"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "dead bug",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0407",
+      "sourceId": "0407",
+      "nameZh": "哑铃侧屈",
+      "nameEn": "dumbbell side bend",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "腹斜肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "哑铃"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "核心",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:3665",
+      "sourceId": "3665",
+      "nameZh": "高低平板支撑",
+      "nameEn": "power point plank",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "肩部肌群",
+        "肱三头肌",
+        "臀肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "plank",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0464",
+      "sourceId": "0464",
+      "nameZh": "平板支撑转体",
+      "nameEn": "front plank with twist",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "腹斜肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "plank",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0664",
+      "sourceId": "0664",
+      "nameZh": "俯卧撑转侧平板",
+      "nameEn": "push-up to side plank",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "肩部肌群",
+        "胸肌",
+        "肱三头肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "push-up",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:3239",
+      "sourceId": "3239",
+      "nameZh": "跪姿平板触肩",
+      "nameEn": "kneeling plank tap shoulder (male)",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "肩部肌群",
+        "肱三头肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "plank",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0873",
+      "sourceId": "0873",
+      "nameZh": "绳索反向卷腹",
+      "nameEn": "cable reverse crunch",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "髋屈肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0262",
+      "sourceId": "0262",
+      "nameZh": "交叉卷腹",
+      "nameEn": "cross body crunch",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "腹斜肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0267",
+      "sourceId": "0267",
+      "nameZh": "手臂过顶卷腹",
+      "nameEn": "crunch (hands overhead)",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "髋屈肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0469",
+      "sourceId": "0469",
+      "nameZh": "屈髋卷腹",
+      "nameEn": "groin crunch",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "髋屈肌",
+        "大腿内侧"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0634",
+      "sourceId": "0634",
+      "nameZh": "离心卷腹",
+      "nameEn": "negative crunch",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "髋屈肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0635",
+      "sourceId": "0635",
+      "nameZh": "地板侧腹卷腹",
+      "nameEn": "oblique crunches floor",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "腹斜肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0871",
+      "sourceId": "0871",
+      "nameZh": "屈膝收腹",
+      "nameEn": "tuck crunch",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "髋屈肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0872",
+      "sourceId": "0872",
+      "nameZh": "反向卷腹",
+      "nameEn": "reverse crunch",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "髋屈肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:2429",
+      "sourceId": "2429",
+      "nameZh": "蛙式卷腹",
+      "nameEn": "frog crunch",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "髋屈肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:3640",
+      "sourceId": "3640",
+      "nameZh": "触膝卷腹",
+      "nameEn": "knee touch crunch",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "髋屈肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:3663",
+      "sourceId": "3663",
+      "nameZh": "反向平板抬腿",
+      "nameEn": "reverse plank with leg lift",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "臀肌",
+        "腘绳肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "plank",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0242",
+      "sourceId": "0242",
+      "nameZh": "绳索屈膝反向卷腹",
+      "nameEn": "cable tuck reverse crunch",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "髋屈肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0691",
+      "sourceId": "0691",
+      "nameZh": "靠墙坐姿侧屈",
+      "nameEn": "seated side crunch (wall)",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "腹斜肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:3544",
+      "sourceId": "3544",
+      "nameZh": "徒手上斜侧向平板支撑",
+      "nameEn": "bodyweight incline side plank",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "腹斜肌",
+        "肩部肌群"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "plank",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0175",
+      "sourceId": "0175",
+      "nameZh": "绳索跪姿卷腹",
+      "nameEn": "cable kneeling crunch",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "腹斜肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0212",
+      "sourceId": "0212",
+      "nameZh": "绳索坐姿卷腹",
+      "nameEn": "cable seated crunch",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "腹斜肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0223",
+      "sourceId": "0223",
+      "nameZh": "绳索侧向卷腹",
+      "nameEn": "cable side crunch",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "腹斜肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0226",
+      "sourceId": "0226",
+      "nameZh": "绳索站姿卷腹",
+      "nameEn": "cable standing crunch",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "腹斜肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "绳索机"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0277",
+      "sourceId": "0277",
+      "nameZh": "下斜卷腹",
+      "nameEn": "decline crunch",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "髋屈肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "crunch",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    },
+    {
+      "exerciseId": "exds:0689",
+      "sourceId": "0689",
+      "nameZh": "坐姿举腿",
+      "nameEn": "seated leg raise",
+      "aliasesZh": [],
+      "pplTags": [
+        "legs"
+      ],
+      "primaryMuscles": [
+        "核心"
+      ],
+      "replacementMuscle": "核心",
+      "secondaryMuscles": [
+        "髋屈肌"
+      ],
+      "movementPatterns": [
+        "核心"
+      ],
+      "equipment": [
+        "徒手"
+      ],
+      "loadRegions": [],
+      "roleEligibility": [
+        "辅助"
+      ],
+      "variantGroup": "leg raise",
+      "substitutionGroup": "legs:核心",
+      "balanceTags": [
+        "核心"
+      ],
+      "recommendationStatus": "自动推荐",
+      "qualityTier": "A",
+      "trainingDefaults": {
+        "sets": 3,
+        "reps": 12,
+        "rest": 60
+      },
+      "catalogVersion": "irontrack-exercises-v1"
+    }
+  ],
+  "legacyNameMap": {
+    "阿诺德推举": "exds:2137",
+    "蚌式开合": "irontrack:legacy-6a3e8e709c",
+    "保加利亚分腿蹲": "irontrack:legacy-c76c03c89f",
+    "标准俯卧撑": "exds:0662",
+    "侧向弓步": "irontrack:legacy-5499e4baab",
+    "超人式后拉": "irontrack:legacy-fdb9c59c1f",
+    "锤式弯举": "exds:0313",
+    "单臂哑铃划船": "exds:0292",
+    "单腿罗马尼亚硬拉": "irontrack:legacy-5ed677558e",
+    "单腿提踵": "irontrack:legacy-c1d86de3a6",
+    "单腿臀桥": "irontrack:legacy-64e7709ac5",
+    "弹力带下拉": "irontrack:legacy-2743b5a545",
+    "凳上臂屈伸": "irontrack:legacy-e38691439f",
+    "反手高位下拉": "exds:0245",
+    "反手引体向上": "exds:1326",
+    "反向飞鸟": "irontrack:legacy-3ac7e84159",
+    "反向箭步蹲": "irontrack:legacy-2805fdec2a",
+    "反向平板支撑": "irontrack:legacy-43c7e8caaa",
+    "反向绳索飞鸟": "irontrack:legacy-d8683f0716",
+    "反向雪天使": "irontrack:legacy-1ffacc70ef",
+    "俯卧撑": "irontrack:legacy-d6901dd1e8",
+    "俯卧撑顶端前伸": "irontrack:legacy-d6be1c9d76",
+    "俯卧撑停顿式": "irontrack:legacy-bf35ce28cf",
+    "俯卧腿弯举": "irontrack:legacy-c7b7564876",
+    "俯卧游泳式": "irontrack:legacy-d40bcf46e1",
+    "俯卧T举": "irontrack:legacy-f8a1ab84ff",
+    "俯卧W举": "irontrack:legacy-c6548a8ddf",
+    "俯卧Y举": "irontrack:legacy-50a7b7e43e",
+    "杠铃划船": "exds:0027",
+    "杠铃深蹲": "exds:0043",
+    "杠铃推举": "irontrack:legacy-9b31ffa333",
+    "杠铃弯举": "exds:0031",
+    "杠铃卧推": "exds:0025",
+    "高脚杯深蹲": "exds:1760",
+    "高位下拉": "exds:0198",
+    "跪姿俯卧撑": "exds:3211",
+    "过顶绳索臂屈伸": "exds:0194",
+    "蝴蝶机夹胸": "irontrack:legacy-7a95c46b9b",
+    "肩部触碰": "irontrack:legacy-1a66674088",
+    "肩胛引体": "exds:0688",
+    "靠墙静蹲": "irontrack:legacy-a2cd3b31b3",
+    "宽距俯卧撑": "irontrack:legacy-9784faca94",
+    "髋外展": "irontrack:legacy-d24fd8adc8",
+    "罗马尼亚硬拉": "exds:0085",
+    "慢速俯卧撑": "irontrack:legacy-d73e9e74e8",
+    "毛巾划船等长": "irontrack:legacy-54e0833595",
+    "毛巾弯举等长": "irontrack:legacy-787acace8c",
+    "门框划船": "irontrack:legacy-c9a9911e5b",
+    "牧师凳弯举": "irontrack:legacy-5e69ccfb3b",
+    "鸟狗式划臂": "irontrack:legacy-3de05a486f",
+    "派克俯卧撑": "irontrack:legacy-9c0371a004",
+    "平板支撑": "irontrack:legacy-96d9004303",
+    "平板支撑转体": "exds:0464",
+    "器械推胸": "irontrack:legacy-601946b696",
+    "墙壁倒立支撑": "irontrack:legacy-d225ef7149",
+    "上斜俯卧撑": "exds:0493",
+    "上斜哑铃卧推": "irontrack:legacy-505af2bb63",
+    "绳索侧平举": "exds:0178",
+    "绳索飞鸟": "irontrack:legacy-c1205d8ad1",
+    "绳索面拉": "irontrack:legacy-8354ee33ca",
+    "绳索弯举": "exds:0868",
+    "绳索下压": "irontrack:legacy-d351d4382f",
+    "史密斯上斜卧推": "exds:0757",
+    "史密斯深蹲": "exds:3281",
+    "双杠臂屈伸": "exds:0251",
+    "死虫式": "exds:0276",
+    "耸肩": "irontrack:legacy-24342454f0",
+    "台阶登阶": "irontrack:legacy-40c871b3ef",
+    "徒手深蹲": "irontrack:legacy-6845ae9276",
+    "腿举": "irontrack:legacy-2e5b0b61f2",
+    "腿屈伸": "irontrack:legacy-677bd71c0c",
+    "腿弯举": "irontrack:legacy-520aa50d31",
+    "臀桥": "irontrack:legacy-524754bbdc",
+    "臀推": "irontrack:legacy-aea2170c03",
+    "下斜俯卧撑": "exds:0279",
+    "胸托哑铃划船": "exds:0327",
+    "悬垂举腿": "exds:0472",
+    "哑铃侧平举": "exds:0334",
+    "哑铃推肩": "irontrack:legacy-0a3b1cef93",
+    "哑铃硬拉": "exds:0300",
+    "引体向上": "exds:0652",
+    "窄距俯卧撑": "irontrack:legacy-25c2d875b6",
+    "窄握卧推": "irontrack:legacy-afe6fe2874",
+    "站姿提踵": "irontrack:legacy-76255f5ec8",
+    "直臂下压": "exds:0238",
+    "桌下划船": "irontrack:legacy-cd316ece4e",
+    "钻石俯卧撑": "exds:0283",
+    "坐姿划船": "irontrack:legacy-c4db7aa676",
+    "坐姿提踵": "irontrack:legacy-aa7cb35831",
+    "坐姿腿弯举": "irontrack:legacy-5e2984da45",
+    "T杠划船": "irontrack:legacy-30c9102754"
+  }
+}

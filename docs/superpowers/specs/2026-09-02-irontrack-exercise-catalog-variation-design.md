@@ -1,7 +1,7 @@
 # IronTrack 精选动作库与智能变式设计规格
 
 日期：2026-09-02
-状态：规格已确认，待实施计划批准
+状态：规格已确认；阶段一整理完成，待用户分类验收
 对应 PRD：`docs/superpowers/specs/2026-08-28-irontrack-prd.md` 第 15 章
 数据来源：`hasaneyldrm/exercises-dataset`，审计版本 `7455efae41b330c265e7cd4b78dfa848e7ce5ebd`
 
@@ -84,6 +84,7 @@
 | `recommendationStatus` | 自动推荐、仅手动、暂停发布或排除 |
 | `qualityTier` | 审核等级，自动推荐只使用合格等级 |
 | `instructionZh` | 经术语校对的分步骤中文说明 |
+| `trainingDefaults` | 没有历史记录时使用的默认组数、次数和休息时间；有历史后由渐进规则接管 |
 | `catalogVersion` | 动作库版本 |
 
 数据源不提供的 PPL、动作模式、替代关系和训练结构字段必须由 IronTrack 转换规则和人工审核补齐，不能让 AI 临时推断后直接写入正式动作库。

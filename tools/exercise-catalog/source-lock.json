@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/hasaneyldrm/exercises-dataset",
+  "commit": "7455efae41b330c265e7cd4b78dfa848e7ce5ebd",
+  "dataPath": "data/exercises.json",
+  "dataSha256": "656634224b8977b99a6d765470ee123260d4979715eaa4e7c0b7c8bb0d79f93d",
+  "expectedRecords": 1324,
+  "catalogVersion": "irontrack-exercises-v1",
+  "importedAt": "2026-09-02",
+  "license": {
+    "dataAndInstructions": "MIT",
+    "media": "excluded",
+    "mediaOwner": "Gym visual"
+  }
+}
