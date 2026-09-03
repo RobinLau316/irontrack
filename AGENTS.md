@@ -17,7 +17,7 @@
 
 - 阶段一已于 2026-09-02 通过用户分类验收，共 207 个精选动作。
 - 目录位于 `public/data/exercise-catalog.v1.json`，中文步骤位于 `public/data/exercise-instructions-zh.v1.json`。
-- `index.html` 已完成阶段二本地接入；发布前用户备份与线上验收尚未完成，因此不得声称新动作已在线生效。
+- `index.html` 已完成阶段二接入，并于 2026-09-03 发布及完成线上验收。
 - 详细规则以 PRD 第 15 章、动作库设计规格和实施计划为准。
 
 ## 检查与发布
