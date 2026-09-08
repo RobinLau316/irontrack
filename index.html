@@ -767,6 +767,33 @@ const BODYWEIGHT_LIBRARY = {
   ]
 };
 
+// V1.2 结构槽位（PRD 16.3）：每个训练日的固定肌群结构，pattern 匹配白名单动作。
+// 正式动作默认约 8 个，机动位用于补弱项/器械占用/不适替换，不破坏当日主要结构。
+const PPL_SLOTS = {
+  push: [
+    { label:'胸部', patterns:['水平推','胸内收'], n:3 },
+    { label:'肩部', patterns:['垂直推','肩外展','肩后束'], n:2 },
+    { label:'三头', patterns:['肘伸'], n:2 },
+    { label:'机动', patterns:null, n:1 }
+  ],
+  pull: [
+    { label:'背部垂直拉', patterns:['垂直拉','垂直拉变式'], n:2 },
+    { label:'背部水平拉', patterns:['水平拉'], n:2 },
+    { label:'后束 / 上背', patterns:['肩后束','肩胛控制','肩胛上提'], n:1 },
+    { label:'二头', patterns:['肘屈'], n:2 },
+    { label:'机动', patterns:null, n:1 }
+  ],
+  legs: [
+    { label:'股四头主导', patterns:['膝主导','膝伸'], n:2 },
+    { label:'髋主导 / 臀腿后侧', patterns:['髋主导'], n:2 },
+    { label:'单侧稳定', patterns:['单腿膝主导'], n:1 },
+    { label:'小腿', patterns:['提踵'], n:1 },
+    { label:'核心', patterns:['核心'], n:1 },
+    { label:'机动', patterns:null, n:1 }
+  ]
+};
+
+const PPL_WHITELIST_VERSION = 'v1.2-whitelist-1';
 const BACKUP_VERSION = 2;
 const EXERCISE_CATALOG_URL = './public/data/exercise-catalog.v1.json';
 const EXERCISE_INSTRUCTIONS_URL = './public/data/exercise-instructions-zh.v1.json';
@@ -1443,7 +1470,7 @@ async function confirmSetup() {
   setupSel.avoid = (document.getElementById('setupAvoid')?.value || '').trim();
   saveSetupDraft();
   const msg = document.getElementById('setupMsg');
-  msg.textContent = getGlobalApiKey() ? '正在生成并校验今日计划...' : '未设置 API，正在生成本地备用计划...';
+  msg.textContent = '正在按本地规则生成今日计划...';
   const btn = document.querySelector('#trainingContent .btn-accent');
   if (btn) btn.disabled = true;
   let generated = null;
@@ -1568,6 +1595,9 @@ function adaptExercise(base, reason) {
   if (ex.role === '核心') {
     const recent = getExerciseHistory(ex,3);
     if (recent.length === 3 && recent.every(item=>item.completed===false)) ex.reason += '；连续 3 次未完成目标，建议本次确认是否替换';
+    const doneCount = Math.max(0, Number(trainingPhase.completedSessions) || 0);
+    const microCycles = Math.floor(doneCount / 3) + 1;
+    ex.reason += `；本次为第 ${microCycles} 个 PPL 小周期，主动作保持稳定便于比较，满 3 个小周期后再评估轮换`;
     const phaseDays = Math.max(1, Math.floor((Date.now()-new Date(trainingPhase.startedAt||getTodayStr()).getTime())/86400000)+1);
     if (phaseDays >= 28) ex.reason += `；当前训练阶段已进入第 ${Math.ceil(phaseDays/7)} 周，可评估是否继续`;
   }
@@ -1601,12 +1631,45 @@ function createLegacyLocalPlan() {
   const basePool = (setupSel.env === '家用徒手' ? BODYWEIGHT_LIBRARY[key] : lib.auxiliary.concat(BODYWEIGHT_LIBRARY[key]))
     .filter(ex => !isExerciseBlocked(ex) && !hadRecentDiscomfort(ex.name) && matchesEnvironment(ex) && !corePlans.some(c => c.name === ex.name));
   const need = Math.max(0, count - corePlans.length);
-  const offset = variant === 'B' ? Math.ceil(need * 0.34) : 0;
-  let rotated = basePool.slice(offset).concat(basePool.slice(0, offset));
-  let auxiliaries = rotated.slice(0, need).map(ex => adaptExercise(ex, `辅助动作 ${variant} 方案轮换`));
-  if (corePlans.length + auxiliaries.length < count) {
-    const extras = allLibraryExercises(key).filter(ex => !isExerciseBlocked(ex) && !corePlans.concat(auxiliaries).some(x=>x.name===ex.name));
-    auxiliaries = auxiliaries.concat(extras.slice(0, count-corePlans.length-auxiliaries.length).map(ex=>adaptExercise(ex,'器械受限时的同类补充动作')));
+  const offset = variant === 'B' ? Math.ceil(basePool.length * 0.34) : 0;
+  const rotated = basePool.slice(offset).concat(basePool.slice(0, offset));
+  const usedNames = new Set(corePlans.map(c => c.name));
+  const auxiliaries = [];
+  const slotDefs = PPL_SLOTS[key] || [];
+  const corePatterns = corePlans.map(c => c.pattern);
+  const takeFromPool = (patterns) => {
+    for (const ex of rotated) {
+      if (usedNames.has(ex.name)) continue;
+      if (patterns && !patterns.includes(ex.pattern)) continue;
+      return ex;
+    }
+    return null;
+  };
+  for (const slot of slotDefs) {
+    let quota = slot.n;
+    if (slot.patterns) quota -= corePlans.filter(c => slot.patterns.includes(c.pattern)).length;
+    for (let i = 0; i < Math.max(0, quota) && auxiliaries.length < need; i++) {
+      const ex = takeFromPool(slot.patterns);
+      if (!ex) break;
+      usedNames.add(ex.name);
+      auxiliaries.push(adaptExercise(ex, `辅助动作（${slot.label}）：按 ${variant} 方案轮换`));
+    }
+  }
+  if (auxiliaries.length < need) {
+    for (const ex of rotated) {
+      if (auxiliaries.length >= need) break;
+      if (usedNames.has(ex.name)) continue;
+      usedNames.add(ex.name);
+      auxiliaries.push(adaptExercise(ex, '机动位补充动作'));
+    }
+  }
+  if (auxiliaries.length < need) {
+    for (const ex of allLibraryExercises(key)) {
+      if (auxiliaries.length >= need) break;
+      if (usedNames.has(ex.name) || isExerciseBlocked(ex)) continue;
+      usedNames.add(ex.name);
+      auxiliaries.push(adaptExercise(ex, '器械受限时的同类补充动作'));
+    }
   }
   const workout = corePlans.concat(auxiliaries).slice(0, count);
   return {
@@ -1624,7 +1687,7 @@ function createLegacyLocalPlan() {
       {name:'舒缓活动',note:'低强度走动并观察是否有异常不适'}
     ],
     nutrition:`训练后优先补充蛋白质和适量碳水，并根据你的“${profile.goal}”目标控制全天总量。`,
-    notice:getGlobalApiKey() ? '' : '未设置 API Key，本次使用本地备用计划。'
+    notice:`本次按本地规则（${lib.focus}）生成，已考虑你的身体状态、可用时间和训练环境。`
   };
 }
 
@@ -1750,18 +1813,9 @@ function createCatalogPlan() {
 }
 
 function createLocalPlan() {
-  if (exerciseCatalog && getExerciseEngine()) {
-    try { return createCatalogPlan(); }
-    catch(e) {
-      console.warn('精选动作库计划生成失败，回退原内置动作库:', e);
-      const fallback = createLegacyLocalPlan();
-      fallback.notice = `精选动作库暂不可用，已回退原内置动作库（${e.message}）。`;
-      return fallback;
-    }
-  }
-  const fallback = createLegacyLocalPlan();
-  if (exerciseCatalogStatus === 'failed') fallback.notice = `精选动作库加载失败，已使用原内置动作库（${exerciseCatalogError}）。`;
-  return fallback;
+  // V1.2：基础计划由本地 PPL 白名单 + 结构槽位直接生成，AI 不作为生成前提。
+  const plan = createLegacyLocalPlan();
+  return plan;
 }
 
 function buildTodayPrompt(skeleton) {
@@ -1866,27 +1920,14 @@ function normalizeCatalogAIPlan(raw, skeleton) {
 }
 
 async function generateTodayPlan() {
-  let skeleton;
+  // V1.2：训练计划由本地规则直接生成，AI 不再介入生成链路，与 API/网络无关。
+  let generated;
   try {
-    skeleton = createLocalPlan();
+    generated = createLocalPlan();
   } catch(e) {
     console.warn('本地计划首次生成失败，正在修复兼容数据:', e);
     ensureUserDataCompatibility();
-    skeleton = createLocalPlan();
-  }
-  let generated = skeleton;
-  if (getGlobalApiKey()) {
-    for (let attempt=0; attempt<2; attempt++) {
-      const result = await aiCall(buildTodayPrompt(skeleton), true);
-      if (!result) continue;
-      try {
-        const parsed = JSON.parse(result.replace(/```json\s*|\s*```/g,'').trim());
-        generated = normalizeAIPlan(parsed, skeleton);
-        break;
-      } catch(e) {
-        generated.notice = `AI 结果校验未通过，已使用本地备用计划（${e.message}）。`;
-      }
-    }
+    generated = createLocalPlan();
   }
   todayPlan = generated;
   LS.set('today_plan', todayPlan);
@@ -2132,8 +2173,6 @@ function resetTraining() {
 
 function renderPlanPreview() {
   setTrainingFixedAction(false);
-  const sourceClass = todayPlan.source === 'ai' ? '' : ' local';
-  const sourceText = todayPlan.source === 'ai' ? '规则 + AI 适配' : '本地备用计划';
   const items = todayPlan.workout.map((ex,index) => `
     <div class="preview-item">
       <div class="preview-head">
@@ -2152,14 +2191,27 @@ function renderPlanPreview() {
       </div>
     </div>`).join('');
   document.getElementById('trainingContent').innerHTML = `
-    <div class="training-header"><span class="text-accent font-bold">计划预览</span><span class="plan-source${sourceClass}">${sourceText}</span></div>
+    <div class="training-header"><span class="text-accent font-bold">计划预览</span><span class="plan-source local">本地规则</span></div>
     ${todayPlan.notice?`<div class="resume-banner">${escapeHtml(todayPlan.notice)}</div>`:''}
+    <div style="margin-bottom:14px"><button class="btn btn-outline" onclick="aiExplainPlan()">AI 解释本计划</button><div id="aiExplain" class="text-sm text-muted text-center" style="margin:8px 0"></div></div>
     <div class="card">
       <div class="row mb-3"><div><div class="section-title" style="margin-bottom:2px">${escapeHtml(todayPlan.focus)} · ${todayPlan.variant} 方案</div><div class="text-muted text-sm">${todayPlan.workout.length} 个动作 · ${escapeHtml(todayPlan.factors.time)} · ${escapeHtml(todayPlan.factors.env)}</div></div></div>
       ${items}
     </div>
     <button class="btn btn-accent" onclick="startConfirmedPlan()">确认计划并开始</button>
     <button class="btn btn-outline mt-3" onclick="discardTodayPlan()">返回重新生成</button>`;
+}
+
+function aiExplainPlan() {
+  const el = document.getElementById('aiExplain');
+  if (!el) return;
+  if (!getGlobalApiKey()) { el.textContent = '暂未设置 API Key，无法生成本计划解释。'; return; }
+  el.textContent = '正在生成解释...';
+  const summary = todayPlan.workout.map((ex,i) => `${i+1}. ${ex.name}（${ex.role||'辅助'}，${ex.replacementMuscle||ex.pattern||'综合'}）：${ex.sets}组×${ex.reps}次 ${ex.weight}kg`).join('\n');
+  const prompt = `你是力量训练教练。请用中文简短解释这份 PPL 训练计划的安排逻辑，帮助用户理解为什么这样练。当前是【${todayPlan.focus}】${todayPlan.variant}方案。计划：\n${summary}\n要求：3-5 句，说明今天练什么、动作结构和训练量为何这样安排，不诊断伤病。`;
+  aiCall(prompt, true).then(res => {
+    if (res) el.textContent = res.trim(); else el.textContent = 'AI 暂时无响应，请稍后重试。';
+  }).catch(() => { el.textContent = 'AI 暂时不可用，请稍后重试。'; });
 }
 
 function updatePreviewField(index,key,value) {
@@ -2594,6 +2646,8 @@ function renderComplete() {
       <div class="complete-title">${s.day.name} 完成！</div>
       <div class="complete-time">总用时 ${formatTime(s.sessionTime)}</div>
       <div class="card summary-card">${summary}</div>
+      <button class="btn btn-outline mt-3" onclick="aiReviewCurrentTraining()">AI 训练评价 / 后续建议</button>
+      <div id="aiReview" class="text-sm text-muted text-center" style="margin:10px 0"></div>
       <button class="btn btn-accent" onclick="resetTraining();renderTrainingPage()">再练一次</button>
       <button class="btn btn-outline mt-3" onclick="navigate('home')">返回首页</button>
     </div>
@@ -2604,6 +2658,22 @@ function adjustWeight(delta) {
   trainState.weight = Math.max(0, validWeight(trainState.weight, 0) + delta);
   persistTrainingState();
   renderWorkoutOnly();
+}
+
+function aiReviewCurrentTraining() {
+  const s = trainState;
+  const el = document.getElementById('aiReview');
+  if (!el) return;
+  if (!getGlobalApiKey()) { el.textContent = '暂未设置 API Key，无法生成评价。'; return; }
+  el.textContent = '正在生成评价...';
+  const summary = s.day.exercises.map(ex => {
+    const recs = s.records[ex.id] || [];
+    return `${ex.name}:${recs.map(r=>`${r.w}kg×${r.r}`).join('、')||'未完成'}`;
+  }).join('\n');
+  const prompt = `你是经验丰富的力量训练教练。请基于本次训练记录做简短评价并给出后续训练建议。用户采用 PPL 分化，本次是【${s.day.name}】，用时 ${formatTime(s.sessionTime)}。训练记录：\n${summary}\n要求：用 3-5 句中文，最多分2点建议，不诊断伤病，不承诺效果。`;
+  aiCall(prompt, true).then(res => {
+    if (res) el.textContent = res.trim(); else el.textContent = 'AI 暂时无响应，请稍后重试。';
+  }).catch(() => { el.textContent = 'AI 暂时不可用，请稍后重试。'; });
 }
 
 function renderWorkoutOnly() {
@@ -3148,7 +3218,7 @@ async function testApiKey() {
 function buildBackupPayload() {
   const data = {};
   USER_DATA_KEYS.forEach(key => { data[key] = LS.get(key, null); });
-  return { app:'IronTrack', version:BACKUP_VERSION, user:currentUser, exportedAt:new Date().toISOString(), data };
+  return { app:'IronTrack', version:BACKUP_VERSION, user:currentUser, exportedAt:new Date().toISOString(), whitelistVersion: PPL_WHITELIST_VERSION, data };
 }
 
 function exportBackup() {
