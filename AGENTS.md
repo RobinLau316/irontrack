@@ -3,7 +3,9 @@
 ## 当前运行入口
 
 - GitHub Pages 与本地静态运行均使用根目录 `index.html`。
-- `src/` 中的 Next.js 文件是早期原型，不参与当前发布。
+- 样式在 `public/app.css`；脚本按加载顺序位于 `public/app/`：`core.js`（API Key、用户、存储）→ `data.js`（默认数据、动作库、兼容校验）→ `helpers.js`（全局状态、初始化、登录、工具函数）→ `plan.js`（导航、计划生成）→ `pages.js`（首页/体系/数据/我的）→ `training.js`（训练状态机、AI 调用）→ `boot.js`（手势、初始化）。
+- `legacy/` 中的 Next.js 文件是早期原型，不参与当前发布，也不再维护。
+- 根目录 `sw.js` 提供离线缓存；**每次发布前必须递增其中的 `CACHE_VERSION`**，否则线上用户会停留在旧缓存。
 - 推送 `main` 会触发 `.github/workflows/deploy-pages.yml` 发布。
 
 ## 修改边界

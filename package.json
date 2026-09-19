@@ -7,21 +7,5 @@
     "build": "npm run check",
     "start": "python3 -m http.server 4173",
     "check": "node scripts/check-static.mjs && node scripts/check-exercise-catalog.mjs && node scripts/check-exercise-engine.mjs && node scripts/smoke-v12.mjs"
-  },
-  "dependencies": {
-    "next": "14.2.29",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/react": "^18.3.0",
-    "@types/react-dom": "^18.3.0",
-    "autoprefixer": "^10.4.0",
-    "eslint": "^8.0.0",
-    "eslint-config-next": "14.2.29",
-    "postcss": "^8.4.0",
-    "tailwindcss": "^3.4.0",
-    "typescript": "^5.0.0"
   }
 }

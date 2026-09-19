@@ -1,7 +1,18 @@
 import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
+const root = fileURLToPath(new URL("..", import.meta.url));
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
-const scripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map((m) => m[1]);
+
+// 按文档顺序收集脚本内容：外链脚本读文件，内联脚本取内容。
+const scripts = [...html.matchAll(/<script(\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map((match) => {
+  const attrs = match[1] || "";
+  const srcMatch = attrs.match(/src\s*=\s*["']([^"']+)["']/i);
+  if (!srcMatch) return match[2];
+  const abs = path.join(root, srcMatch[1].replace(/^\.\//, ""));
+  return fs.readFileSync(abs, "utf8");
+});
 
 // 模拟浏览器全局
 const LSstore = {};

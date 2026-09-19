@@ -4,9 +4,11 @@
 
 ## 1. 运行形态
 
-IronTrack 当前是一个部署在 GitHub Pages 的单页静态应用。线上只发布 `index.html` 和 `public/`；早期 Next.js 原型保留在 `src/`，不参与当前部署。
+IronTrack 当前是一个部署在 GitHub Pages 的单页静态应用。线上只发布 `index.html` 和 `public/`（脚本按加载顺序拆分在 `public/app/`）；早期 Next.js 原型保留在 `legacy/`，不参与当前部署。
 
 应用没有自有后端。训练数据保存在浏览器 `localStorage`，AI 计划适配由浏览器直接请求 DeepSeek API。
+
+根目录 `sw.js` 注册 Service Worker：预缓存应用壳与动作数据，页面和数据 JSON 走网络优先（失败回退缓存），静态资源走缓存优先。每次发布必须递增 `CACHE_VERSION`，旧缓存在激活时清除。历史训练超过 200 条时，最早记录自动转入 `sessions_archive`（上限 400 条），并随备份导出。
 
 V1.1 视觉层仍由同一个 `index.html` 提供，主视觉资源保存在 `public/`。本次改版没有改变本地存储键、数据结构或训练状态机。
 

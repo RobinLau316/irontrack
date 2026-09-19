@@ -6,9 +6,9 @@ IronTrack 是一个手机优先的个人 AI 训练助手。它按 PPL 周期推�
 
 ## 当前运行入口
 
-- 线上和本地实际入口：`index.html`
+- 线上和本地实际入口：`index.html`（样式 `public/app.css`，脚本 `public/app/`）
 - 部署：推送 `main` 后由 `.github/workflows/deploy-pages.yml` 发布到 GitHub Pages
-- `src/`、Next.js 和 Tailwind 相关文件是早期原型，当前不参与线上构建
+- `legacy/` 中的 Next.js 和 Tailwind 相关文件是早期原型，当前不参与线上构建
 
 ## 已实现能力
 
