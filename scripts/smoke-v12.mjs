@@ -35,6 +35,7 @@ const document = {
   addEventListener() {},
 };
 globalThis.localStorage = LS;
+globalThis.navigator = {};
 globalThis.window = { IronTrackExerciseEngine: null, addEventListener() {}, matchMedia: () => ({ addEventListener() {}, matches: false }) };
 globalThis.document = document;
 globalThis.alert = () => {};

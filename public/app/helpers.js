@@ -2,28 +2,15 @@
 let profile, plan, sessions, bodyRecords, measurements, todayIndex, cycleVariants, coreLocks, trainingPhase, exercisePreferences;
 
 function initUserData() {
+  if (trainState.timerInterval) clearInterval(trainState.timerInterval);
+  if (trainState.restInterval) clearInterval(trainState.restInterval);
   trainState = {};
-  ensureUserDataCompatibility();
-
-  // 恢复今日动态计划（若存在）
-  const rawTodayPlan = LS.get('today_plan', null);
-  todayPlan = normalizeTodayPlanData(rawTodayPlan);
-  if (!todayPlan || todayPlan.date !== getTodayStr()) {
-    if (rawTodayPlan != null && (!todayPlan || rawTodayPlan.date === getTodayStr())) rememberCompatibilityData({ today_plan:rawTodayPlan });
-    todayPlan = null;
-    LS.set('today_plan', null);
-    LS.set('active_training', null);
-  } else {
-    if (!sameData(rawTodayPlan, todayPlan)) LS.set('today_plan', todayPlan);
-    if (todayPlan.status === 'active') {
-      try { restoreDynamicTraining(); }
-      catch(e) {
-        console.warn('进行中训练恢复失败，已从今日计划重新开始:', e);
-        LS.set('active_training', null);
-        initDynamicTraining();
-      }
-    }
-  }
+  pendingRecoveryData = null;
+  dataRecoveryNotice = '';
+  LS.recover();
+  const loaded = ensureUserDataCompatibility();
+  todayPlan = loaded.today_plan;
+  if (todayPlan?.status === 'active') restoreDynamicTraining(loaded.active_training);
 
   if (bodyRecords.length === 0 && profile.weight) {
     const today = new Date();
@@ -80,7 +67,7 @@ function doLogin() {
 }
 
 function switchUser() {
-  persistTrainingState();
+  if (todayPlan?.status === 'active' && !persistTrainingState()) { alert('当前训练尚未写入，请先导出备份或重试保存后再切换用户。'); return; }
   if (trainState.timerInterval) clearInterval(trainState.timerInterval);
   if (trainState.restInterval) clearInterval(trainState.restInterval);
   currentUser = '';
@@ -162,6 +149,7 @@ function applyPrevRecords() {
 }
 
 function switchPlan(templateKey) {
+  if (trainState.pendingCompletion && !trainState.saved) { alert('本次训练尚未保存，请先重试保存或导出备份。'); return; }
   const tmpl = PLAN_TEMPLATES[templateKey];
   if (!tmpl) return;
   plan = { name: tmpl.name, cycle: tmpl.cycle, days: JSON.parse(JSON.stringify(tmpl.days)) };

@@ -350,10 +350,8 @@ function migrateExerciseReferences() {
       console.warn('动作编号兼容快照保存失败，本次不迁移旧数据');
       return;
     }
-    const writes = [['plan',next.plan],['sessions',next.sessions],['today_plan',next.today_plan],['active_training',next.active_training]];
-    if (!writes.every(([key,value]) => LS.set(key,value))) {
-      Object.entries(original).forEach(([key,value]) => LS.set(key,value));
-      console.warn('动作编号兼容写入失败，已恢复迁移前数据');
+    if (!LS.transaction({...next, exercise_preferences:{...exercisePreferences,catalogVersion:exerciseCatalog.version}, exercise_catalog_version:exerciseCatalog.version, catalog_migration_v1:exerciseCatalog.version})) {
+      console.warn('动作编号兼容写入失败，已保留恢复资料');
       return;
     }
     plan = next.plan;
@@ -412,122 +410,244 @@ async function ensureExerciseInstructions() {
   }
 }
 
+// 数据边界：导入先完整验证；本地异常数据先隔离原文，再使用安全值。
+let pendingRecoveryData = null;
+let dataRecoveryNotice = '';
+
 function rememberCompatibilityData(recovery) {
-  const keys = Object.keys(recovery);
-  if (!keys.length) return;
+  if (!Object.keys(recovery).length) return true;
+  pendingRecoveryData = recovery;
   const existing = LS.get('compat_recovery', null);
-  if (isPlainRecord(existing) && isPlainRecord(existing.data)) {
-    LS.set('compat_recovery', Object.assign({}, existing, { updatedAt:new Date().toISOString(), data:Object.assign({}, existing.data, recovery) }));
-  } else {
-    LS.set('compat_recovery', { savedAt:new Date().toISOString(), data:recovery });
+  const entries = Array.isArray(existing?.entries) ? existing.entries.slice() :
+    (isPlainRecord(existing?.data) ? [{ savedAt:existing.savedAt, data:existing.data }] : []);
+  if (!entries.some(entry => sameData(entry.data, recovery))) entries.push({ savedAt:new Date().toISOString(), data:recovery });
+  if (!LS.set('compat_recovery', { version:1, entries })) return false;
+  pendingRecoveryData = null;
+  return true;
+}
+
+function dataNumber(value, label, min=0, integer=false) {
+  if ((typeof value !== 'number' && typeof value !== 'string') || String(value).trim() === '') throw new Error(label+'不是有效数字');
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < min || (integer && !Number.isInteger(n))) throw new Error(label+'不是有效数字');
+  return n;
+}
+
+function dataText(value, label, fallback='') {
+  if (value == null) return fallback;
+  if (typeof value !== 'string') throw new Error(label+'不是文本');
+  return value;
+}
+
+function checkedExercise(ex, runtime=false) {
+  if (!isPlainRecord(ex) || typeof ex.name !== 'string' || !ex.name.trim()) throw new Error('动作名称缺失');
+  const out = cloneData(ex);
+  if (out.role != null && !['核心','辅助'].includes(out.role)) throw new Error('动作角色异常');
+  if (out.previous != null) {
+    if (!isPlainRecord(out.previous)) throw new Error('上次动作记录异常');
+    out.previous.weight = dataNumber(out.previous.weight,'上次重量');
+    out.previous.reps = dataNumber(out.previous.reps,'上次次数',0,true);
   }
+  if (runtime && (typeof ex.id !== 'string' || !ex.id)) throw new Error('进行中动作编号缺失');
+  ['sets','reps','weight','rest'].forEach(key => {
+    out[key] = dataNumber(ex[key], '动作'+key, key === 'sets' ? 1 : 0, key === 'sets' || key === 'reps');
+  });
+  ['id','exerciseId','role','reason','pattern','nameSnapshot','replacementMuscle','catalogVersion'].forEach(key => {
+    if (out[key] != null) out[key] = dataText(out[key], key);
+  });
+  return out;
+}
+
+function checkedSession(session) {
+  if (!isPlainRecord(session) || !Array.isArray(session.exercises)) throw new Error('训练历史结构异常');
+  const out = cloneData(session);
+  out.date = dataText(out.date, '训练日期');
+  out.duration = dataNumber(out.duration ?? 0, '训练时长');
+  out.exercises = out.exercises.map(ex => {
+    if (!isPlainRecord(ex) || typeof ex.name !== 'string' || !Array.isArray(ex.sets)) throw new Error('历史动作或组记录异常');
+    const item = cloneData(ex);
+    item.sets = item.sets.map(set => {
+      if (!isPlainRecord(set)) throw new Error('组记录异常');
+      return Object.assign({}, set, { w:dataNumber(set.w,'历史重量'), r:dataNumber(set.r,'历史次数',0,true) });
+    });
+    return item;
+  });
+  return out;
 }
 
 function normalizeTodayPlanData(value) {
-  if (!isPlainRecord(value) || !Array.isArray(value.workout) || value.workout.length === 0) return null;
-  const normalized = Object.assign({}, value);
-  normalized.status = value.status === 'preview' ? 'preview' : 'active';
-  normalized.factors = isPlainRecord(value.factors) ? value.factors : {};
-  normalized.warmup = Array.isArray(value.warmup) ? value.warmup : [];
-  normalized.stretch = Array.isArray(value.stretch) ? value.stretch : [];
-  normalized.id = value.id || ('recovered-plan-' + Date.now());
-  return normalized;
+  if (value == null) return null;
+  if (!isPlainRecord(value) || !Array.isArray(value.workout) || !value.workout.length) throw new Error('训练计划结构异常');
+  const out = cloneData(value);
+  out.workout = out.workout.map(ex => checkedExercise(ex, true));
+  if (new Set(out.workout.map(ex=>ex.id)).size !== out.workout.length) throw new Error('动作编号重复');
+  out.id = dataText(out.id, '计划编号') || 'recovered-plan-'+Date.now();
+  out.date = dataText(out.date, '计划日期', getTodayStr());
+  if (out.status != null && !['preview','active'].includes(out.status)) throw new Error('计划状态异常');
+  out.status = out.status || 'active';
+  if (out.variant != null && !['A','B'].includes(out.variant)) throw new Error('计划 A/B 状态异常');
+  if (out.factors != null && !isPlainRecord(out.factors)) throw new Error('训练设置异常');
+  out.factors = out.factors || {};
+  ['warmup','stretch'].forEach(key => {
+    if (out[key] != null && !Array.isArray(out[key])) throw new Error('热身或拉伸结构异常');
+    out[key] = (out[key] || []).map(item => {
+      if (!isPlainRecord(item) || typeof item.name !== 'string') throw new Error('热身或拉伸动作异常');
+      return item;
+    });
+  });
+  return out;
+}
+
+function checkedActiveTraining(value, today) {
+  if (value == null) return null;
+  if (!today || today.status !== 'active' || !isPlainRecord(value) || value.planId !== today.id || !isPlainRecord(value.state)) throw new Error('进行中训练与计划不匹配');
+  const out = cloneData(value), s = out.state;
+  if (!isPlainRecord(s.day) || !Array.isArray(s.day.exercises) || !s.day.exercises.length) throw new Error('进行中动作缺失');
+  s.day.exercises = s.day.exercises.map(ex=>checkedExercise(ex,true));
+  if (!sameData(s.day.exercises.map(ex=>ex.id),today.workout.map(ex=>ex.id))) throw new Error('进行中动作编号与计划不一致');
+  s.exIdx = dataNumber(s.exIdx,'动作位置',0,true);
+  if (s.exIdx >= s.day.exercises.length) throw new Error('动作位置越界');
+  s.set = dataNumber(s.set,'当前组',1,true);
+  s.weight = dataNumber(s.weight,'当前重量');
+  s.reps = dataNumber(s.reps,'当前次数',0,true);
+  s.sessionTime = dataNumber(s.sessionTime ?? 0,'训练时长');
+  s.restTimer = dataNumber(s.restTimer ?? 0,'休息时长');
+  s.restEndAt = dataNumber(s.restEndAt ?? 0,'休息结束时间');
+  if (!['warmup','workout','stretch','nutrition'].includes(s.section)) throw new Error('训练板块异常');
+  const ids = new Set(s.day.exercises.map(ex=>ex.id));
+  if (!isPlainRecord(s.records)) throw new Error('进行中组记录异常');
+  Object.entries(s.records).forEach(([id,sets]) => {
+    if (!ids.has(id) || !Array.isArray(sets)) throw new Error('组记录编号异常');
+    s.records[id] = sets.map((set,index) => {
+      if (!isPlainRecord(set)) throw new Error('组记录异常');
+      return { ...set, set:dataNumber(set.set ?? index+1,'组序号',1,true), w:dataNumber(set.w,'重量'), r:dataNumber(set.r,'次数',0,true) };
+    });
+  });
+  ['feedback','skipped'].forEach(key => {
+    if (s[key] != null && !isPlainRecord(s[key])) throw new Error('动作反馈异常');
+    s[key] = s[key] || {};
+  });
+  if (Object.values(s.feedback).some(item=>!isPlainRecord(item))) throw new Error('动作反馈内容异常');
+  if (s.pendingFeedback != null && !ids.has(s.pendingFeedback)) throw new Error('待反馈动作异常');
+  ['warmupDone','stretchDone'].forEach((key,i) => {
+    if (s[key] != null && !Array.isArray(s[key])) throw new Error('热身或拉伸进度异常');
+    s[key] = s[key] || [];
+    if (s[key].some(n=>!Number.isInteger(n)||n<0||n>=today[i?'stretch':'warmup'].length)) throw new Error('热身或拉伸进度越界');
+  });
+  if (s.pendingCompletion != null) {
+    if (!isPlainRecord(s.pendingCompletion)) throw new Error('待保存训练异常');
+    s.pendingCompletion.session = checkedSession(s.pendingCompletion.session);
+    s.pendingCompletion.nextIndex = dataNumber(s.pendingCompletion.nextIndex,'下一训练日',0,true);
+    s.pendingCompletion.phase = checkedPhase(s.pendingCompletion.phase);
+    if (!isPlainRecord(s.pendingCompletion.variants) || ['push','pull','legs'].some(k=>!['A','B'].includes(s.pendingCompletion.variants[k]))) throw new Error('待保存周期异常');
+  }
+  s.timerInterval = null;
+  s.restInterval = null;
+  return out;
+}
+
+function checkedPhase(value) {
+  if (!isPlainRecord(value)) throw new Error('训练阶段异常');
+  return { ...value, startedAt:dataText(value.startedAt,'阶段起点',getTodayStr()), completedSessions:dataNumber(value.completedSessions ?? 0,'已完成次数',0,true) };
+}
+
+function normalizeUserData(source, strict=false) {
+  const data = {}, recovery = {}, issues = [];
+  function field(key, fallback, check) {
+    const raw = source[key];
+    try { data[key] = raw == null ? cloneData(fallback) : check(raw); }
+    catch(e) { issues.push(key+'：'+e.message); recovery[key] = raw; data[key] = cloneData(fallback); }
+  }
+  function records(key, check) {
+    field(key, [], value => {
+      if (!Array.isArray(value)) throw new Error('应为记录列表');
+      return value.flatMap(item => {
+        try { return [check(item)]; }
+        catch(e) { recovery[key] = value; issues.push(key+'：'+e.message); return []; }
+      });
+    });
+  }
+  field('profile', DEFAULT_PROFILE, value => {
+    if (!isPlainRecord(value)) throw new Error('个人档案结构异常');
+    const out = Object.assign(cloneData(DEFAULT_PROFILE), value);
+    ['height','weight','bodyFat','trainingDays','chest','waist','arm','thigh'].forEach(key => { out[key] = dataNumber(out[key],key); });
+    ['goal','experience','planTemplate'].forEach(key => { out[key] = dataText(out[key],key); });
+    if (!Array.isArray(out.equipment) || out.equipment.some(e=>typeof e!=='string')) throw new Error('器械列表异常');
+    if (!PLAN_TEMPLATES[out.planTemplate]) out.planTemplate = 'ppl';
+    return out;
+  });
+  const tmpl = PLAN_TEMPLATES[data.profile.planTemplate] || PLAN_TEMPLATES.ppl;
+  field('plan', { name:tmpl.name, cycle:tmpl.cycle, days:tmpl.days }, value => {
+    if (!isValidPlanData(value)) throw new Error('训练体系结构异常');
+    const out = cloneData(value);
+    out.days.forEach(day => { day.exercises = day.exercises.map(ex=>checkedExercise(ex)); });
+    return out;
+  });
+  records('sessions', checkedSession);
+  records('sessions_archive', checkedSession);
+  records('body_records', value => {
+    if (!isPlainRecord(value) || typeof value.date !== 'string') throw new Error('身体记录日期异常');
+    return { ...value, weight:dataNumber(value.weight,'体重'), ...(value.bodyFat == null ? {} : {bodyFat:dataNumber(value.bodyFat,'体脂')}) };
+  });
+  records('measurements', value => {
+    if (!isPlainRecord(value) || typeof value.date !== 'string') throw new Error('围度日期异常');
+    const out = cloneData(value);
+    ['chest','waist','arm','thigh'].forEach(k=>{if(out[k]!=null)out[k]=dataNumber(out[k],k);});
+    return out;
+  });
+  field('today_index', 0, v=>dataNumber(v,'训练日',0,true));
+  field('cycle_variants', DEFAULT_CYCLE_VARIANTS, value => {
+    if (!isPlainRecord(value)) throw new Error('周期状态异常');
+    const out = { ...DEFAULT_CYCLE_VARIANTS, ...value };
+    if (['push','pull','legs'].some(k=>!['A','B'].includes(out[k]))) throw new Error('A/B 状态异常');
+    return out;
+  });
+  field('core_locks', {}, value=>{if(!isPlainRecord(value)||Object.values(value).some(v=>typeof v!=='boolean'))throw new Error('锁定状态异常');return value;});
+  field('training_phase', {startedAt:getTodayStr(),completedSessions:0}, checkedPhase);
+  field('setup_draft', null, value=>{
+    if(!isPlainRecord(value))throw new Error('设置草稿异常');
+    const out={...DEFAULT_SETUP_STATE,...value};
+    ['focus','state','time','env','avoid'].forEach(k=>{out[k]=dataText(out[k],k);});
+    if(!Array.isArray(out.discomfort)||out.discomfort.some(v=>typeof v!=='string'))throw new Error('不适设置异常');
+    return out;
+  });
+  field('exercise_preferences', DEFAULT_EXERCISE_PREFERENCES, value=>{
+    if(!isPlainRecord(value))throw new Error('动作偏好异常');
+    const out=normalizeExercisePreferences(value);
+    if(value.paused!=null&&!isPlainRecord(value.paused)||value.lightChoices!=null&&!isPlainRecord(value.lightChoices))throw new Error('动作偏好列表异常');
+    if(Object.values(out.paused).some(v=>!isPlainRecord(v)))throw new Error('暂停推荐内容异常');
+    return out;
+  });
+  field('exercise_catalog_version', '', v=>dataText(v,'动作库版本'));
+  field('today_plan', null, normalizeTodayPlanData);
+  field('active_training', null, v=>checkedActiveTraining(v,data.today_plan));
+  if (strict && issues.length) throw new Error(issues.slice(0,3).join('；'));
+  return { data, recovery, issues };
 }
 
 function ensureUserDataCompatibility() {
-  const recovery = {};
-
-  const rawProfile = LS.get('profile', null);
-  profile = Object.assign({}, cloneData(DEFAULT_PROFILE), isPlainRecord(rawProfile) ? rawProfile : {});
-  if (!Array.isArray(profile.equipment)) profile.equipment = cloneData(DEFAULT_PROFILE.equipment);
-  if (!PLAN_TEMPLATES[profile.planTemplate]) profile.planTemplate = 'ppl';
-  if (!sameData(rawProfile, profile)) {
-    if (rawProfile != null && !isPlainRecord(rawProfile)) recovery.profile = rawProfile;
-    LS.set('profile', profile);
-  }
-
-  const rawPlan = LS.get('plan', null);
-  if (isValidPlanData(rawPlan)) {
-    plan = rawPlan;
-  } else {
-    if (rawPlan != null) recovery.plan = rawPlan;
-    const tmpl = PLAN_TEMPLATES[profile.planTemplate] || PLAN_TEMPLATES.ppl;
-    plan = { name:tmpl.name, cycle:tmpl.cycle, days:cloneData(tmpl.days) };
-    LS.set('plan', plan);
-  }
-
-  const rawSessions = LS.get('sessions', []);
-  sessions = Array.isArray(rawSessions) ? rawSessions.filter(item => isPlainRecord(item) && Array.isArray(item.exercises)) : [];
-  if (!sameData(rawSessions, sessions)) {
-    if (rawSessions != null) recovery.sessions = rawSessions;
-    LS.set('sessions', sessions);
-  }
-
-  const rawBodyRecords = LS.get('body_records', []);
-  bodyRecords = Array.isArray(rawBodyRecords) ? rawBodyRecords : [];
-  if (!Array.isArray(rawBodyRecords)) {
-    if (rawBodyRecords != null) recovery.body_records = rawBodyRecords;
-    LS.set('body_records', bodyRecords);
-  }
-
-  const rawMeasurements = LS.get('measurements', []);
-  measurements = Array.isArray(rawMeasurements) ? rawMeasurements : [];
-  if (!Array.isArray(rawMeasurements)) {
-    if (rawMeasurements != null) recovery.measurements = rawMeasurements;
-    LS.set('measurements', measurements);
-  }
-
-  const rawIndex = Number(LS.get('today_index', 0));
-  todayIndex = Number.isInteger(rawIndex) && rawIndex >= 0 ? rawIndex : 0;
-  if (todayIndex !== rawIndex) LS.set('today_index', todayIndex);
-
-  const rawVariants = LS.get('cycle_variants', null);
-  const variants = isPlainRecord(rawVariants) ? rawVariants : {};
-  cycleVariants = Object.assign({}, variants, {
-    push:variants.push === 'B' ? 'B' : 'A',
-    pull:variants.pull === 'B' ? 'B' : 'A',
-    legs:variants.legs === 'B' ? 'B' : 'A'
+  const raw = {}, unreadable = {};
+  USER_DATA_KEYS.forEach(key => {
+    try {
+      const text = LS.raw(key);
+      try { raw[key] = text == null ? null : JSON.parse(text); }
+      catch(e) { unreadable[key] = { rawJSON:text }; raw[key] = null; }
+    } catch(e) { LS.blocked = true; dataRecoveryNotice = '无法读取本地数据，已暂停写入。'; }
   });
-  if (!sameData(rawVariants, cycleVariants)) {
-    if (rawVariants != null && !isPlainRecord(rawVariants)) recovery.cycle_variants = rawVariants;
-    LS.set('cycle_variants', cycleVariants);
-  }
-
-  const rawLocks = LS.get('core_locks', null);
-  coreLocks = isPlainRecord(rawLocks) ? rawLocks : {};
-  if (!sameData(rawLocks, coreLocks)) {
-    if (rawLocks != null) recovery.core_locks = rawLocks;
-    LS.set('core_locks', coreLocks);
-  }
-
-  const rawPhase = LS.get('training_phase', null);
-  const phase = isPlainRecord(rawPhase) ? rawPhase : {};
-  trainingPhase = {
-    startedAt:typeof phase.startedAt === 'string' && phase.startedAt ? phase.startedAt : getTodayStr(),
-    completedSessions:Number.isFinite(Number(phase.completedSessions)) && Number(phase.completedSessions) >= 0 ? Math.floor(Number(phase.completedSessions)) : 0
-  };
-  if (!sameData(rawPhase, trainingPhase)) {
-    if (rawPhase != null && !isPlainRecord(rawPhase)) recovery.training_phase = rawPhase;
-    LS.set('training_phase', trainingPhase);
-  }
-
-  const rawDraft = LS.get('setup_draft', null);
-  if (rawDraft != null) {
-    const draft = Object.assign({}, DEFAULT_SETUP_STATE, isPlainRecord(rawDraft) ? rawDraft : {});
-    draft.discomfort = Array.isArray(draft.discomfort) ? draft.discomfort : [];
-    draft.avoid = typeof draft.avoid === 'string' ? draft.avoid : '';
-    if (!sameData(rawDraft, draft)) {
-      if (!isPlainRecord(rawDraft)) recovery.setup_draft = rawDraft;
-      LS.set('setup_draft', draft);
+  const result = normalizeUserData(raw);
+  const recovery = Object.assign({}, result.recovery, unreadable);
+  if (Object.keys(recovery).length) {
+    dataRecoveryNotice = '已隔离异常数据，正常记录仍可使用。请在“我的”导出恢复资料。';
+    if (!rememberCompatibilityData(recovery)) {
+      LS.blocked = true;
+      dataRecoveryNotice = '异常原文未能保存快照，已暂停写入；请先导出恢复资料。';
     }
   }
-
-  const rawExercisePreferences = LS.get('exercise_preferences', null);
-  exercisePreferences = normalizeExercisePreferences(rawExercisePreferences);
-  if (!sameData(rawExercisePreferences, exercisePreferences)) {
-    if (rawExercisePreferences != null && !isPlainRecord(rawExercisePreferences)) recovery.exercise_preferences = rawExercisePreferences;
-    LS.set('exercise_preferences', exercisePreferences);
-  }
-
-  rememberCompatibilityData(recovery);
+  const changes = {};
+  USER_DATA_KEYS.forEach(key=>{if(!sameData(raw[key],result.data[key]))changes[key]=result.data[key];});
+  if (Object.keys(changes).length && !LS.transaction(changes)) dataRecoveryNotice = dataRecoveryNotice || '兼容数据尚未写入，请先导出备份并检查存储空间。';
+  const d = result.data;
+  profile=d.profile; plan=d.plan; sessions=d.sessions; bodyRecords=d.body_records; measurements=d.measurements;
+  todayIndex=d.today_index; cycleVariants=d.cycle_variants; coreLocks=d.core_locks; trainingPhase=d.training_phase; exercisePreferences=d.exercise_preferences;
+  return d;
 }

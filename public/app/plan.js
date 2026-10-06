@@ -62,7 +62,7 @@ function enterTraining() {
     if (document.getElementById('page-training')?.classList.contains('active') && !todayPlan) renderTrainingSetup();
   });
   // 若已有今日计划，进入预览或继续训练。
-  if (todayPlan && todayPlan.date === getTodayStr()) {
+  if (todayPlan) {
     renderTrainingPage();
     return;
   }

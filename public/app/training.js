@@ -61,6 +61,7 @@ function setLightExerciseChoice(index, choice) {
 
 function resetTraining() {
   if (!currentUser) return;
+  if (trainState.pendingCompletion && !trainState.saved) { alert('本次训练尚未保存，请先重试保存或导出备份。'); return; }
   if (trainState.timerInterval) clearInterval(trainState.timerInterval);
   if (trainState.restInterval) clearInterval(trainState.restInterval);
   todayPlan = null;
@@ -219,8 +220,7 @@ function initDynamicTraining() {
   startSessionTimer();
 }
 
-function restoreDynamicTraining() {
-  const saved = LS.get('active_training', null);
+function restoreDynamicTraining(saved = LS.get('active_training', null)) {
   if (!saved || saved.planId !== todayPlan.id || !saved.state) {
     initDynamicTraining();
     return;
@@ -242,7 +242,9 @@ function restoreDynamicTraining() {
 function persistTrainingState() {
   if (!currentUser || !todayPlan || todayPlan.status !== 'active' || !trainState.day) return;
   const snapshot = Object.assign({}, trainState, { timerInterval:null, restInterval:null });
-  LS.set('active_training', { version:1, planId:todayPlan.id, savedAt:new Date().toISOString(), state:snapshot });
+  const ok = LS.set('active_training', { version:1, planId:todayPlan.id, savedAt:new Date().toISOString(), state:snapshot });
+  if (!ok) dataRecoveryNotice = '进行中训练尚未写入本地，请在结束前重试保存或导出备份。';
+  return ok;
 }
 
 function startSessionTimer() {
@@ -429,6 +431,8 @@ function renderTrainingUI() {
       <span class="text-accent font-bold">${escapeHtml(s.day.name)}</span>
       <span class="text-muted text-sm">⏱ ${formatTime(s.sessionTime)}</span>
     </div>
+    ${todayPlan.date !== getTodayStr() ? `<div class="resume-banner">继续 ${escapeHtml(todayPlan.date)} 的未完成训练，已保留原进度。</div>` : ''}
+    ${dataRecoveryNotice || LS.error ? `<div class="danger-note">${escapeHtml(dataRecoveryNotice || LS.error)}</div>` : ''}
     ${renderSectionTabs()}
     ${body}`;
 }
@@ -541,14 +545,14 @@ function renderComplete() {
   container.innerHTML = `
     <div class="complete-container">
       <div class="complete-icon">🏆</div>
-      <div class="complete-title">${escapeHtml(s.day.name)} 完成！</div>
+      <div class="complete-title">${s.saved ? escapeHtml(s.day.name)+' 完成！' : '训练结束，等待保存'}</div>
       <div class="complete-time">总用时 ${formatTime(s.sessionTime)}</div>
       <div class="card summary-card">${summary}</div>
       ${s.saveError ? `<div class="danger-note" style="margin-bottom:14px">${escapeHtml(s.saveError)}</div>` : ''}
       ${s.archiveNote ? `<div class="reason-note" style="margin-bottom:14px">${escapeHtml(s.archiveNote)}</div>` : ''}
       <button class="btn btn-outline mt-3" onclick="aiReviewCurrentTraining()">AI 训练评价 / 后续建议</button>
       <div id="aiReview" class="text-sm text-muted text-center" style="margin:10px 0"></div>
-      <button class="btn btn-accent" onclick="resetTraining();renderTrainingPage()">再练一次</button>
+      ${s.saved ? '<button class="btn btn-accent" onclick="resetTraining();renderTrainingPage()">再练一次</button>' : '<button class="btn btn-accent" onclick="finishTraining()">重试保存</button><button class="btn btn-outline mt-3" onclick="exportBackup()">导出含本次训练的备份</button>'}
       <button class="btn btn-outline mt-3" onclick="navigate('home')">返回首页</button>
     </div>
   `;
@@ -691,65 +695,78 @@ function completeSet() {
 }
 
 function finishTraining() {
-  const s = trainState;
-  s.complete = true;
-  if (s.timerInterval) clearInterval(s.timerInterval);
+  if (trainState.saved) { renderComplete(); return; }
+  trainState.complete = true;
+  if (trainState.timerInterval) clearInterval(trainState.timerInterval);
+  if (trainState.restInterval) clearInterval(trainState.restInterval);
   saveSession();
-  const todayDate = formatDate(new Date());
-  if (!bodyRecords.find(r => r.date === todayDate)) {
-    bodyRecords.push({ date: todayDate, weight: profile.weight, bodyFat: profile.bodyFat });
-    if (bodyRecords.length > 30) bodyRecords.shift();
-    LS.set('body_records', bodyRecords);
-  }
   renderComplete();
+}
+
+function completionData(pending) {
+  const history = LS.get('sessions', sessions);
+  const latest = Array.isArray(history) ? history : sessions;
+  const nextBody = bodyRecords.slice();
+  const todayDate = formatDate(new Date());
+  if (!nextBody.some(r => r.date === todayDate)) nextBody.push({ date:todayDate, weight:profile.weight, bodyFat:profile.bodyFat });
+  return {
+    sessions:[pending.session, ...latest.filter(item=>item.id !== pending.session.id)],
+    today_index:pending.nextIndex,
+    cycle_variants:pending.variants,
+    training_phase:pending.phase,
+    body_records:nextBody,
+    today_plan:null,
+    active_training:null
+  };
 }
 
 function saveSession() {
   const s = trainState;
-  const session = {
-    id:'session-'+Date.now(),
-    date: getTodayStr(),
-    dayName: s.day.name,
-    focusArea: todayPlan.focus,
-    factors: todayPlan.factors,
-    source: todayPlan.source,
-    variant: todayPlan.variant,
-    catalogVersion:todayPlan.catalogVersion || '',
-    duration: s.sessionTime,
-    exercises: s.day.exercises.map(ex => {
-      const recs = s.records[ex.id] || [];
-      const feedback = s.feedback[ex.id] || {};
-      return { exerciseId:ex.exerciseId||'', name:ex.name, nameSnapshot:ex.nameSnapshot||ex.name, catalogVersion:ex.catalogVersion||todayPlan.catalogVersion||'', replacementMuscle:ex.replacementMuscle||'', variantGroup:ex.variantGroup||'', role:ex.role, pattern:ex.pattern, targetSets:ex.sets, targetReps:ex.reps, completed:recs.length>=ex.sets, skipped:!!(s.skipped||{})[ex.id], feedback:feedback.value||'', feedbackNote:feedback.note||'', sets: recs.map(r => ({ w: r.w, r: r.r })) };
-    }).filter(e => e.sets.length > 0 || e.skipped)
-  };
-  sessions.unshift(session);
-  if (sessions.length > 200) {
-    // 超出上限的旧记录转入归档键，导出备份时一并包含，不再直接丢弃。
-    const overflow = sessions.splice(200);
-    const existingArchive = LS.get('sessions_archive', []);
-    const archive = Array.isArray(existingArchive) ? existingArchive : [];
-    if (LS.set('sessions_archive', archive.concat(overflow).slice(-400))) {
-      s.archiveNote = `历史记录超过 200 条，最早的 ${overflow.length} 次训练已自动转入归档，导出备份时会一并包含。`;
-    } else {
-      s.saveError = '历史记录归档失败，请及时到「我的」页面导出备份，避免旧记录丢失。';
-    }
+  if (s.saved) return true;
+  if (!s.pendingCompletion) {
+    const session = {
+      id:'session-'+todayPlan.id,
+      date: getTodayStr(),
+      dayName: s.day.name,
+      focusArea: todayPlan.focus,
+      factors: todayPlan.factors,
+      source: todayPlan.source,
+      variant: todayPlan.variant,
+      catalogVersion:todayPlan.catalogVersion || '',
+      duration: s.sessionTime,
+      exercises: s.day.exercises.map(ex => {
+        const recs = s.records[ex.id] || [];
+        const feedback = s.feedback[ex.id] || {};
+        return { exerciseId:ex.exerciseId||'', name:ex.name, nameSnapshot:ex.nameSnapshot||ex.name, catalogVersion:ex.catalogVersion||todayPlan.catalogVersion||'', replacementMuscle:ex.replacementMuscle||'', variantGroup:ex.variantGroup||'', role:ex.role, pattern:ex.pattern, targetSets:ex.sets, targetReps:ex.reps, completed:recs.length>=ex.sets, skipped:!!(s.skipped||{})[ex.id], feedback:feedback.value||'', feedbackNote:feedback.note||'', sets: recs.map(r => ({ w: r.w, r: r.r })) };
+      }).filter(e => e.sets.length > 0 || e.skipped)
+    };
+    const key = todayPlan.focusKey || focusKeyFromText(todayPlan.focus);
+    const actualIdx = plan.days.findIndex(day => focusKeyFromText(day.focus||day.name) === key);
+    s.pendingCompletion = {
+      session,
+      nextIndex:actualIdx >= 0 ? (actualIdx+1)%plan.days.length : (todayIndex+1)%plan.days.length,
+      variants:{ ...cycleVariants, [key]:cycleVariants[key] === 'B' ? 'A' : 'B' },
+      phase:{ ...trainingPhase, completedSessions:(trainingPhase.completedSessions||0)+1 }
+    };
   }
-  if (!LS.set('sessions', sessions)) {
-    s.saveError = '训练记录未能写入本地存储（空间可能已满），请立即到「我的」页面导出备份，避免本次记录丢失。';
+  if (LS.blocked) { LS.recover(); ensureUserDataCompatibility(); }
+  // Keep a retryable checkpoint before committing history and cycle together.
+  persistTrainingState();
+  const changes = completionData(s.pendingCompletion);
+  if (!LS.transaction(changes)) {
+    s.saveError = '尚未保存成功，训练和周期进度已保留。请重试保存，或导出含本次训练的备份；不要清除浏览器数据。';
+    persistTrainingState();
+    return false;
   }
-  const key = todayPlan.focusKey || focusKeyFromText(todayPlan.focus);
-  const actualIdx = plan.days.findIndex(day => focusKeyFromText(day.focus||day.name) === key);
-  todayIndex = actualIdx >= 0 ? (actualIdx + 1) % plan.days.length : (todayIndex + 1) % plan.days.length;
-  LS.set('today_index', todayIndex);
-  cycleVariants[key] = cycleVariants[key] === 'B' ? 'A' : 'B';
-  LS.set('cycle_variants', cycleVariants);
-  trainingPhase.completedSessions = (trainingPhase.completedSessions||0) + 1;
-  LS.set('training_phase', trainingPhase);
-  applyPrevRecords();
-  // 今日计划已完成，清空以便明天重新生成
-  LS.set('today_plan', null);
-  LS.set('active_training', null);
+  sessions=changes.sessions; todayIndex=changes.today_index; cycleVariants=changes.cycle_variants;
+  trainingPhase=changes.training_phase; bodyRecords=changes.body_records;
+  s.saved = true;
+  s.saveError = '';
+  s.pendingCompletion = null;
+  dataRecoveryNotice = '';
   todayPlan = null;
+  applyPrevRecords();
+  return true;
 }
 
 function skipRest() {

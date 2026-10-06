@@ -17,6 +17,7 @@ function renderHomePage() {
   const heroAction = todayPlan ? (todayPlan.status === 'preview' ? '继续确认计划' : '继续今日训练') : '生成今日计划';
   const container = document.getElementById('homeContent');
   container.innerHTML = `
+    ${dataRecoveryNotice || LS.error ? `<div class="danger-note">${escapeHtml(dataRecoveryNotice || LS.error)} <button class="mini-btn" onclick="navigate('profile')">备份与恢复</button></div>` : ''}
     <header class="app-masthead">
       <div><div class="brand-word">IRONTRACK</div><div class="brand-meta">个人训练 · ${escapeHtml(plan.name)}</div></div>
       <div class="user-pill"><span>${escapeHtml(currentUser)}</span><b>${escapeHtml(String(profile.weight))}kg</b></div>
@@ -414,7 +415,8 @@ function renderProfileContent() {
           <button class="mini-btn" style="flex:1" onclick="document.getElementById('backupFile').click()">导入恢复</button>
         </div>
         <input id="backupFile" type="file" accept="application/json,.json" style="display:none" onchange="importBackupFile(this.files[0]);this.value=''">
-        <div id="backupMsg" class="text-xs text-muted mt-3"></div>
+        <div id="backupMsg" class="text-xs text-muted mt-3">${escapeHtml(dataRecoveryNotice || LS.error)}</div>
+        ${renderRecoveryOptions()}
       </div>
       <button class="btn btn-accent" onclick="saveProfile()">保存修改</button>
       <div class="text-center text-xs text-muted mt-3" id="saveMsg"></div>`;
@@ -471,8 +473,7 @@ function saveProfile() {
     if (thigh > 0) rec.thigh = thigh;
     var mrecs = LS.get('measurements', []);
     mrecs.push(rec);
-    if (mrecs.length > 200) mrecs = mrecs.slice(-200);
-    LS.set('measurements', mrecs);
+    if (LS.set('measurements', mrecs)) measurements = mrecs;
   }
 
   LS.set('profile', profile);
@@ -509,50 +510,131 @@ async function testApiKey() {
   }
 }
 
-function buildBackupPayload() {
-  const data = {};
-  USER_DATA_KEYS.forEach(key => { data[key] = LS.get(key, null); });
-  return { app:'IronTrack', version:BACKUP_VERSION, user:currentUser, exportedAt:new Date().toISOString(), whitelistVersion: PPL_WHITELIST_VERSION, data };
+const RECOVERY_KEYS = ['pre_import_backup','pre_restore_backup','compat_recovery','catalog_compat_recovery_v1','imported_recovery'];
+
+function recoveryBundle() {
+  const bundle = {};
+  RECOVERY_KEYS.forEach(key => { const value = LS.get(key,null); if(value!=null)bundle[key]=value; });
+  if (pendingRecoveryData) bundle.unsaved = pendingRecoveryData;
+  if (LS.pending) bundle.interruptedWrite = LS.pending;
+  return bundle;
 }
 
-function exportBackup() {
-  const payload = buildBackupPayload();
+function buildBackupPayload(includePending=true) {
+  const data = {};
+  USER_DATA_KEYS.forEach(key => { data[key] = LS.get(key, null); });
+  if (includePending) Object.assign(data, normalizeUserData(data).data);
+  if (includePending && todayPlan?.status === 'active' && trainState.day) {
+    data.today_plan = todayPlan;
+    data.active_training = { version:1, planId:todayPlan.id, savedAt:new Date().toISOString(), state:{...trainState,timerInterval:null,restInterval:null} };
+  }
+  if (includePending && trainState.pendingCompletion && !trainState.saved) Object.assign(data, completionData(trainState.pendingCompletion));
+  const payload = { app:'IronTrack', version:BACKUP_VERSION, user:currentUser, exportedAt:new Date().toISOString(), whitelistVersion:PPL_WHITELIST_VERSION, data };
+  if (includePending) payload.recovery = recoveryBundle();
+  return payload;
+}
+
+function downloadData(payload, filename) {
   const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `irontrack-backup-${getTodayStr()}.json`;
+  link.download = filename;
   document.body.appendChild(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(url);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function exportBackup() {
+  downloadData(buildBackupPayload(), `irontrack-backup-${getTodayStr()}.json`);
   const msg = document.getElementById('backupMsg');
-  if (msg) msg.textContent = '备份已导出，API Key 未包含在文件中。';
+  if (msg) msg.textContent = '已生成备份，请确认文件已保存；包含当前训练和归档，API Key 未包含。';
+}
+
+function renderRecoveryOptions() {
+  const hasRecovery = RECOVERY_KEYS.some(key=>LS.get(key,null)) || pendingRecoveryData || LS.pending;
+  return `<div class="mt-3">
+    ${LS.blocked ? '<button class="mini-btn" onclick="retryStorageRecovery()">重试本地写入恢复</button>' : ''}
+    ${LS.get('pre_import_backup',null) ? '<button class="mini-btn" data-snapshot="pre_import_backup" onclick="restoreRecoverySnapshot(this.dataset.snapshot)">恢复导入前快照</button>' : ''}
+    ${LS.get('pre_restore_backup',null) ? '<button class="mini-btn" data-snapshot="pre_restore_backup" onclick="restoreRecoverySnapshot(this.dataset.snapshot)">撤销上次快照恢复</button>' : ''}
+    ${LS.get('catalog_compat_recovery_v1',null) ? '<button class="mini-btn" data-snapshot="catalog_compat_recovery_v1" onclick="restoreRecoverySnapshot(this.dataset.snapshot)">恢复动作兼容前快照</button>' : ''}
+    ${hasRecovery ? '<button class="mini-btn" onclick="exportRecoveryData()">导出恢复资料</button><div class="reason-note">异常原文单独保留，不参与统计；可导出检查，修正后通过备份导入。恢复完整快照会覆盖当前数据。</div>' : ''}
+  </div>`;
+}
+
+function exportRecoveryData() {
+  downloadData({app:'IronTrackRecovery',version:1,user:currentUser,exportedAt:new Date().toISOString(),recovery:recoveryBundle()}, `irontrack-recovery-${getTodayStr()}.json`);
+}
+
+function retryStorageRecovery() {
+  if (trainState.pendingCompletion && !trainState.saved) {
+    LS.recover();
+    finishTraining();
+    navigate('training');
+    return;
+  }
+  initUserData();
+  renderProfilePage();
+}
+
+function checkedBackup(payload) {
+  if (!isPlainRecord(payload) || payload.app !== 'IronTrack' || ![1,2].includes(Number(payload.version)) || !isPlainRecord(payload.data)) throw new Error('文件格式或版本不支持');
+  if (!isPlainRecord(payload.data.profile) || !isPlainRecord(payload.data.plan) || !Array.isArray(payload.data.sessions)) throw new Error('备份缺少个人档案、训练体系或历史记录');
+  if(payload.recovery!=null&&!isPlainRecord(payload.recovery))throw new Error('恢复资料格式异常');
+  return normalizeUserData(payload.data,true).data;
+}
+
+function setBackupMessage(text) {
+  const msg = document.getElementById('backupMsg');
+  if (msg) msg.textContent = text;
+}
+
+function applyBackupPayload(payload, snapshotKey='pre_import_backup') {
+  const data = checkedBackup(payload);
+  const before = buildBackupPayload(false);
+  const beforeMarker = LS.get('catalog_migration_v1','');
+  const beforeRecovery = LS.get('imported_recovery',null);
+  if (!LS.set(snapshotKey,before)) throw new Error('无法保存操作前快照，未覆盖当前数据');
+  const changes = {...data, catalog_migration_v1:''};
+  if(payload.recovery && Object.keys(payload.recovery).length) changes.imported_recovery = payload.recovery;
+  if (!LS.transaction(changes)) throw new Error(LS.blocked ? '写入失败且回滚未完成，已暂停写入；操作前快照仍保留，请导出恢复资料' : '写入失败，已核验恢复操作前数据');
+  // Validation is pure and completes before the first write. Rendering is not part of the commit.
+  try { initUserData(); }
+  catch(e) {
+    const restored = LS.transaction({...before.data, catalog_migration_v1:beforeMarker, imported_recovery:beforeRecovery});
+    if (restored) {
+      try { initUserData(); } catch(ignore) { /* The original snapshot remains available. */ }
+    }
+    throw new Error(restored ? '恢复后的初始化失败，已恢复操作前数据' : '恢复后的初始化失败，自动回滚未完成；请导出操作前快照');
+  }
+  try { renderProfilePage(); }
+  catch(e) { console.error('数据已恢复，页面展示失败:',e); navigate('profile'); }
 }
 
 async function importBackupFile(file) {
-  const msg = document.getElementById('backupMsg');
   if (!file) return;
+  const owner = currentUser;
   try {
     const payload = JSON.parse(await file.text());
-    if (payload.app !== 'IronTrack' || ![1,2].includes(Number(payload.version)) || !payload.data || typeof payload.data !== 'object') throw new Error('文件格式或版本不支持');
-    if (!payload.data.profile || typeof payload.data.profile !== 'object' || !payload.data.plan || typeof payload.data.plan !== 'object' || !Array.isArray(payload.data.sessions)) throw new Error('备份缺少个人档案、训练体系或历史记录');
-    const sessionCount = Array.isArray(payload.data.sessions) ? payload.data.sessions.length : 0;
-    if (!confirm(`备份时间：${payload.exportedAt||'未知'}\n训练记录：${sessionCount} 条\n\n确认恢复并覆盖当前本地数据吗？`)) return;
-    const beforeImport = buildBackupPayload();
-    if (!LS.set('pre_import_backup', beforeImport)) throw new Error('无法保存导入前快照');
-    const imported = USER_DATA_KEYS.every(key => LS.set(key, payload.data[key] == null ? null : payload.data[key]));
-    if (!imported) {
-      USER_DATA_KEYS.forEach(key => LS.set(key, beforeImport.data[key] == null ? null : beforeImport.data[key]));
-      throw new Error('本地空间不足，已恢复导入前数据');
-    }
-    initUserData();
-    renderProfilePage();
-    const restoredMsg = document.getElementById('backupMsg');
-    if (restoredMsg) restoredMsg.textContent = Number(payload.version) === 1
-      ? '旧版备份恢复成功并已自动兼容；原数据已保存在导入前快照中。'
-      : '恢复成功；原数据已保存在导入前快照中。';
-  } catch(e) {
-    if (msg) msg.textContent = '导入失败：' + e.message + '。当前数据未改变。';
-  }
+    if(owner!==currentUser)throw new Error('用户已切换，请在当前用户下重新选择文件');
+    const data = checkedBackup(payload);
+    const total = data.sessions.length+data.sessions_archive.length;
+    if (!confirm(`备份时间：${payload.exportedAt||'未知'}\n训练记录（含归档）：${total} 条\n\n确认恢复并覆盖当前本地数据吗？操作前会保存快照。`)) return;
+    applyBackupPayload(payload);
+    setBackupMessage('恢复成功，已兼容旧版字段；操作前数据可通过下方快照恢复。');
+  } catch(e) { setBackupMessage('导入未完成：'+e.message); }
+}
+
+function restoreRecoverySnapshot(key) {
+  if(!['pre_import_backup','pre_restore_backup','catalog_compat_recovery_v1'].includes(key))return;
+  try {
+    const snapshot = LS.get(key,null);
+    if(!snapshot)throw new Error('快照不存在');
+    const payload = snapshot.app === 'IronTrack' ? snapshot : {...buildBackupPayload(false),data:{...buildBackupPayload(false).data,...snapshot.data}};
+    checkedBackup(payload);
+    if(!confirm('恢复此快照会覆盖当前数据。当前数据也会保存为可撤销快照，是否继续？'))return;
+    applyBackupPayload(payload,'pre_restore_backup');
+    setBackupMessage('快照已恢复。可通过“撤销上次快照恢复”返回操作前状态。');
+  } catch(e) { setBackupMessage('快照未恢复：'+e.message+'；原快照仍可导出检查。'); }
 }
