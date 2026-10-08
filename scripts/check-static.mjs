@@ -68,7 +68,9 @@ const requiredMarkers = [
   "restorePausedExercise",
   "replacementMuscle",
   'rel="apple-touch-icon"',
-  'href="./manifest.json"',
+  'href="./public/manifest.json"',
+  'href="./public/apple-touch-icon.png"',
+  'href="./public/icon-192.png"',
 ];
 
 for (const marker of requiredMarkers) {
@@ -149,8 +151,12 @@ if (manifest.name !== "IronTrack - 智能健身伴侣" || manifest.short_name !=
   throw new Error("Web App 清单中的应用名称不正确");
 }
 
-if (manifest.start_url !== "./" || manifest.scope !== "./") {
+if (manifest.id !== "../" || manifest.start_url !== "../" || manifest.scope !== "../") {
   throw new Error("Web App 清单必须使用适配 GitHub Pages 子目录的相对入口");
+}
+
+for (const marker of ["url('./irontrack-hero.jpg')", "url('./irontrack-hero.webp')"]) {
+  if (!cssTexts.join("\n").includes(marker)) throw new Error(`主视觉 CSS 路径错误：${marker}`);
 }
 
 const manifestIcons = new Map(manifest.icons.map((icon) => [icon.src, icon]));
