@@ -10,7 +10,7 @@ function harness(existing) {
   const element = () => ({value:'',textContent:'',innerHTML:'',style:{},classList:{add(){},remove(){},toggle(){},contains(){return true;}},focus(){},addEventListener(){},querySelector(){return element();},querySelectorAll(){return [];}});
   const c = {
     console:{log(){},warn(){},error(){}}, Date, navigator:{},
-    setInterval:()=>1, clearInterval(){}, setTimeout(){}, clearTimeout(){}, alert(){}, confirm:()=>true,
+    setInterval:()=>1, clearInterval(){}, setTimeout(){}, clearTimeout(){}, AbortController, alert(){}, confirm:()=>true,
     addEventListener(){}, scrollTo(){},
     document:{getElementById(id){if(!elements.has(id))elements.set(id,element());return elements.get(id);},querySelectorAll:()=>[],querySelector:()=>element(),addEventListener(){},body:element()},
     localStorage:{getItem:k=>store.get(k)??null,setItem(k,v){if(c.fail?.(k,v))throw Error('injected write failure');store.set(k,String(v));},removeItem(k){if(c.failRemove?.(k))throw Error('injected removal failure');store.delete(k);}}
@@ -20,42 +20,42 @@ function harness(existing) {
   const run = code=>vm.runInContext(code,c);
   const json = code=>JSON.parse(run(`JSON.stringify(${code})`));
   run("currentUser='audit';initUserData();");
-  const start = () => run("setupSel={focus:'胸',state:'精力充沛',time:'30分钟',env:'健身房',discomfort:[],avoid:''};todayPlan=createLocalPlan();todayPlan.status='active';LS.set('today_plan',todayPlan);initDynamicTraining();trainState.records[trainState.day.exercises[0].id]=[{set:1,w:82.5,r:7}];persistTrainingState();");
-  return {c,store,elements,run,json,start};
+  const start = () => run("setupSel={focus:'胸',state:'精力充沛',time:'30分钟',env:'健身房',discomfort:[],discomfortText:'无',avoid:''};todayPlan=createLocalPlan();todayPlan.status='active';LS.set('today_plan',todayPlan);initDynamicTraining();trainState.records[trainState.day.exercises[0].id]=[{set:1,w:82.5,r:7}];trainState.sessionFeedback='刚刚好';trainState.advancePpl=true;persistTrainingState();");
+  return {c,store,elements,run,json,start,end:()=>run('confirmFinishTraining()')};
 }
 let passed=0;
 async function test(name,fn){await fn();passed++;console.log('PASS: '+name);}
 
 await test('保存任一字段失败：保留训练、周期不推进，应急备份包含本次记录',()=>{
-  for(const field of ['write_journal','sessions','today_index','cycle_variants','training_phase','body_records','today_plan','active_training']){
+  for(const field of ['write_journal','sessions','today_index','cycle_variants','training_phase','today_plan','active_training']){
     const h=harness();h.start();
     const before=h.json('({index:todayIndex,variants:cycleVariants,phase:trainingPhase})');
     h.c.fail=(k,v)=>k===`irontrack_audit_${field}` && (field!=='active_training'||v==='null');
-    h.run('finishTraining()');
+    h.end();
     assert.equal(h.run('sessions.length'),0,field);
     assert.deepEqual(h.json('({index:todayIndex,variants:cycleVariants,phase:trainingPhase})'),before,field);
     assert.ok(h.run('todayPlan && trainState.pendingCompletion && !trainState.saved'),field);
     assert.ok(h.run("LS.get('active_training',null)"),field);
     assert.equal(h.run('buildBackupPayload().data.sessions[0].exercises[0].sets[0].w'),82.5,field);
-    h.c.fail=null;h.run('finishTraining();finishTraining()');
+    h.c.fail=null;h.end();h.end();
     assert.equal(h.run('sessions.length'),1,field);
-    assert.equal(h.run('trainingPhase.completedSessions'),1,field);
-    assert.equal(h.run('cycleVariants.push'),'B',field);
+    assert.equal(h.run('trainingPhase.completedSessions'),0,field);
+    assert.equal(h.run('cycleVariants.push'),'A',field,'PPL不再使用A/B轮换');
     assert.equal(h.run("LS.get('active_training',null)"),null,field);
   }
 });
 await test('失败后刷新并重试：单条历史、一次周期推进',()=>{
-  const h=harness();h.start();h.c.fail=k=>k.endsWith('_sessions');h.run('finishTraining()');
+  const h=harness();h.start();h.c.fail=k=>k.endsWith('_sessions');h.end();
   const reloaded=harness(h.store);assert.ok(reloaded.run('trainState.pendingCompletion'));
-  reloaded.run('finishTraining();finishTraining()');assert.equal(reloaded.run('sessions.length'),1);assert.equal(reloaded.run('trainingPhase.completedSessions'),1);
+  reloaded.end();reloaded.end();assert.equal(reloaded.run('sessions.length'),1);assert.equal(reloaded.run('trainingPhase.completedSessions'),0);
 });
 await test('跨日恢复原计划、动作和已完成组',()=>{
   const h=harness();h.start();h.run("todayPlan.date='2020-01-01';LS.set('today_plan',todayPlan);initUserData();enterTraining()");
   assert.equal(h.run('todayPlan.date'),'2020-01-01');assert.equal(h.run('trainState.records[trainState.day.exercises[0].id][0].r'),7);
 });
 await test('历史、已有归档与身体记录均不截断',()=>{
-  const h=harness();h.start();h.run("sessions=Array.from({length:650},(_,i)=>({id:'old-'+i,date:'2020-01-01',exercises:[]}));LS.set('sessions',sessions);LS.set('sessions_archive',Array.from({length:450},(_,i)=>({id:'archive-'+i,exercises:[]})));bodyRecords=Array.from({length:40},()=>({date:'1/1',weight:78}));finishTraining()");
-  assert.equal(h.run('sessions.length'),651);assert.equal(h.run("LS.get('sessions_archive',[]).length"),450);assert.equal(h.run('bodyRecords.length'),41);
+  const h=harness();h.start();h.run("sessions=Array.from({length:650},(_,i)=>({id:'old-'+i,date:'2020-01-01',exercises:[]}));LS.set('sessions',sessions);LS.set('sessions_archive',Array.from({length:450},(_,i)=>({id:'archive-'+i,exercises:[]})));bodyRecords=Array.from({length:40},()=>({date:'1/1',weight:78}))");h.end();
+  assert.equal(h.run('sessions.length'),651);assert.equal(h.run("LS.get('sessions_archive',[]).length"),450);assert.equal(h.run('bodyRecords.length'),40);
   assert.equal(h.run('buildBackupPayload().data.sessions.at(-1).id'),'old-649');
 });
 await test('有效 V1/V2 备份保留旧历史，API Key 不进入备份',async()=>{
@@ -105,7 +105,7 @@ await test('隔离快照无法保存时不覆盖异常原文',()=>{
 });
 await test('隔离失败后结束训练仍不能覆盖原文，应急备份可重新导入',()=>{
   const h=harness();h.start();h.run("localStorage.setItem('irontrack_audit_sessions','{broken')");
-  h.c.fail=k=>k.endsWith('_compat_recovery');h.run('ensureUserDataCompatibility();finishTraining()');
+  h.c.fail=k=>k.endsWith('_compat_recovery');h.run('ensureUserDataCompatibility()');h.end();
   assert.equal(h.store.get('irontrack_audit_sessions'),'{broken');
   assert.equal(h.run('checkedBackup(buildBackupPayload()).sessions.length'),1);
 });
@@ -121,5 +121,36 @@ await test('写入中断后重开自动回滚；回滚失败则阻止后续覆�
 });
 await test('次数保护仍有效，合法 0 次保持兼容',()=>{
   const h=harness();for(const v of ['', ' ', '6-8', 'abc', 1.5, -1]){h.c.input=v;assert.equal(h.run('validReps(input,8)'),8);}assert.equal(h.run('validReps(0,8)'),0);
+});
+await test('新用户档案逐题可恢复，旧档案不会重复问卷',()=>{
+  const h=harness();assert.equal(h.run('profile.onboardingComplete'),false);
+  h.run("onboardingDraft={step:2,direction:'建立规律',frequency:'3次',experience:'刚开始',limitations:''};LS.set('onboarding_draft',onboardingDraft);finishOnboarding()");
+  assert.equal(h.run('profile.trainingDirection'),'建立规律');assert.equal(h.run('profile.trainingDays'),3);assert.equal(h.run('profile.onboardingComplete'),true);
+  const old=harness();old.run("const legacyProfile={...DEFAULT_PROFILE,goal:'增肌'};delete legacyProfile.onboardingComplete;LS.set('profile',legacyProfile);initUserData()");assert.equal(old.run('profile.onboardingComplete'),true);
+});
+await test('PPL短时计划最多6个、长时最多8个，并保留旧历史',()=>{
+  const h=harness();h.run("plan={name:'旧四日计划',days:[{name:'上肢',focus:'胸+背',exercises:[]},{name:'腿',focus:'腿',exercises:[]},{name:'肩',focus:'肩',exercises:[]},{name:'手臂',focus:'手臂',exercises:[]}]};todayIndex=2;sessions=[{id:'legacy-history',date:'2020-01-01',exercises:[]}];ensurePplPlan()");
+  assert.equal(h.run('plan.days.length'),3);assert.equal(h.run('todayIndex'),0);assert.equal(h.run("sessions[0].id"),'legacy-history');
+  for(const [time,count] of [['30分钟',6],['45分钟',8],['60分钟',8],['90分钟',8]]){h.run(`setupSel={focus:'胸',state:'状态一般',time:'${time}',env:'健身房',discomfort:[],discomfortText:'无',avoid:''}`);assert.equal(h.run('createLocalPlan().workout.length'),count,time);}
+});
+await test('结束部分训练需选推进方式，计划值与实际值分开保存',()=>{
+  const h=harness();h.start();const targetWeight=h.run('todayPlan.workout[0].weight');h.run("trainState.advancePpl=false;confirmFinishTraining()");
+  const saved=h.json('sessions[0]');assert.equal(saved.progressionAdvanced,false);assert.equal(saved.exercises[0].targetWeight,targetWeight);assert.equal(saved.exercises[0].sets[0].w,82.5);assert.equal(saved.exercises[0].status,'partial');assert.ok(saved.exercises.slice(1).every(ex=>ex.status==='not_started'&&!ex.sets.length));assert.equal(h.run('todayIndex'),0);
+  assert.equal(h.run('getWeekSessions().length'),0);assert.equal(h.run('getStreak()'),0);assert.equal(h.run('trainingPhase.completedSessions'),0);
+  h.run('updateWeekStats()');const stats=h.elements.get('weekStats').innerHTML;assert.match(stats,/<div class="val">0<\/div><div class="lbl">完成训练/);assert.match(stats,/<div class="val">1<\/div><div class="lbl">总组数/);
+});
+await test('完整训练只按已确认组计数，且不伪造体重记录',()=>{
+  const h=harness();assert.equal(h.run('bodyRecords.length'),0);h.run("setupSel={focus:'胸',state:'状态一般',time:'30分钟',env:'健身房',discomfort:[],discomfortText:'无',avoid:''};todayPlan=createLocalPlan();todayPlan.status='active';LS.set('today_plan',todayPlan);initDynamicTraining();trainState.records=Object.fromEntries(trainState.day.exercises.map(ex=>[ex.id,Array.from({length:ex.sets},(_,i)=>({set:i+1,w:ex.weight,r:ex.reps}))]));trainState.sessionFeedback='刚刚好';confirmFinishTraining()");
+  assert.ok(h.run('sessions[0].exercises.every(ex=>ex.completed&&ex.status===\'completed\')'));assert.equal(h.run('sessions[0].exercises.reduce((n,ex)=>n+ex.sets.length,0)'),h.run('sessions[0].exercises.reduce((n,ex)=>n+ex.targetSets,0)'));assert.equal(h.run('bodyRecords.length'),0);
+  assert.equal(h.run('getWeekSessions().length'),1);assert.equal(h.run('trainingPhase.completedSessions'),1);
+});
+await test('可选 AI 只接收脱敏上下文，合规建议应用，异常建议回退',async()=>{
+  const h=harness(),catalog=JSON.parse(fs.readFileSync(new URL('public/data/exercise-catalog.v1.json',root),'utf8'));
+  h.run(`exerciseCatalog=${JSON.stringify(catalog)};profile.aiPlanEnabled=true;profile.trainingDirection='规律训练';setupSel={focus:'胸',state:'状态一般',time:'30分钟',env:'健身房',discomfort:[],discomfortText:'无',avoid:''};todayPlan=createCatalogPlan();setGlobalApiKey('synthetic-test-key')`);
+  const target=h.json('todayPlan.workout.map(ex=>({exerciseId:ex.exerciseId,sets:ex.sets,reps:ex.reps,weight:ex.weight,rest:ex.rest,reason:"保持"}))');
+  let sent='';h.c.fetch=async(url,options)=>{sent=options.body;return {ok:true,json:async()=>({choices:[{message:{content:JSON.stringify({exercises:target,summary:'保持训练方向'})}}]})};};
+  const adapted=await h.run('adaptPlanWithAI(todayPlan)');assert.equal(adapted.usedAI,true,adapted.error);assert.equal(adapted.plan.workout.length,6);assert.ok(!sent.includes('流程用户'));
+  const invalid=target.map((item,index)=>index===0?{...item,weight:10000}:item);h.c.fetch=async()=>({ok:true,json:async()=>({choices:[{message:{content:JSON.stringify({exercises:invalid,summary:'无效'})}}]})});
+  const fallback=await h.run('adaptPlanWithAI(todayPlan)');assert.equal(fallback.usedAI,false);assert.equal(fallback.plan.workout[0].weight,h.run('todayPlan.workout[0].weight'));
 });
 console.log(`PASS: ${passed} 组数据可靠性回归完成`);

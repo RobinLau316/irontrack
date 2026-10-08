@@ -26,7 +26,8 @@ IronTrack 是一款**手机优先的个人 AI 训练助手**，按 **PPL（推 P
 
 - 阶段一：207 个精选动作库分类验收通过（2026-09-02）
 - 阶段二：动作库 + 引擎接入上线并验收（2026-09-03）
-- V1.2：规则主导计划重构（推拉腿结构槽位 `PPL_SLOTS` + 白名单版本），计划生成不再依赖 AI
+- V1.2：本地规则生成 PPL 计划骨架
+- 2026-10-08：首次档案、当日三问、6/8 动作、可选 AI 适配、计划与实际组记录分离
 
 ---
 
@@ -67,7 +68,7 @@ IronTrack 是一款**手机优先的个人 AI 训练助手**，按 **PPL（推 P
         │ fetch (可选，浏览器直连)
         ▼
 ┌───────────────────────────────────────────────┐
-│  DeepSeek API（AI 解释/评测，非计划生成前提）    │
+│  DeepSeek API（可选计划适配；失败时本地回退）     │
 └───────────────────────────────────────────────┘
 ```
 
@@ -133,17 +134,17 @@ fitness-tool/
 
 | 键 | 用途 |
 |---|---|
-| `profile` | 个人档案与器械 |
+| `profile` | 训练方向、频率、经验、限制、备注和 AI 开关；旧身体/器械字段保留兼容 |
 | `plan` | 当前训练模板（PPL 模板等） |
-| `sessions` | 已完成训练历史（上限 200 条） |
+| `sessions` | 完整、部分及未完成训练记录 |
 | `body_records` / `measurements` | 体重/体脂、围度记录 |
 | `today_index` | 下一训练日索引 |
 | `today_plan` | 今日动态计划（含 preview/active 状态） |
 | `active_training` | 进行中训练快照（断点恢复） |
-| `cycle_variants` | 推/拉/腿的 A/B 轮换态 |
-| `core_locks` | 核心动作锁定 |
-| `training_phase` | 4~6 周阶段起点与完成次数 |
+| `cycle_variants` / `core_locks` | 旧版兼容字段，当前不在界面展示 |
+| `training_phase` | 阶段起点和完整训练次数 |
 | `setup_draft` | 生成前设置草稿 |
+| `onboarding_draft` | 首次档案问答进度 |
 | `exercise_preferences` | 暂停推荐动作、轻松“继续/换变式”偏好 |
 | `exercise_catalog_version` | 已完成兼容处理的动作库版本 |
 
@@ -155,53 +156,53 @@ fitness-tool/
 ### 4.2 计划生成层（`index.html`）
 
 **选择流**
-1. `enterTraining()` / `renderTrainingSetup()` — 设置身体状态、时间、环境、不适部位、避开动作。
+1. 新用户由 `renderOnboarding()` 逐题建立档案；`renderTrainingSetup()` 只询问时间、疲劳和不适，默认健身房。
 2. `suggestTodayFocus()` — 基于 PPL 周期与最近训练推荐当日部位。
 3. `confirmSetup()` → `generateTodayPlan()`：
-   - **V1.2 关键**：`generateTodayPlan()` 直接调用 `createLocalPlan()`，**计划生成不再依赖 AI/网络**；失败时先 `ensureUserDataCompatibility()` 再重试。
+   - `generateTodayPlan()` 先生成本地规则计划；档案启用 `aiPlanEnabled` 且设置 API Key 后，再用 `adaptPlanWithAI()` 做受约束适配；校验失败时保留本地计划。
    - `createLocalPlan()` — 按是否有动作库分派到 `createCatalogPlan()` 或 `createLegacyLocalPlan()`。
 
 **候选与骨架**
-- `targetExerciseCount(time)` — 30/45/60/90 分钟对应 8/9/12/15 个动作。
+- `targetExerciseCount(time)` — 30 分钟 6 个动作，其余时间 8 个动作。
 - `getCatalogCandidates(key)` — 从 `exercise-engine` 的 `filterCandidates` 过滤得到合格候选。
 - `EXERCISE_LIBRARY` / `BODYWEIGHT_LIBRARY` — 未接入精选目录时的**遗留兜底动作库**（`X()` 构造器）。
 - `PPL_SLOTS` — V1.2 结构槽位：推(4) / 拉(5) / 腿(6) 个结构分组，每组带动作模式与数量（`机动` 槽位弹性填充）。
-- `createCatalogPlan()` — 核心动作从 `lib.core` 锁定；辅助动作交给引擎 `buildFallbackPlan()` 生成约 35% 轮换；平衡校验失败时全量重建。
+- `createCatalogPlan()` — 主动作优先保持连续；辅助动作交给引擎按历史和结构平衡选择，失败时本地全量重建。
 
-**AI 调用（V1.2 起仅用于解释与评价，不参与计划生成）**
+**可选 AI 计划适配**
 - `aiCall(prompt, silent)` — DeepSeek 请求封装（25s 超时、AbortController、错误兜底）。
-- `aiExplainPlan()` / `aiReviewCurrentTraining()` — 按需调用 AI 解释计划/评审当前训练。
-- 2026-09-18 起 `buildTodayPrompt()` / `normalizeAIPlan()` / `normalizeCatalogAIPlan()` 已随 V1.2 纯本地化移除。
+- `adaptPlanWithAI(base, requestText)` — 使用训练档案、当天状态和近四次实际记录；限制候选范围、重量变化和计划结构。
+- `applyPlanRequest()` — 将计划预览中的日常语言请求交给可选 AI；失败保留本地计划。
 
 ### 4.3 计划预览（`index.html`）
-- `renderPlanPreview()` / `togglePlanLock(index)` — 锁定动作（核心动作同步写 `core_locks`）。
-- `swapPlanExercise(index, preferNew)` — 同肌群替换，替换后需通过结构平衡校验。
+- `renderPlanPreview()` — 显示计划和自然语言调整入口。
+- `swapPlanExercise(index)` — 当前计划换一个同类动作，替换后通过结构平衡校验。
 - `updatePreviewField(index, key, value)` — 手动改组数/次数/重量/休息，带范围校验。
 - `startConfirmedPlan()` — `today_plan.status = 'active'`，进入训练状态机，此后不再调 AI。
 
 ### 4.4 训练状态机（`index.html`）
 
 ```
-生成前设置 → 计划预览 → 热身 → 正式训练 → 动作反馈 → 拉伸 → 完成
+新用户档案 → 当日三问 → 计划预览/调整 → 确认 → 热身 → 正式训练 → 动作反馈 → 结束反馈 → 保存
                           ↕
                        休息计时（startRestTimer / resumeRestTimer / skipRest）
 ```
 
 - `initDynamicTraining()` / `restoreDynamicTraining()` — 初始化 / 通过计划 ID 断点恢复。
 - `persistTrainingState()` — 每次组完成、换动作、切板块、提交反馈后持久化；`beforeunload` 时自动保存。
-- `renderWarmup()` / `renderWorkout()` / `renderStretch()` / `renderNutrition()` — 四大板块渲染（记忆约束要求的四段结构）。
-- `completeSet()` — 记录本组 `{w, r}`；未到目标组数进休息，完成则进入动作反馈。
+- `renderWarmup()` / `renderWorkout()` / `renderStretch()` — 训练必要板块。
+- `completeSet()` — 用户确认后记录实际 `{w, r}`；未到目标组数进休息，完成则进入动作反馈。
 - `submitExerciseFeedback(value)` / `advanceAfterExercise()` — 反馈（轻松/合适/吃力/不适），决定下一动作或换变式。
-- `saveSession()` — 生成 session 写入历史，推进 `today_index`、切换 A/B、累计阶段次数，并清空当日计划。
+- `confirmFinishTraining()` / `saveSession()` — 收集简短整体感受；部分训练由用户选择是否推进，并一次提交历史、周期和计划清理。
 - 滑动切换：`touchstart`/`touchend` 横向滑动切换上一/下一动作。
 
 ### 4.5 数据页 / 个人页（`index.html`）
 - `renderDataChart(tab)` — 体重 / 围度柱状图。
 - `renderSessionHistory()` / `updateWeekStats()` — 历史与周统计。
-- `renderProfilePage()` + `toggleEquipment` / `saveProfile` / `testApiKey` — 档案、器械、Key 测试。
+- `renderProfilePage()` + `saveProfile` / `testApiKey` — 训练档案、AI 开关、Key 测试和备份恢复。
 
 ### 4.6 备份（`index.html`）
-- `buildBackupPayload()` — 快照（应用标识、格式版本 v2、用户、导出时间、用户数据），**排除 API Key**。
+- `buildBackupPayload()` — 快照格式版本 v3，兼容导入 v1/v2/v3，**排除 API Key**。
 - `exportBackup()` / `importBackupFile(file)` — 导出下载 / 导入校验，导入前保存快照。
 
 ---
@@ -245,7 +246,7 @@ fitness-tool/
 | `PLAN_TEMPLATES` | PPL 三分化 / PPL 肩四分化 / 上下肢分化 三套模板 |
 | `PPL_SLOTS` | 推(4)/拉(5)/腿(6) 结构槽位（V1.2） |
 | `PPL_WHITELIST_VERSION` | `v1.2-whitelist-1`（白名单版本标记） |
-| `BACKUP_VERSION` | `2` |
+| `BACKUP_VERSION` | `3` |
 | `EXERCISE_CATALOG_URL` / `EXERCISE_INSTRUCTIONS_URL` | 动作库/中文步骤相对路径 |
 | `EQUIPMENT_OPTIONS` / `FOCUS_OPTIONS` / `STATE_OPTIONS` / `TIME_OPTIONS` / `ENV_OPTIONS` / `DISCOMFORT_OPTIONS` | UI 选项常量 |
 
@@ -256,7 +257,7 @@ fitness-tool/
 ### 7.1 运行时依赖
 - **零第三方前端运行时库**——应用本体为原生 JS。
 - 依赖浏览器能力：`localStorage`、`fetch`、`AbortController`、`EventSource`（未用）等。
-- 外部服务：**DeepSeek API**（可选，仅用于 AI 解释/评测）。
+- 外部服务：**DeepSeek API**（可选，用于计划适配与自然语言调整）。
 
 ### 7.2 文件间依赖
 - `index.html` ←（`<script src>`）→ `public/exercise-engine.js`
@@ -308,7 +309,7 @@ curl -fsSL https://robinlau316.github.io/irontrack/ | grep -q "EXERCISE_LIBRARY"
 ```
 
 ### 8.4 发布前人工冒烟要点
-按 `docs/runbook.md` 覆盖：新建用户生成计划、不设 Key 出本地备用计划、30min/90min 动作数(8/15)、计划锁定替换改数、刷新恢复训练、反馈四态、PPL 推进与 A/B 切换、备份导出不含 Key、旧版备份(含 v1)导入兼容。
+按 `docs/runbook.md` 覆盖：新档案逐题问答、当日三问、不开 AI 生成本地计划、30 分钟 6 个/其余最多 8 个动作、自然语言调整回退、刷新恢复、部分训练选择 PPL 推进、实际组统计和 V1/V2/V3 备份兼容。
 
 ---
 

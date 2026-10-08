@@ -234,7 +234,7 @@
       for (const index of replaceSlots) {
         const current = chosen[index];
         usedIds.delete(current.exerciseId);
-        const pool = candidates.filter(item => item.replacementMuscle === current.replacementMuscle && item.exerciseId !== current.exerciseId);
+        const pool = candidates.filter(item => item.replacementMuscle === current.replacementMuscle && item.exerciseId !== current.exerciseId && item.movementPatterns.some(pattern => current.movementPatterns.includes(pattern)));
         const replacement = scoreCandidates(pool, {
           seed:`${seed}:replace:${index}`,
           recentExerciseIds,

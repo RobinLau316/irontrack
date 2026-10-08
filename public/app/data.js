@@ -3,7 +3,9 @@ const DEFAULT_PROFILE = {
   height: 178, weight: 78.5, bodyFat: 18, trainingDays: 4, experience: '有一定基础', goal: '增肌塑形',
   equipment: ['杠铃','哑铃','卧推架','深蹲架','绳索机','蝴蝶机','腿举机'],
   planTemplate: 'ppl',
-  chest: 0, waist: 0, arm: 0, thigh: 0
+  chest: 0, waist: 0, arm: 0, thigh: 0,
+  trainingDirection: '', experienceSummary: '', limitations: '', onboardingComplete: false,
+  aiPlanEnabled: false, trainingNotes: []
 };
 
 const DEFAULT_PLAN = {
@@ -217,12 +219,13 @@ const PPL_SLOTS = {
 };
 
 const PPL_WHITELIST_VERSION = 'v1.2-whitelist-1';
-const BACKUP_VERSION = 2;
+const BACKUP_VERSION = 3;
 const EXERCISE_CATALOG_URL = './public/data/exercise-catalog.v1.json';
 const EXERCISE_INSTRUCTIONS_URL = './public/data/exercise-instructions-zh.v1.json';
-const USER_DATA_KEYS = ['profile','plan','sessions','sessions_archive','body_records','measurements','today_index','today_plan','active_training','cycle_variants','core_locks','training_phase','setup_draft','exercise_preferences','exercise_catalog_version'];
+const USER_DATA_KEYS = ['profile','plan','sessions','sessions_archive','body_records','measurements','today_index','today_plan','active_training','cycle_variants','core_locks','training_phase','setup_draft','onboarding_draft','exercise_preferences','exercise_catalog_version'];
 const DEFAULT_CYCLE_VARIANTS = { push:'A', pull:'A', legs:'A' };
-const DEFAULT_SETUP_STATE = { focus:'', state:'', time:'', env:'', discomfort:[], avoid:'' };
+const DEFAULT_SETUP_STATE = { focus:'', state:'状态一般', time:'45分钟', env:'健身房', discomfort:[], discomfortText:'无' , avoid:'' };
+const DEFAULT_ONBOARDING_DRAFT = { step:0, direction:'', frequency:'', experience:'', limitations:'' };
 const DEFAULT_EXERCISE_PREFERENCES = { version:1, catalogVersion:'', paused:{}, lightChoices:{} };
 let exerciseCatalog = null;
 let exerciseCatalogStatus = 'idle';
@@ -463,9 +466,14 @@ function checkedSession(session) {
   const out = cloneData(session);
   out.date = dataText(out.date, '训练日期');
   out.duration = dataNumber(out.duration ?? 0, '训练时长');
+  ['startedDate','completedAt','sessionFeedback','sessionDiscomfort'].forEach(key=>{if(out[key]!=null)out[key]=dataText(out[key],key);});
+  if(out.progressionAdvanced!=null&&typeof out.progressionAdvanced!=='boolean')throw new Error('训练推进状态异常');
   out.exercises = out.exercises.map(ex => {
     if (!isPlainRecord(ex) || typeof ex.name !== 'string' || !Array.isArray(ex.sets)) throw new Error('历史动作或组记录异常');
     const item = cloneData(ex);
+    ['targetSets','targetReps','targetWeight'].forEach(key=>{if(item[key]!=null)item[key]=dataNumber(item[key],key,key==='targetSets'?1:0,key!=='targetWeight');});
+    if(item.status!=null&&!['completed','partial','skipped','not_started'].includes(item.status))throw new Error('历史动作完成状态异常');
+    ['completed','skipped'].forEach(key=>{if(item[key]!=null&&typeof item[key]!=='boolean')throw new Error('历史动作状态异常');});
     item.sets = item.sets.map(set => {
       if (!isPlainRecord(set)) throw new Error('组记录异常');
       return Object.assign({}, set, { w:dataNumber(set.w,'历史重量'), r:dataNumber(set.r,'历史次数',0,true) });
@@ -513,7 +521,7 @@ function checkedActiveTraining(value, today) {
   s.sessionTime = dataNumber(s.sessionTime ?? 0,'训练时长');
   s.restTimer = dataNumber(s.restTimer ?? 0,'休息时长');
   s.restEndAt = dataNumber(s.restEndAt ?? 0,'休息结束时间');
-  if (!['warmup','workout','stretch','nutrition'].includes(s.section)) throw new Error('训练板块异常');
+  if (!['warmup','workout','stretch','nutrition','finish'].includes(s.section)) throw new Error('训练板块异常');
   const ids = new Set(s.day.exercises.map(ex=>ex.id));
   if (!isPlainRecord(s.records)) throw new Error('进行中组记录异常');
   Object.entries(s.records).forEach(([id,sets]) => {
@@ -572,6 +580,10 @@ function normalizeUserData(source, strict=false) {
     const out = Object.assign(cloneData(DEFAULT_PROFILE), value);
     ['height','weight','bodyFat','trainingDays','chest','waist','arm','thigh'].forEach(key => { out[key] = dataNumber(out[key],key); });
     ['goal','experience','planTemplate'].forEach(key => { out[key] = dataText(out[key],key); });
+    ['trainingDirection','experienceSummary','limitations'].forEach(key => { out[key] = dataText(out[key],key); });
+    out.onboardingComplete = value.onboardingComplete == null ? true : value.onboardingComplete === true;
+    out.aiPlanEnabled = value.aiPlanEnabled === true;
+    out.trainingNotes = Array.isArray(value.trainingNotes) ? value.trainingNotes.filter(item=>typeof item==='string').slice(-30) : [];
     if (!Array.isArray(out.equipment) || out.equipment.some(e=>typeof e!=='string')) throw new Error('器械列表异常');
     if (!PLAN_TEMPLATES[out.planTemplate]) out.planTemplate = 'ppl';
     return out;
@@ -608,7 +620,16 @@ function normalizeUserData(source, strict=false) {
     if(!isPlainRecord(value))throw new Error('设置草稿异常');
     const out={...DEFAULT_SETUP_STATE,...value};
     ['focus','state','time','env','avoid'].forEach(k=>{out[k]=dataText(out[k],k);});
+    out.discomfortText=dataText(out.discomfortText,'不适说明','无');
     if(!Array.isArray(out.discomfort)||out.discomfort.some(v=>typeof v!=='string'))throw new Error('不适设置异常');
+    return out;
+  });
+  field('onboarding_draft', DEFAULT_ONBOARDING_DRAFT, value=>{
+    if(!isPlainRecord(value))throw new Error('首次训练档案对话异常');
+    const out={...DEFAULT_ONBOARDING_DRAFT,...value};
+    out.step=dataNumber(out.step,'对话进度',0,true);
+    if(out.step>4)throw new Error('首次训练档案对话进度异常');
+    ['direction','frequency','experience','limitations'].forEach(k=>out[k]=dataText(out[k],k));
     return out;
   });
   field('exercise_preferences', DEFAULT_EXERCISE_PREFERENCES, value=>{

@@ -96,7 +96,7 @@ assert(migratedAgain.changes === 0 && JSON.stringify(migratedAgain.data) === JSO
 
 const fullEquipment = ["徒手","哑铃","杠铃","绳索机","史密斯机","高位下拉","腿举机","腿弯举","腿屈伸","划船机","壶铃","推胸器","推肩器","蝴蝶机","龙门架","引体架","卧推架","深蹲架"];
 const corePatterns = { push:["水平推","垂直推"], pull:["水平拉","垂直拉"], legs:["膝主导","髋主导"] };
-const timeCounts = { "30分钟":8, "45分钟":10, "60分钟":12, "90分钟":15 };
+const timeCounts = { "30分钟":6, "45分钟":8, "60分钟":8, "90分钟":8 };
 
 for (const focusKey of ["push","pull","legs"]) {
   const candidates = engine.filterCandidates(catalog, { focusKey, environment:"健身房", availableEquipment:fullEquipment });

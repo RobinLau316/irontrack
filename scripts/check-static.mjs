@@ -79,8 +79,11 @@ if (/<(?:script|link)[^>]+(?:src|href)=["'][^"']*exercise-instructions-zh/i.test
   throw new Error("中文步骤不得在首页通过 script 或 link 预加载");
 }
 
-if (!combined.includes("![1,2].includes(Number(payload.version))")) {
-  throw new Error("备份导入未兼容版本 1 与版本 2");
+if (!combined.includes("[1,2,3].includes(Number(payload.version))")) {
+  throw new Error("备份导入未兼容版本 1、2 与版本 3");
+}
+for (const marker of ["onboardingComplete", "trainingDirection", "aiPlanEnabled", "confirmFinishTraining", "progressionAdvanced"]) {
+  if (!combined.includes(marker)) throw new Error(`缺少训练流程能力：${marker}`);
 }
 
 for (const backupKey of ["exercise_preferences", "exercise_catalog_version"]) {

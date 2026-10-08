@@ -80,7 +80,7 @@ function runDay(focusText){
 let plan = runDay('推+胸+肩+三头');
 let p = plan.workout.map(e=>e.pattern);
 console.log('\n===== Push 推日 =====  ' + p.join(' / '));
-assert(plan.workout.length===8, `Push默认8个动作，实际${plan.workout.length}`);
+assert(plan.workout.length===6, `30分钟推日默认6个动作，实际${plan.workout.length}`);
 assert(p.filter(x=>['水平推','胸内收'].includes(x)).length>=2, `胸至少2个，实际${p.filter(x=>['水平推','胸内收'].includes(x)).length}`);
 assert(p.filter(x=>['垂直推','肩外展','肩后束'].includes(x)).length>=1, `肩至少1个，实际${p.filter(x=>['垂直推','肩外展','肩后束'].includes(x)).length}`);
 assert(p.includes('肘伸'), `应含三头（肘伸）`);
@@ -89,7 +89,7 @@ assert(p.includes('肘伸'), `应含三头（肘伸）`);
 plan = runDay('拉+背+二头');
 p = plan.workout.map(e=>e.pattern);
 console.log('\n===== Pull 拉日 =====  ' + p.join(' / '));
-assert(plan.workout.length===8, `Pull默认8个动作，实际${plan.workout.length}`);
+assert(plan.workout.length===6, `30分钟拉日默认6个动作，实际${plan.workout.length}`);
 assert(p.filter(x=>['垂直拉','垂直拉变式'].includes(x)).length>=1, `应含垂直拉`);
 assert(p.filter(x=>['水平拉'].includes(x)).length>=1, `应含水平拉`);
 assert(p.includes('肘屈'), `应含二头（肘屈)`);
@@ -98,7 +98,7 @@ assert(p.includes('肘屈'), `应含二头（肘屈)`);
 plan = runDay('腿+股四+腘绳+臀');
 p = plan.workout.map(e=>e.pattern);
 console.log('\n===== Legs 腿日 =====  ' + p.join(' / '));
-assert(plan.workout.length===8, `Legs默认8个动作，实际${plan.workout.length}`);
+assert(plan.workout.length===6, `30分钟腿日默认6个动作，实际${plan.workout.length}`);
 assert(p.filter(x=>['膝主导','膝伸'].includes(x)).length>=1, `应含股四主导`);
 assert(p.filter(x=>['髋主导'].includes(x)).length>=1, `应含髋主导`);
 assert(p.includes('核心'), `应含核心动作`);
@@ -110,7 +110,7 @@ plan = api.createLocalPlan();
 const bad = plan.workout.filter(e=>['膝主导','单腿膝主导','膝伸'].includes(e.pattern));
 console.log('\n===== 家用哑铃 + 膝不适 =====  ' + plan.workout.map(e=>e.name).join(' / '));
 assert(bad.length===0, `膝不适不应出现膝主导动作，实际 ${bad.map(e=>e.name).join(',')||'无'}`);
-assert(plan.workout.length>=8, `家用哑铃+膝不适仍能生成≥8个动作，实际${plan.workout.length}`);
+assert(plan.workout.length===6, `家用哑铃+膝不适应匹配30分钟安排6个动作，实际${plan.workout.length}`);
 
 // generateTodayPlan：不依赖 AI、不卡住、立即生成并持久化
 api.setSetup('focus', '推+胸+肩+三头');
@@ -122,10 +122,9 @@ api.setSetup('avoid', '');
 const gp = await api.generateTodayPlan();
 const saved = api.getSavedPlan();
 console.log('\n===== generateTodayPlan =====  source=' + gp.source + ' 动作=' + gp.workout.length + ' 已存=' + (saved && saved.workout ? saved.workout.length : '无'));
-assert(gp && gp.workout && gp.workout.length >= 8, `generateTodayPlan 应生成≥8个动作，实际${gp && gp.workout && gp.workout.length}`);
+assert(gp && gp.workout && gp.workout.length === 6, `30分钟计划应生成6个动作，实际${gp && gp.workout && gp.workout.length}`);
 assert(gp.source === 'local', `计划来源应为 local，实际 ${gp.source}`);
-assert(gp.notice && gp.notice.includes('本地规则'), `notice 应说明本地规则生成，实际 "${gp.notice}"`);
-assert(saved && saved.workout && saved.workout.length >= 8, `today_plan 应持久化`);
+assert(saved && saved.workout && saved.workout.length === 6, `today_plan 应持久化`);
 assert(gp.workout[0].role === '核心', `首个动作应为核心（主动作稳定）`);
 
 console.log(allOk ? '\n全部 V1.2 结构断言通过 ✅' : '\n存在未通过断言 ❌');

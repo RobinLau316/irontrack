@@ -201,6 +201,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .nutrition-card{background:linear-gradient(135deg,rgba(255,107,53,.12),rgba(42,157,143,.12));border:1px solid var(--border);border-radius:16px;padding:18px;font-size:16px;line-height:1.7;white-space:pre-line}
 .setup-input{width:100%;min-height:48px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text);font-size:16px;outline:none}
 .setup-input:focus{border-color:var(--accent)}
+.onboarding-answer{min-height:88px;resize:vertical;line-height:1.5}
 .plan-source{display:inline-flex;padding:5px 10px;border-radius:18px;font-size:13px;background:rgba(42,157,143,.15);color:#2a9d8f}
 .plan-source.local{background:rgba(244,162,97,.15);color:#f4a261}
 .preview-item{padding:14px 0;border-bottom:1px solid var(--border)}

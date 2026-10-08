@@ -38,27 +38,6 @@ async function toggleExerciseInstructions(exerciseId, targetId) {
   panel.innerHTML = `<ol>${steps.map(step => `<li>${escapeHtml(step)}</li>`).join('')}</ol>`;
 }
 
-function renderLightChoice(exercise, index) {
-  if (exercise.role === '核心' || exercise.previous?.feedback !== '轻松') return '';
-  const choice = exercisePreferences?.lightChoices?.[exercise.exerciseId] || exercise.lightChoice || 'progress';
-  return `<div class="light-choice">
-    <div class="light-choice-label">上次感觉轻松，这次怎么安排？</div>
-    <div class="segment-control">
-      <button class="${choice==='progress'?'active':''}" onclick="setLightExerciseChoice(${index},'progress')">继续进阶</button>
-      <button class="${choice==='variant'?'active':''}" onclick="setLightExerciseChoice(${index},'variant')">换个变式</button>
-    </div>
-  </div>`;
-}
-
-function setLightExerciseChoice(index, choice) {
-  const exercise = todayPlan?.workout?.[index];
-  if (!exercise?.exerciseId) return;
-  exercisePreferences.lightChoices[exercise.exerciseId] = choice === 'variant' ? 'variant' : 'progress';
-  LS.set('exercise_preferences', exercisePreferences);
-  if (choice === 'variant') swapPlanExercise(index, true);
-  else renderPlanPreview();
-}
-
 function resetTraining() {
   if (!currentUser) return;
   if (trainState.pendingCompletion && !trainState.saved) { alert('本次训练尚未保存，请先重试保存或导出备份。'); return; }
@@ -75,42 +54,40 @@ function renderPlanPreview() {
   const items = todayPlan.workout.map((ex,index) => `
     <div class="preview-item">
       <div class="preview-head">
-        <span class="preview-role ${ex.role==='核心'?'':'aux'}">${ex.role||'辅助'}</span>
-        <div style="flex:1"><div class="font-bold">${index+1}. ${escapeHtml(ex.name)}${ex.isNew?'<span class="new-exercise-badge">新动作</span>':''}</div><div class="reason-note">${escapeHtml(ex.replacementMuscle||'综合')} · ${escapeHtml(ex.pattern||'综合')} · ${escapeHtml(ex.reason||'按训练规则选择')}</div>${ex.previous?`<div class="reason-note">上次：${ex.previous.weight}kg × ${ex.previous.reps}${ex.previous.feedback?' · '+escapeHtml(ex.previous.feedback):''}</div>`:''}${exerciseInstructionBlock(ex,`preview-instruction-${index}`)}${renderLightChoice(ex,index)}</div>
+        <span class="preview-role ${ex.role==='核心'?'':'aux'}">${ex.role==='核心'?'主要动作':'补充动作'}</span>
+        <div style="flex:1"><div class="font-bold">${index+1}. ${escapeHtml(ex.name)}${ex.isNew?'<span class="new-exercise-badge">新动作</span>':''}</div><div class="reason-note">${ex.role==='核心'?'保持主动作连续，方便比较实际表现':'按今天训练方向安排'}</div>${ex.previous?`<div class="reason-note">上次实际：${ex.previous.weight}kg × ${ex.previous.reps}${ex.previous.feedback?' · '+escapeHtml(ex.previous.feedback):''}</div>`:''}${exerciseInstructionBlock(ex,`preview-instruction-${index}`)}</div>
       </div>
       <div class="edit-grid">
-        <div class="edit-field"><label>组数</label><input type="number" min="1" max="8" value="${ex.sets}" oninput="updatePreviewField(${index},'sets',this.value)"></div>
+        <div class="edit-field"><label>组数</label><input type="number" min="1" max="5" value="${ex.sets}" oninput="updatePreviewField(${index},'sets',this.value)"></div>
         <div class="edit-field"><label>次数</label><input type="number" min="1" max="100" value="${ex.reps}" oninput="updatePreviewField(${index},'reps',this.value)"></div>
         <div class="edit-field"><label>重量kg</label><input type="number" min="0" step="2.5" value="${ex.weight}" oninput="updatePreviewField(${index},'weight',this.value)"></div>
         <div class="edit-field"><label>休息秒</label><input type="number" min="30" max="300" step="15" value="${ex.rest}" oninput="updatePreviewField(${index},'rest',this.value)"></div>
       </div>
-      <div class="preview-actions">
-        <button class="mini-btn ${ex.locked?'on':''}" onclick="togglePlanLock(${index})">${ex.locked?'🔒 已锁定':'🔓 锁定'}</button>
-        <button class="mini-btn" onclick="swapPlanExercise(${index})" ${ex.locked?'disabled style="opacity:.45"':''}>换一个同类动作</button>
-      </div>
+      <div class="preview-actions"><button class="mini-btn" onclick="swapPlanExercise(${index})">换一个动作</button></div>
     </div>`).join('');
   document.getElementById('trainingContent').innerHTML = `
-    <div class="training-header"><span class="text-accent font-bold">计划预览</span><span class="plan-source local">本地规则</span></div>
+    <div class="training-header"><span class="text-accent font-bold">计划预览</span><span class="plan-source ${todayPlan.aiUsed?'':'local'}">${todayPlan.aiUsed?'AI 适配':'本地计划'}</span></div>
     ${todayPlan.notice?`<div class="resume-banner">${escapeHtml(todayPlan.notice)}</div>`:''}
-    <div style="margin-bottom:14px"><button class="btn btn-outline" onclick="aiExplainPlan()">AI 解释本计划</button><div id="aiExplain" class="text-sm text-muted text-center" style="margin:8px 0"></div></div>
+    <div class="plan-request card"><label class="setup-label" for="planRequest">想改哪里？用平常的话告诉我</label><textarea id="planRequest" class="setup-input" rows="2" maxlength="400" placeholder="例如：这个动作我不会；今天轻松一点">${escapeHtml(todayPlan.userRequest||'')}</textarea><button class="mini-btn mt-3" onclick="applyPlanRequest()">按这句话调整</button><div id="planRequestMsg" class="text-sm text-muted mt-2">${todayPlan.aiUsed?'已用AI结合训练记录适配':(profile.aiPlanEnabled?'AI开启后会结合训练记录适配':'本地规则计划；可在“我的”开启可选 AI')}</div></div>
     <div class="card">
-      <div class="row mb-3"><div><div class="section-title" style="margin-bottom:2px">${escapeHtml(todayPlan.focus)} · ${todayPlan.variant} 方案</div><div class="text-muted text-sm">${todayPlan.workout.length} 个动作 · ${escapeHtml(todayPlan.factors.time)} · ${escapeHtml(todayPlan.factors.env)}</div></div></div>
+      <div class="row mb-3"><div><div class="section-title" style="margin-bottom:2px">${escapeHtml(todayPlan.focus)} · PPL 循环</div><div class="text-muted text-sm">${todayPlan.workout.length} 个动作 · ${escapeHtml(todayPlan.factors.time)}</div></div></div>
       ${items}
     </div>
     <button class="btn btn-accent" onclick="startConfirmedPlan()">确认计划并开始</button>
-    <button class="btn btn-outline mt-3" onclick="discardTodayPlan()">返回重新生成</button>`;
+    <button class="btn btn-outline mt-3" onclick="discardTodayPlan()">重新生成</button>`;
 }
 
-function aiExplainPlan() {
-  const el = document.getElementById('aiExplain');
-  if (!el) return;
-  if (!getGlobalApiKey()) { el.textContent = '暂未设置 API Key，无法生成本计划解释。'; return; }
-  el.textContent = '正在生成解释...';
-  const summary = todayPlan.workout.map((ex,i) => `${i+1}. ${ex.name}（${ex.role||'辅助'}，${ex.replacementMuscle||ex.pattern||'综合'}）：${ex.sets}组×${ex.reps}次 ${ex.weight}kg`).join('\n');
-  const prompt = `你是力量训练教练。请用中文简短解释这份 PPL 训练计划的安排逻辑，帮助用户理解为什么这样练。当前是【${todayPlan.focus}】${todayPlan.variant}方案。计划：\n${summary}\n要求：3-5 句，说明今天练什么、动作结构和训练量为何这样安排，不诊断伤病。`;
-  aiCall(prompt, true).then(res => {
-    if (res) el.textContent = res.trim(); else el.textContent = 'AI 暂时无响应，请稍后重试。';
-  }).catch(() => { el.textContent = 'AI 暂时不可用，请稍后重试。'; });
+async function applyPlanRequest() {
+  const request=(document.getElementById('planRequest')?.value||'').trim();
+  const msg=document.getElementById('planRequestMsg');
+  if(!request){if(msg)msg.textContent='先写一句你希望调整的地方。';return;}
+  if(!profile.aiPlanEnabled||!getGlobalApiKey()){if(msg)msg.textContent='要理解自然语言并调整计划，请在“我的”开启可选 AI；当前计划和输入会保留。';return;}
+  const btn=document.querySelector('.plan-request button');if(btn)btn.disabled=true;
+  if(msg)msg.textContent='正在理解你的意思…';
+  const original=cloneData(todayPlan), result=await adaptPlanWithAI(original,request);
+  if(btn)btn.disabled=false;
+  if(result.usedAI){const next={...result.plan,userRequest:request,aiUsed:true};if(LS.transaction({today_plan:next})){todayPlan=next;renderPlanPreview();}else if(msg)msg.textContent='调整结果暂时保存失败；原计划仍保留，请重试。';}
+  else if(msg)msg.textContent=`${result.error||'暂时无法调整'}；原计划仍保留，你可以改写这句话或手动换一个同类动作。`;
 }
 
 function updatePreviewField(index,key,value) {
@@ -123,18 +100,6 @@ function updatePreviewField(index,key,value) {
   ex[key] = key === 'weight' ? Math.round(num*2)/2 : Math.round(num);
   ex.reason = '用户在计划预览中手动调整';
   LS.set('today_plan', todayPlan);
-}
-
-function togglePlanLock(index) {
-  const ex = todayPlan.workout[index];
-  if (!ex) return;
-  ex.locked = !ex.locked;
-  if (ex.role === '核心') {
-    coreLocks[ex.name] = ex.locked;
-    LS.set('core_locks', coreLocks);
-  }
-  LS.set('today_plan', todayPlan);
-  renderPlanPreview();
 }
 
 function swapPlanExercise(index, preferNew=false) {
@@ -186,9 +151,9 @@ function swapPlanExercise(index, preferNew=false) {
 }
 
 function startConfirmedPlan() {
-  todayPlan.status = 'active';
-  LS.set('today_plan', todayPlan);
-  LS.set('setup_draft', null);
+  const next={...todayPlan,status:'active',startedDate:todayPlan.startedDate||getTodayStr()};
+  if(!LS.transaction({today_plan:next,active_training:null})){dataRecoveryNotice='计划尚未保存，未开始训练。请重试或先导出备份。';renderPlanPreview();return;}
+  todayPlan=next;LS.set('setup_draft', null);
   initDynamicTraining();
   renderTrainingPage();
   window.scrollTo(0, 0);
@@ -212,6 +177,7 @@ function initDynamicTraining() {
     weight: exercises[0] ? exercises[0].weight||0 : 0,
     reps: exercises[0] ? exercises[0].reps||8 : 8,
     records: {}, feedback:{}, skipped:{}, pendingFeedback:null, isResting: false, restTimer: 0, restEndAt:0, sessionTime: 0, complete: false,
+    sessionFeedback:'',sessionDiscomfort:'',advancePpl:null,
     section: 'warmup',   // warmup | workout | stretch | nutrition
     warmupDone: [], stretchDone: [],
     timerInterval: null, restInterval: null
@@ -290,6 +256,7 @@ function renderTrainingPage() {
   if (todayPlan.status === 'preview') { renderPlanPreview(); return; }
   const s = trainState;
   if (s.complete) { renderComplete(); return; }
+  if (s.section === 'finish') { renderFinishPrompt(); return; }
   if (s.isResting) { renderRestOverlay(); return; }
   if (s.pendingFeedback) { renderFeedbackPrompt(); return; }
   renderTrainingUI();
@@ -299,6 +266,7 @@ function setSection(sec) {
   if (trainState.complete || trainState.isResting) return;
   trainState.section = sec;
   persistTrainingState();
+  if(sec==='finish'){renderFinishPrompt();return;}
   renderTrainingUI();
   window.scrollTo(0, 0);
 }
@@ -312,7 +280,7 @@ function renderSectionTabs() {
     {k:'warmup', label:'热身', done:warmupAll},
     {k:'workout', label:'正式', done:workoutDone},
     {k:'stretch', label:'拉伸', done:stretchAll},
-    {k:'nutrition', label:'饮食', done:false}
+    {k:'finish', label:'结束', done:false}
   ];
   return `<div class="section-tabs">${tabs.map(t =>
     `<div class="section-tab ${s.section===t.k?'active':''}" onclick="setSection('${t.k}')">${t.label}${t.done?'<span class="done-mark">✓</span>':''}</div>`
@@ -348,6 +316,7 @@ function renderWorkout() {
   const s = trainState;
   const ex = s.day.exercises[s.exIdx];
   s.reps = validReps(s.reps, validReps(ex.reps, 8));
+  if (s.reps < 1) { alert('实际次数至少为 1；未完成的训练可以直接结束并记录已完成组。'); return; }
   const recs = s.records[ex.id] || [];
   return `
     <div class="training-container workout-focus">
@@ -368,13 +337,13 @@ function renderWorkout() {
         <div class="num-btn" onclick="adjustReps(1)">+</div>
       </div>
       <div class="set-indicator">第 ${s.set} 组 / 共 ${ex.sets} 组 · 动作 ${s.exIdx+1}/${s.day.exercises.length}</div>
-      <div class="reason-note text-center">${escapeHtml(ex.reason||'按今日计划执行')}</div>
+      <div class="reason-note text-center">${ex.role==='核心'?'保持主动作连续，方便比较实际表现':'按今天训练方向安排'}</div>
       ${recs.length > 0 ? `<div class="set-history">${recs.map(r=>`<span class="set-dot">组${r.set}:${r.w}×${r.r}</span>`).join('')}</div>` : ''}
     </div>
     <div class="training-actions">
       <div id="workoutMore" class="workout-more">
         <button class="btn btn-outline" onclick="skipExercise()">跳过当前动作</button>
-        <button class="btn btn-outline" onclick="setSection('stretch')">跳过剩余训练</button>
+        <button class="btn btn-outline" onclick="finishTraining()">结束并记录已完成组</button>
       </div>
       <button class="training-more-toggle" onclick="toggleWorkoutActions()">更多操作 · 跳过动作</button>
       <button class="btn btn-accent" onclick="completeSet()">完成第 ${s.set} 组</button>
@@ -391,7 +360,7 @@ function renderStretch() {
   const items = todayPlan.stretch;
   if (!items || items.length === 0) {
     return `<div class="card"><div class="text-muted text-sm">今日无专项拉伸，可自行放松。</div></div>
-      <button class="btn btn-accent mt-3" onclick="finishTraining()">完成训练</button>`;
+      <button class="btn btn-accent mt-3" onclick="finishTraining()">结束训练</button>`;
   }
   return `
     <div class="card">
@@ -404,17 +373,7 @@ function renderStretch() {
           </div>`).join('')}
       </div>
     </div>
-    <button class="btn btn-accent mt-3" onclick="finishTraining()">完成训练</button>`;
-}
-
-function renderNutrition() {
-  const n = todayPlan.nutrition;
-  return `
-    <div class="card">
-      <div class="section-title">今日饮食建议</div>
-      <div class="nutrition-card">${escapeHtml(n || 'AI 生成后在此显示今日饮食建议。')}</div>
-    </div>
-    ${isWorkoutDone() ? `<button class="btn btn-accent mt-3" onclick="finishTraining()">完成训练</button>` : ''}`;
+    <button class="btn btn-accent mt-3" onclick="finishTraining()">结束训练</button>`;
 }
 
 function renderTrainingUI() {
@@ -425,7 +384,7 @@ function renderTrainingUI() {
   if (s.section === 'warmup') body = renderWarmup();
   else if (s.section === 'workout') body = renderWorkout();
   else if (s.section === 'stretch') body = renderStretch();
-  else body = renderNutrition();
+  else body = renderWorkout();
   container.innerHTML = `
     <div class="training-header">
       <span class="text-accent font-bold">${escapeHtml(s.day.name)}</span>
@@ -536,48 +495,59 @@ function renderComplete() {
   setTrainingFixedAction(false);
   const s = trainState;
   const container = document.getElementById('trainingContent');
-  let summary = s.day.exercises.map(ex => {
-    const recs = s.records[ex.id] || [];
-    const vol = recs.reduce((sum,r) => sum + r.w*r.r, 0);
-    return vol > 0 ? `<div class="row text-sm"><span>${escapeHtml(ex.name)}</span><span class="text-accent">${vol}kg 总容量</span></div>` : '';
-  }).filter(Boolean).join('');
-  if (!summary) summary = '<div class="text-muted text-sm text-center">无记录</div>';
+  const actualSets=Object.values(s.records||{}).reduce((n,rows)=>n+rows.length,0);
   container.innerHTML = `
     <div class="complete-container">
-      <div class="complete-icon">🏆</div>
-      <div class="complete-title">${s.saved ? escapeHtml(s.day.name)+' 完成！' : '训练结束，等待保存'}</div>
-      <div class="complete-time">总用时 ${formatTime(s.sessionTime)}</div>
-      <div class="card summary-card">${summary}</div>
+      <div class="complete-icon">✓</div>
+      <div class="complete-title">${s.saved ? '训练记录已保存' : '训练结束，等待保存'}</div>
+      <div class="complete-time">${escapeHtml(s.day.name)} · ${actualSets} 组实际记录 · ${formatTime(s.sessionTime)}${s.sessionFeedback?' · '+escapeHtml(s.sessionFeedback):''}</div>
       ${s.saveError ? `<div class="danger-note" style="margin-bottom:14px">${escapeHtml(s.saveError)}</div>` : ''}
       ${s.archiveNote ? `<div class="reason-note" style="margin-bottom:14px">${escapeHtml(s.archiveNote)}</div>` : ''}
-      <button class="btn btn-outline mt-3" onclick="aiReviewCurrentTraining()">AI 训练评价 / 后续建议</button>
-      <div id="aiReview" class="text-sm text-muted text-center" style="margin:10px 0"></div>
-      ${s.saved ? '<button class="btn btn-accent" onclick="resetTraining();renderTrainingPage()">再练一次</button>' : '<button class="btn btn-accent" onclick="finishTraining()">重试保存</button><button class="btn btn-outline mt-3" onclick="exportBackup()">导出含本次训练的备份</button>'}
+      ${s.saved ? '<button class="btn btn-accent" onclick="resetTraining();renderTrainingPage()">再练一次</button>' : '<button class="btn btn-accent" onclick="retryFinishSave()">重试保存</button><button class="btn btn-outline mt-3" onclick="exportBackup()">导出含本次训练的备份</button>'}
       <button class="btn btn-outline mt-3" onclick="navigate('home')">返回首页</button>
     </div>
   `;
+}
+
+function renderFinishPrompt() {
+  setTrainingFixedAction(false);
+  const s=trainState, planned=todayPlan.workout.reduce((n,ex)=>n+ex.sets,0);
+  const actual=Object.values(s.records||{}).reduce((n,rows)=>n+rows.length,0);
+  const partial=!todayPlan.workout.every(ex=>(s.records[ex.id]||[]).length>=ex.sets);
+  document.getElementById('trainingContent').innerHTML=`
+    <div class="training-header"><span class="text-accent font-bold">结束训练</span><span class="text-muted text-sm">${actual}/${planned} 组</span></div>
+    <div class="card"><div class="setup-title">这次感觉怎么样？</div>
+      <div class="opt-grid finish-feeling">${[['轻松','🙂'],['刚刚好','👍'],['偏吃力','😮‍💨']].map(([v,e])=>`<button class="opt-chip ${s.sessionFeedback===v?'sel':''}" onclick="setSessionFeeling('${v}')">${e} ${v}</button>`).join('')}</div>
+      <label class="setup-label mt-3" for="sessionDiscomfort">如果有不适，可以补充一句</label><input id="sessionDiscomfort" class="setup-input" maxlength="240" value="${escapeHtml(s.sessionDiscomfort||'')}" placeholder="选填" oninput="trainState.sessionDiscomfort=this.value;persistTrainingState()">
+      ${partial?`<div class="setup-group"><span class="setup-label">下次怎么接着练？</span><div class="opt-grid finish-progress"><button class="opt-chip ${s.advancePpl===false?'sel':''}" onclick="choosePplAdvance(false)">继续这一天</button><button class="opt-chip ${s.advancePpl===true?'sel':''}" onclick="choosePplAdvance(true)">推进到下一天</button></div></div>`:''}
+      <div id="finishMsg" class="text-center text-muted text-sm"></div><button class="btn btn-accent mt-3" onclick="confirmFinishTraining()">保存训练记录</button><button class="btn btn-outline mt-3" onclick="returnToWorkout()">返回训练</button>
+    </div>`;
+}
+
+function retryFinishSave() {
+  saveSession();
+  renderComplete();
+}
+
+function setSessionFeeling(value) { trainState.sessionFeedback=value;persistTrainingState();renderFinishPrompt(); }
+function choosePplAdvance(value) { trainState.advancePpl=!!value;persistTrainingState();renderFinishPrompt(); }
+function returnToWorkout() { trainState.section='workout';persistTrainingState();renderTrainingPage(); }
+function confirmFinishTraining() {
+  const s=trainState;
+  if(s.saved||!todayPlan){if(s.pendingCompletion)saveSession();renderComplete();return;}
+  if(!s.sessionFeedback){document.getElementById('finishMsg').textContent='选一个最接近的感受就好。';return;}
+  const fullyDone=todayPlan.workout.every(ex=>(s.records[ex.id]||[]).length>=ex.sets);
+  if(!fullyDone&&typeof s.advancePpl!=='boolean'){document.getElementById('finishMsg').textContent='选一下下次继续这一天，还是推进到下一天。';return;}
+  s.sessionDiscomfort=(document.getElementById('sessionDiscomfort')?.value||'').trim();
+  s.advancePpl=fullyDone?true:s.advancePpl;s.complete=true;
+  if(s.timerInterval)clearInterval(s.timerInterval);if(s.restInterval)clearInterval(s.restInterval);
+  persistTrainingState();saveSession();renderComplete();
 }
 
 function adjustWeight(delta) {
   trainState.weight = Math.max(0, validWeight(trainState.weight, 0) + delta);
   persistTrainingState();
   renderWorkoutOnly();
-}
-
-function aiReviewCurrentTraining() {
-  const s = trainState;
-  const el = document.getElementById('aiReview');
-  if (!el) return;
-  if (!getGlobalApiKey()) { el.textContent = '暂未设置 API Key，无法生成评价。'; return; }
-  el.textContent = '正在生成评价...';
-  const summary = s.day.exercises.map(ex => {
-    const recs = s.records[ex.id] || [];
-    return `${ex.name}:${recs.map(r=>`${r.w}kg×${r.r}`).join('、')||'未完成'}`;
-  }).join('\n');
-  const prompt = `你是经验丰富的力量训练教练。请基于本次训练记录做简短评价并给出后续训练建议。用户采用 PPL 分化，本次是【${s.day.name}】，用时 ${formatTime(s.sessionTime)}。训练记录：\n${summary}\n要求：用 3-5 句中文，最多分2点建议，不诊断伤病，不承诺效果。`;
-  aiCall(prompt, true).then(res => {
-    if (res) el.textContent = res.trim(); else el.textContent = 'AI 暂时无响应，请稍后重试。';
-  }).catch(() => { el.textContent = 'AI 暂时不可用，请稍后重试。'; });
 }
 
 function renderWorkoutOnly() {
@@ -681,8 +651,9 @@ function completeSet() {
   const s = trainState;
   const ex = s.day.exercises[s.exIdx];
   s.reps = validReps(s.reps, validReps(ex.reps, 8));
+  if (s.reps < 1) { alert('实际次数至少为 1；未完成的训练可以直接结束并记录已完成组。'); return; }
   if (!s.records[ex.id]) s.records[ex.id] = [];
-  s.records[ex.id].push({set:s.set, w:s.weight, r:s.reps});
+  s.records[ex.id].push({set:s.set, w:s.weight, r:s.reps, confirmedAt:new Date().toISOString()});
   persistTrainingState();
   if (s.set < ex.sets) {
     s.set++;
@@ -695,29 +666,24 @@ function completeSet() {
 }
 
 function finishTraining() {
-  if (trainState.saved) { renderComplete(); return; }
-  trainState.complete = true;
-  if (trainState.timerInterval) clearInterval(trainState.timerInterval);
-  if (trainState.restInterval) clearInterval(trainState.restInterval);
-  saveSession();
-  renderComplete();
+  if(trainState.saved||trainState.pendingCompletion){renderComplete();return;}
+  if(trainState.timerInterval)clearInterval(trainState.timerInterval);if(trainState.restInterval)clearInterval(trainState.restInterval);
+  trainState.section='finish';persistTrainingState();renderFinishPrompt();
 }
 
 function completionData(pending) {
   const history = LS.get('sessions', sessions);
   const latest = Array.isArray(history) ? history : sessions;
-  const nextBody = bodyRecords.slice();
-  const todayDate = formatDate(new Date());
-  if (!nextBody.some(r => r.date === todayDate)) nextBody.push({ date:todayDate, weight:profile.weight, bodyFat:profile.bodyFat });
-  return {
+  const result = {
     sessions:[pending.session, ...latest.filter(item=>item.id !== pending.session.id)],
     today_index:pending.nextIndex,
     cycle_variants:pending.variants,
     training_phase:pending.phase,
-    body_records:nextBody,
     today_plan:null,
     active_training:null
   };
+  if (pending.plan) { result.plan=pending.plan; result.profile=pending.profile; }
+  return result;
 }
 
 function saveSession() {
@@ -727,6 +693,8 @@ function saveSession() {
     const session = {
       id:'session-'+todayPlan.id,
       date: getTodayStr(),
+      startedDate:todayPlan.startedDate||todayPlan.date||getTodayStr(),
+      completedAt:new Date().toISOString(),
       dayName: s.day.name,
       focusArea: todayPlan.focus,
       factors: todayPlan.factors,
@@ -734,20 +702,30 @@ function saveSession() {
       variant: todayPlan.variant,
       catalogVersion:todayPlan.catalogVersion || '',
       duration: s.sessionTime,
+      sessionFeedback:s.sessionFeedback||'',
+      sessionDiscomfort:s.sessionDiscomfort||'',
+      progressionAdvanced:!!s.advancePpl,
       exercises: s.day.exercises.map(ex => {
         const recs = s.records[ex.id] || [];
         const feedback = s.feedback[ex.id] || {};
-        return { exerciseId:ex.exerciseId||'', name:ex.name, nameSnapshot:ex.nameSnapshot||ex.name, catalogVersion:ex.catalogVersion||todayPlan.catalogVersion||'', replacementMuscle:ex.replacementMuscle||'', variantGroup:ex.variantGroup||'', role:ex.role, pattern:ex.pattern, targetSets:ex.sets, targetReps:ex.reps, completed:recs.length>=ex.sets, skipped:!!(s.skipped||{})[ex.id], feedback:feedback.value||'', feedbackNote:feedback.note||'', sets: recs.map(r => ({ w: r.w, r: r.r })) };
-      }).filter(e => e.sets.length > 0 || e.skipped)
+        const skipped=!!(s.skipped||{})[ex.id],completed=recs.length>=ex.sets&&!skipped;
+        return { exerciseId:ex.exerciseId||'',name:ex.name,nameSnapshot:ex.nameSnapshot||ex.name,catalogVersion:ex.catalogVersion||todayPlan.catalogVersion||'',replacementMuscle:ex.replacementMuscle||'',variantGroup:ex.variantGroup||'',role:ex.role,pattern:ex.pattern,targetSets:ex.sets,targetReps:ex.reps,targetWeight:ex.weight,completed,skipped,status:completed?'completed':(skipped?(recs.length?'partial':'skipped'):(recs.length?'partial':'not_started')),feedback:feedback.value||'',feedbackNote:feedback.note||'',sets:recs.map(r=>({w:r.w,r:r.r,confirmedAt:r.confirmedAt||''}))};
+      })
     };
     const key = todayPlan.focusKey || focusKeyFromText(todayPlan.focus);
     const actualIdx = plan.days.findIndex(day => focusKeyFromText(day.focus||day.name) === key);
     s.pendingCompletion = {
       session,
-      nextIndex:actualIdx >= 0 ? (actualIdx+1)%plan.days.length : (todayIndex+1)%plan.days.length,
-      variants:{ ...cycleVariants, [key]:cycleVariants[key] === 'B' ? 'A' : 'B' },
-      phase:{ ...trainingPhase, completedSessions:(trainingPhase.completedSessions||0)+1 }
+      nextIndex:actualIdx >= 0 ? ((actualIdx+(s.advancePpl===false?0:1))%plan.days.length) : (todayIndex+1)%plan.days.length,
+      variants:{...cycleVariants},
+      phase:{ ...trainingPhase, completedSessions:(trainingPhase.completedSessions||0)+(sessionIsComplete(session)?1:0) }
     };
+    if(!isPplPlan()) {
+      const pplDays=cloneData(DEFAULT_PLAN.days),pplIdx=pplDays.findIndex(day=>focusKeyFromText(day.focus||day.name)===key);
+      s.pendingCompletion.plan={name:PLAN_TEMPLATES.ppl.name,cycle:PLAN_TEMPLATES.ppl.cycle,days:pplDays};
+      s.pendingCompletion.profile={...profile,planTemplate:'ppl'};
+      s.pendingCompletion.nextIndex=((pplIdx<0?0:pplIdx)+(s.advancePpl===false?0:1))%pplDays.length;
+    }
   }
   if (LS.blocked) { LS.recover(); ensureUserDataCompatibility(); }
   // Keep a retryable checkpoint before committing history and cycle together.
@@ -759,7 +737,8 @@ function saveSession() {
     return false;
   }
   sessions=changes.sessions; todayIndex=changes.today_index; cycleVariants=changes.cycle_variants;
-  trainingPhase=changes.training_phase; bodyRecords=changes.body_records;
+  trainingPhase=changes.training_phase;
+  if(changes.plan){plan=changes.plan;profile=changes.profile;}
   s.saved = true;
   s.saveError = '';
   s.pendingCompletion = null;
@@ -789,11 +768,13 @@ async function aiCall(prompt, silent=false) {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(()=>controller.abort(),25000);
-    const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-      body: JSON.stringify({ model: 'deepseek-chat', messages: [{ role: 'user', content: prompt }], temperature: 0.4, max_tokens: 4000 }), signal:controller.signal
-    });
-    clearTimeout(timeout);
+    let res;
+    try {
+      res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+        body: JSON.stringify({ model: 'deepseek-chat', messages: [{ role: 'user', content: prompt }], temperature: 0.4, max_tokens: 4000 }), signal:controller.signal
+      });
+    } finally { clearTimeout(timeout); }
     if (!res.ok) { const err = await res.json().catch(() => ({})); if (!silent) alert('AI 调用失败: ' + (err.error?.message || res.status)); return null; }
     const data = await res.json();
     return data.choices[0].message.content;

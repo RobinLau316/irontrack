@@ -11,12 +11,7 @@ function initUserData() {
   const loaded = ensureUserDataCompatibility();
   todayPlan = loaded.today_plan;
   if (todayPlan?.status === 'active') restoreDynamicTraining(loaded.active_training);
-
-  if (bodyRecords.length === 0 && profile.weight) {
-    const today = new Date();
-    bodyRecords = [{ date: formatDate(today), weight: profile.weight, bodyFat: profile.bodyFat }];
-    LS.set('body_records', bodyRecords);
-  }
+  ensurePplPlan();
 
   applyPrevRecords();
   if (exerciseCatalog) migrateExerciseReferences();
@@ -113,14 +108,21 @@ function getWeekStart() {
   return d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0')+'-'+d.getDate().toString().padStart(2,'0');
 }
 
+function sessionIsComplete(session) {
+  const exercises=session?.exercises||[];
+  if(!exercises.length||!exercises.some(ex=>(ex.sets||[]).length))return false;
+  if(exercises.some(ex=>ex.status!=null||ex.completed!=null))return exercises.every(ex=>ex.status==='completed'||ex.completed===true);
+  return true; // 旧记录没有完成状态字段，保留其既有统计口径。
+}
+
 function getWeekSessions() {
   const ws = getWeekStart();
-  return sessions.filter(s => s.date >= ws);
+  return sessions.filter(s => s.date >= ws && sessionIsComplete(s));
 }
 
 function getStreak() {
   // 连续天数：从最近一次训练日期往前逐日回推，断档即停。
-  const dates = [...new Set(sessions.map(s => s.date))].sort().reverse();
+  const dates = [...new Set(sessions.filter(sessionIsComplete).map(s => s.date))].sort().reverse();
   if (!dates.length) return 0;
   let streak = 1;
   for (let i = 1; i < dates.length; i++) {
