@@ -224,7 +224,7 @@ const EXERCISE_CATALOG_URL = './public/data/exercise-catalog.v1.json';
 const EXERCISE_INSTRUCTIONS_URL = './public/data/exercise-instructions-zh.v1.json';
 const USER_DATA_KEYS = ['profile','plan','sessions','sessions_archive','body_records','measurements','today_index','today_plan','active_training','cycle_variants','core_locks','training_phase','setup_draft','onboarding_draft','exercise_preferences','exercise_catalog_version'];
 const DEFAULT_CYCLE_VARIANTS = { push:'A', pull:'A', legs:'A' };
-const DEFAULT_SETUP_STATE = { focus:'', state:'状态一般', time:'45分钟', env:'健身房', discomfort:[], discomfortText:'无' , avoid:'' };
+const DEFAULT_SETUP_STATE = { focus:'', focusKey:'', trainingFocus:'', state:'状态一般', time:'45分钟', env:'健身房', discomfort:[], discomfortText:'无' , avoid:'' };
 const DEFAULT_ONBOARDING_DRAFT = { step:0, direction:'', frequency:'', experience:'', limitations:'' };
 const DEFAULT_EXERCISE_PREFERENCES = { version:1, catalogVersion:'', paused:{}, lightChoices:{} };
 let exerciseCatalog = null;
@@ -620,6 +620,9 @@ function normalizeUserData(source, strict=false) {
     if(!isPlainRecord(value))throw new Error('设置草稿异常');
     const out={...DEFAULT_SETUP_STATE,...value};
     ['focus','state','time','env','avoid'].forEach(k=>{out[k]=dataText(out[k],k);});
+    out.focusKey=out.focusKey===''?'':dataText(out.focusKey,'训练日');
+    if(out.focusKey&&!['push','pull','legs'].includes(out.focusKey))throw new Error('训练日设置异常');
+    out.trainingFocus=dataText(out.trainingFocus,'训练重点');
     out.discomfortText=dataText(out.discomfortText,'不适说明','无');
     if(!Array.isArray(out.discomfort)||out.discomfort.some(v=>typeof v!=='string'))throw new Error('不适设置异常');
     return out;

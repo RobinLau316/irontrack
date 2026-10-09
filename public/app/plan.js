@@ -137,14 +137,18 @@ function setTrainingFixedAction(enabled) {
   if (!enabled) document.body.classList.remove('keyboard-active');
 }
 
-function renderTrainingSetup() {
+function renderTrainingSetup(notice='') {
   if (!currentUser) return;
   setTrainingFixedAction(false);
   const suggested = suggestTodayFocus();
   const savedDraft = LS.get('setup_draft', null);
   setupSel = isPlainRecord(savedDraft) ? Object.assign(cloneData(DEFAULT_SETUP_STATE), savedDraft) : cloneData(DEFAULT_SETUP_STATE);
+  setupSel.focusKey=['push','pull','legs'].includes(setupSel.focusKey)?setupSel.focusKey:(setupSel.focus?focusKeyFromText(setupSel.focus):suggested.key);
+  setupSel.focus=focusLabelFromKey(setupSel.focusKey);
+  setupSel.trainingFocus=String(setupSel.trainingFocus||'');
   setupSel.discomfort = Array.isArray(setupSel.discomfort) ? setupSel.discomfort : [];
   setupSel.discomfortText = typeof setupSel.discomfortText === 'string' ? setupSel.discomfortText : '无';
+  const focusChips = [['push','推日'],['pull','拉日'],['legs','腿日']].map(([key,label])=>`<button type="button" class="opt-chip ${setupSel.focusKey===key?'sel':''}" aria-pressed="${setupSel.focusKey===key}" onclick="pickFocus('${key}')">${label}</button>`).join('');
   const stateChips = STATE_OPTIONS.map(o => `<div class="opt-chip ${setupSel.state===o.k?'sel':''}" onclick="setState('${o.k}')"><span class="opt-emoji">${o.e}</span><span class="opt-text">${o.k}</span></div>`).join('');
   const timeChips = TIME_OPTIONS.map(o => `<div class="opt-chip ${setupSel.time===o.k?'sel':''}" onclick="setTime('${o.k}')"><span class="opt-emoji">${o.e}</span><span class="opt-text">${o.k}</span></div>`).join('');
   const catalogStatusHtml = exerciseCatalogStatus === 'ready'
@@ -160,8 +164,11 @@ function renderTrainingSetup() {
     </div>
     <div class="card">
       <div class="setup-title">开始今天的训练</div>
-      <div class="setup-subtitle">${escapeHtml(suggested.day.name)} · 延续「${escapeHtml(profile.trainingDirection||profile.goal||'持续进步')}」训练方向</div>
+      <div class="setup-subtitle">按训练循环建议 ${escapeHtml(suggested.day.name)}；你可以直接更改。延续「${escapeHtml(profile.trainingDirection||profile.goal||'持续进步')}」训练方向</div>
       ${catalogStatusHtml}
+      ${notice?`<div class="resume-banner">${escapeHtml(notice)}</div>`:''}
+      <div class="setup-group"><span class="setup-label">今天练哪一天？</span><div class="opt-grid" id="setupFocus">${focusChips}</div></div>
+      <div class="setup-group"><label class="setup-label" for="trainingFocus">今天训练重点（选填）</label><input id="trainingFocus" class="setup-input" maxlength="120" value="${escapeHtml(setupSel.trainingFocus)}" placeholder="例如：以胸部为重点" oninput="setTrainingFocusNote(this.value)"></div>
       <div class="setup-group">
         <span class="setup-label">今天能练多久？</span>
         <div class="opt-grid" id="setupTime">${timeChips}</div>
@@ -182,7 +189,12 @@ function renderTrainingSetup() {
 }
 
 function saveSetupDraft() { LS.set('setup_draft', setupSel); }
-function pickFocus(f) { setupSel.focus = f; saveSetupDraft(); }
+function pickFocus(key) {
+  if(!['push','pull','legs'].includes(key))return;
+  setupSel.focusKey=key;setupSel.focus=focusLabelFromKey(key);saveSetupDraft();
+  document.querySelectorAll('#setupFocus .opt-chip').forEach((chip,index)=>{const selected=['push','pull','legs'][index]===key;chip.classList.toggle('sel',selected);chip.setAttribute('aria-pressed',String(selected));});
+}
+function setTrainingFocusNote(value) { setupSel.trainingFocus=String(value||'').slice(0,120);saveSetupDraft(); }
 function setState(k) { setupSel.state = k; saveSetupDraft(); markSel('setupState'); }
 function setTime(k) { setupSel.time = k; saveSetupDraft(); markSel('setupTime'); }
 function setEnv(k) { setupSel.env = k; saveSetupDraft(); }
@@ -220,7 +232,8 @@ function suggestTodayFocus() {
 async function confirmSetup() {
   if (!setupSel.state) { document.getElementById('setupMsg').textContent = '请选择身体状态'; return; }
   if (!setupSel.time) { document.getElementById('setupMsg').textContent = '请选择可用时间'; return; }
-  setupSel.focus=suggestTodayFocus().focus; setupSel.env='健身房'; setupSel.avoid='';
+  if(!['push','pull','legs'].includes(setupSel.focusKey))setupSel.focusKey=suggestTodayFocus().key;
+  setupSel.focus=focusLabelFromKey(setupSel.focusKey); setupSel.env='健身房'; setupSel.avoid='';
   setupSel.discomfortText=(document.getElementById('setupPain')?.value||setupSel.discomfortText||'无').trim()||'无';
   setupSel.discomfort=inferDiscomfortRegions(setupSel.discomfortText);
   saveSetupDraft();
@@ -279,10 +292,8 @@ function isExerciseBlocked(ex) {
 function matchesEnvironment(ex) {
   if (setupSel.env === '家用徒手') return ex.equipment.includes('徒手');
   if (setupSel.env === '家用哑铃') return ex.equipment.some(e => e === '哑铃' || e === '徒手');
-  const available = new Set((profile.equipment || []).concat(['徒手','杠铃','哑铃']));
-  if (available.has('龙门架')) available.add('绳索机');
-  if (available.has('绳索机')) available.add('龙门架');
-  return ex.equipment.some(e => available.has(e));
+  // 默认健身房按器械齐全处理；旧档案的设备清单不再意外排除馆内动作。
+  return true;
 }
 
 function getLastExerciseRecord(reference) {
@@ -424,7 +435,7 @@ function createLegacyLocalPlan() {
   return {
     id:'plan-'+Date.now(), date:getTodayStr(), status:'preview', source:'local', variant,
     focus:lib.focus, focusKey:key,
-    factors:{ focus:setupSel.focus, state:setupSel.state, time:setupSel.time, env:setupSel.env, discomfort:setupSel.discomfort.slice(), avoid:setupSel.avoid },
+    factors:{ focus:setupSel.focus, focusKey:key, trainingFocus:setupSel.trainingFocus||'', state:setupSel.state, time:setupSel.time, env:setupSel.env, discomfort:setupSel.discomfort.slice(), discomfortText:setupSel.discomfortText, avoid:setupSel.avoid },
     warmup:[
       {name:'低强度有氧',note:'快走或单车 3 分钟，逐步提高体温'},
       {name:'关节动态活动',note:'围绕今天训练部位活动 2～3 分钟'},
@@ -545,7 +556,7 @@ function createCatalogPlan() {
     id:'plan-'+Date.now(), date:getTodayStr(), status:'preview', source:'local', variant,
     catalogVersion:exerciseCatalog.version,
     focus:lib.focus, focusKey:key,
-    factors:{ focus:setupSel.focus, state:setupSel.state, time:setupSel.time, env:setupSel.env, discomfort:setupSel.discomfort.slice(), avoid:setupSel.avoid },
+    factors:{ focus:setupSel.focus, focusKey:key, trainingFocus:setupSel.trainingFocus||'', state:setupSel.state, time:setupSel.time, env:setupSel.env, discomfort:setupSel.discomfort.slice(), discomfortText:setupSel.discomfortText, avoid:setupSel.avoid },
     warmup:[
       {name:'低强度有氧',note:'快走或单车 3 分钟，逐步提高体温'},
       {name:'关节动态活动',note:'围绕今天训练部位活动 2～3 分钟'},
@@ -570,8 +581,8 @@ function createLocalPlan() {
 
 function recentTrainingContext(focusKey) {
   return sessions.filter(s=>focusKeyFromText(s.focusArea||s.dayName)===focusKey).slice(0,4).map(s=>({
-    date:s.date, duration:s.duration, feedback:s.sessionFeedback||'',
-    exercises:(s.exercises||[]).map(ex=>({id:ex.exerciseId||'',name:ex.name,targetSets:ex.targetSets??null,targetReps:ex.targetReps??null,targetWeight:ex.targetWeight??null,status:ex.status||'',sets:(ex.sets||[]).map(set=>({w:set.w,r:set.r})) ,feedback:ex.feedback||''}))
+    date:s.date, duration:s.duration, feedback:s.sessionFeedback||'',discomfort:s.sessionDiscomfort||'',
+    exercises:(s.exercises||[]).map(ex=>({id:ex.exerciseId||'',name:ex.name,role:ex.role||'',targetSets:ex.targetSets??null,targetReps:ex.targetReps??null,targetWeight:ex.targetWeight??null,status:ex.status||'',sets:(ex.sets||[]).map(set=>({w:set.w,r:set.r})) ,feedback:ex.feedback||''}))
   }));
 }
 
@@ -583,49 +594,98 @@ function safeParseAIJson(text) {
 }
 
 function allowedPlanChoices(base) {
-  const all=getCatalogCandidates(base.focusKey||'push');
-  const engine=getExerciseEngine(); if(!engine)return [];
-  const used=new Set();
-  return base.workout.map((slot,index)=>{
-    const choices=all.filter(ex=>ex.replacementMuscle===slot.replacementMuscle&&ex.pattern===slot.pattern);
-    const ranked=engine.scoreCandidates(choices,{seed:`${base.id}:${index}`,usedIds:[...used],recentExerciseIds:catalogHistoryContext(base.focusKey).recentExerciseIds});
-    const chosen=ranked.slice(0,8).map(x=>x.exercise);
-    const current=all.find(x=>x.exerciseId===slot.exerciseId);
-    if(current&&!chosen.some(x=>x.exerciseId===current.exerciseId))chosen.unshift(current);
-    if(slot.locked)return [current||slot];
-    return chosen.slice(0,9);
-  });
+  return getCatalogCandidates(base.focusKey||'push');
+}
+
+// AI plan count remains a real choice; two is the structural minimum (one primary plus one accessory).
+function minimumDynamicExerciseCount() { return 2; }
+function dynamicSetBudget(time,state) {
+  const minutes=Number(String(time||'45分钟').match(/\d+/)?.[0])||45;
+  const byTime=Math.min(32,Math.floor(minutes*.45));
+  const byRecovery=state==='比较疲劳'?12:state==='有些疲惫'?18:32;
+  return Math.min(byTime,byRecovery);
+}
+
+function recentReferenceWeight(choice, exactRecord) {
+  if(exactRecord)return Math.max(...exactRecord.exercise.sets.map(set=>Number(set.w)||0));
+  let highest=0;
+  const key=(choice.pplTags||[]).find(item=>['push','pull','legs'].includes(item));
+  for(const session of sessions.slice(0,8)){
+    if(focusKeyFromText(session.focusArea||session.dayName)!==key)continue;
+    for(const exercise of session.exercises||[]){
+      if(exercise.pattern!==choice.pattern||!Array.isArray(exercise.sets)||!['completed','partial'].includes(exercise.status))continue;
+      exercise.sets.forEach(set=>{highest=Math.max(highest,Number(set.w)||0);});
+    }
+  }
+  return highest||Number(choice.weight)||0;
+}
+
+function dynamicPlanPromptPayload(base, requestText, candidates) {
+  const pool=candidates.map(ex=>({
+    exerciseId:ex.exerciseId,name:ex.name,primaryMuscles:ex.primaryMuscles||[],secondaryMuscles:ex.secondaryMuscles||[],
+    replacementMuscle:ex.replacementMuscle,pattern:ex.pattern,movementPatterns:ex.movementPatterns||[],
+    equipment:ex.equipment||[],roleEligibility:ex.roleEligibility||[],sets:ex.sets,reps:ex.reps,weight:ex.weight,rest:ex.rest
+  }));
+  return {
+    profile:{direction:profile.trainingDirection||profile.goal,daysPerWeek:profile.trainingDays,experience:profile.experienceSummary||profile.experience,limitations:profile.limitations,notes:(profile.trainingNotes||[]).slice(-10)},
+    today:{day:base.focus,focusKey:base.focusKey,trainingFocus:setupSel.trainingFocus||'',minutes:setupSel.time,fatigue:setupSel.state,discomfort:setupSel.discomfortText},
+    recent:recentTrainingContext(base.focusKey),candidateExercises:pool,currentPlan:base.workout.map(ex=>({exerciseId:ex.exerciseId,name:ex.name,role:ex.role,sets:ex.sets,reps:ex.reps,weight:ex.weight,rest:ex.rest})),userRequest:requestText
+  };
+}
+
+function validateDynamicAIPlan(items, base, candidates) {
+  if(!Array.isArray(items))throw new Error('AI 未返回动作列表');
+  const cap=targetExerciseCount(setupSel.time),min=minimumDynamicExerciseCount(setupSel.time);
+  if(items.length<min||items.length>cap||items.length>8)throw new Error(`动作数量应为 ${min} 至 ${cap} 个`);
+  const byId=new Map(candidates.map(ex=>[ex.exerciseId,ex]));
+  const seen=new Set(),workout=[];
+  for(const item of items){
+    if(!item||typeof item!=='object')throw new Error('AI 返回的动作格式错误');
+    const choice=byId.get(String(item.exerciseId||''));
+    if(!choice||seen.has(choice.exerciseId))throw new Error('AI 使用了不在安全候选库内的动作或重复动作');
+    if(isExerciseBlocked(choice)||!matchesEnvironment(choice))throw new Error('AI 计划包含当前不适合的动作');
+    seen.add(choice.exerciseId);
+    const role=item.role==='primary'?'核心':item.role==='auxiliary'?'辅助':'';
+    const sets=Number(item.sets),reps=Number(item.reps),weight=Number(item.weight),rest=Number(item.rest);
+    if(!role||!Number.isInteger(sets)||sets<1||sets>5||!Number.isInteger(reps)||reps<4||reps>20||!Number.isFinite(weight)||weight<0||weight>1000||!Number.isInteger(rest)||rest<30||rest>240)throw new Error('AI 返回的训练数字超出范围');
+    if(choice.roleEligibility?.length&&!choice.roleEligibility.includes(role))throw new Error('AI 为动作选择了不适合的主辅角色');
+    const previous=getLastExerciseRecord(choice);
+    const referenceWeight=recentReferenceWeight(choice,previous);
+    if(referenceWeight>0&&weight>referenceWeight*1.15+2.5)throw new Error('AI 建议重量高于近期实际记录的安全校验范围');
+    if(referenceWeight===0&&weight!==0)throw new Error('该动作没有可核验重量记录，请先用空重量预览并由用户确认');
+    workout.push({...choice,id:'dyn-'+Math.random().toString(36).slice(2,9),role,locked:false,sets,reps,weight,rest,
+      reason:String(item.reason||'根据今天的训练重点安排').slice(0,120),purpose:String(item.purpose||'').slice(0,100),
+      isNew:isNewCatalogExercise(choice),previous:previous?{weight:referenceWeight,reps:previous.exercise.sets.at(-1)?.r,feedback:previous.exercise.feedback||''}:null});
+  }
+  if(!workout.some(ex=>ex.role==='核心')||!workout.some(ex=>ex.role==='辅助'))throw new Error('计划需要同时包含主要训练和辅助训练');
+  const totalSets=workout.reduce((sum,ex)=>sum+ex.sets,0);
+  if(totalSets>dynamicSetBudget(setupSel.time,setupSel.state))throw new Error('AI 安排的总组数超出今天时间与恢复状态的范围');
+  return workout;
 }
 
 async function adaptPlanWithAI(base, requestText='') {
-  if(!profile.aiPlanEnabled||!getGlobalApiKey())return {plan:base,usedAI:false};
-  if(!exerciseCatalog||!getExerciseEngine())return {plan:base,usedAI:false,error:'动作库暂不可用，已用本地规则生成计划'};
+  if(!profile.aiPlanEnabled)return {plan:base,usedAI:false};
+  if(!getGlobalApiKey())return {plan:{...base,notice:'计划 AI 已开启，但尚未设置 API Key；当前为本地备用计划。'},usedAI:false,error:'尚未设置 AI API Key'};
+  if(!exerciseCatalog||!getExerciseEngine())return {plan:{...base,notice:'动作库暂不可用，AI 个性化计划未生成；当前为本地备用计划。'},usedAI:false,error:'动作库暂不可用'};
+  setupSel={...setupSel,...(base.factors||{}),focus:base.focus,focusKey:base.focusKey,env:'健身房'};
+  setupSel.discomfort=Array.isArray(base.factors?.discomfort)?base.factors.discomfort:[];
+  setupSel.discomfortText=base.factors?.discomfortText||'无';
+  setupSel.trainingFocus=base.factors?.trainingFocus||'';
+  setupSel.time=base.factors?.time||setupSel.time;
+  setupSel.state=base.factors?.state||setupSel.state;
   const choices=allowedPlanChoices(base);
-  const skeleton=base.workout.map((ex,index)=>({slot:index,exerciseId:ex.exerciseId,replacementMuscle:ex.replacementMuscle,pattern:ex.pattern,role:ex.role,locked:!!ex.locked,sets:ex.sets,reps:ex.reps,weight:ex.weight,rest:ex.rest,choices:choices[index].map(item=>({exerciseId:item.exerciseId,name:item.name,replacementMuscle:item.replacementMuscle,pattern:item.pattern,sets:item.sets,reps:item.reps,weight:item.weight,rest:item.rest}))}));
-  const payload={profile:{direction:profile.trainingDirection||profile.goal,daysPerWeek:profile.trainingDays,experience:profile.experienceSummary||profile.experience,limitations:profile.limitations,notes:(profile.trainingNotes||[]).slice(-10)},today:{day:base.focus,minutes:setupSel.time,fatigue:setupSel.state,discomfort:setupSel.discomfortText},recent:recentTrainingContext(base.focusKey),plan:skeleton,userRequest:requestText};
-  const prompt=`你是 IronTrack 的力量训练计划适配助手。请用中文处理用户本次训练。只从每个动作位 choices 中选 exerciseId；锁定位原样保留；不改变动作位数量；不超过8个动作；只输出JSON：{"exercises":[{"exerciseId":"...","sets":3,"reps":8,"weight":20,"rest":90,"reason":"简短原因"}],"summary":"一句话说明调整"}。不得诊断或治疗疼痛；不适要保守避让。保持数周训练方向和主动作连续，使用实际完成组、重量、次数、反馈判断，忽略跳过和未完成组。疲劳或时间紧时优先减少辅助动作组数/保留更少的辅助位，不能增加训练总量。计划目标数字只能在本地目标附近小幅调整，不得超过每位计划重量±10%、组数1到5、次数4到20、休息30到180秒。用户表达修改意图时只改相关动作或数值；不清楚时summary简短追问，不要臆造。用户资料和本次计划如下：\n${JSON.stringify(payload)}`;
+  if(choices.length<minimumDynamicExerciseCount(setupSel.time))return {plan:{...base,notice:'安全候选动作不足，AI 个性化计划未生成；当前为本地备用计划。'},usedAI:false,error:'安全候选动作不足'};
+  const payload=dynamicPlanPromptPayload(base,requestText,choices);
+  const setBudget=dynamicSetBudget(setupSel.time,setupSel.state);
+  const prompt=`你是 IronTrack 的力量训练计划助手。根据个人训练方向、近期已完成的真实组记录、反馈、今天选定的训练日、可用时间、疲劳、不适和选填训练重点，生成完整且连贯的本次计划。动作库是候选参考，不是固定组合；你要动态决定主要动作与辅助动作、顺序、训练侧重、组数、次数和休息，不能随机换动作，也不能复制固定模板。推日不是默认只练胸；只有用户写明胸部重点时才明显增加胸部主要训练的比重，辅助动作应服务长期安排。保持主要动作的适度连续，只有表现、恢复、疼痛或用户要求支持变化时才调整。跳过或未完成动作不算实际表现。疼痛不做诊断；避开与当前不适冲突的动作，存在风险时安排保守动作或少练，并提示停止引发疼痛的动作。每个动作必须来自 candidateExercises 且 exerciseId 唯一；role 必须符合该动作的 roleEligibility。返回 ${minimumDynamicExerciseCount(setupSel.time)} 至 ${targetExerciseCount(setupSel.time)} 个动作，全计划最多8个，必须同时有主要动作和辅助动作。组数1到5，次数4到20，休息30到240秒；有实际重量记录时，建议重量不得高于该动作或同类动作近期最高值15%以上；没有可核验重量时必须填0，留给用户在预览确认。全计划总组数不得超过${setBudget}组，该上限按可用时间和疲劳程度计算。用 purpose 简短说明每个动作承担的作用，summary 用一句通俗话概括主要与辅助训练安排。请求修改时保留用户没要求改变的内容，确实不清楚才简短追问。不得声称 AI 已生成成功，除非返回完整有效计划。只输出 JSON：{"exercises":[{"exerciseId":"...","role":"primary|auxiliary","sets":3,"reps":8,"weight":20,"rest":90,"reason":"简短安排理由","purpose":"这项训练的作用"}],"summary":"一句话说明本次安排"}。数据如下：\n${JSON.stringify(payload)}`;
   try {
     const raw=await aiCall(prompt,true); if(!raw)throw new Error('AI 暂不可用');
     const result=safeParseAIJson(raw), items=result.exercises;
-    if(!Array.isArray(items)||items.length!==base.workout.length)throw new Error('计划动作数量不符');
-    const engine=getExerciseEngine(),allowed=choices.flat();
-    const verified=engine.validateCandidateSequence(items,skeleton,allowed,base.focusKey);
-    if(!verified.valid)throw new Error(verified.error||'计划结构校验未通过');
-    const nextWorkout=items.map((item,index)=>{
-      const old=base.workout[index],choice=allowed.find(ex=>ex.exerciseId===item.exerciseId);
-      const sets=Number(item.sets),reps=Number(item.reps),weight=Number(item.weight),rest=Number(item.rest);
-      if(!Number.isInteger(sets)||sets<1||sets>5||!Number.isInteger(reps)||reps<4||reps>20||!Number.isFinite(weight)||weight<0||weight>1000||!Number.isInteger(rest)||rest<30||rest>180)throw new Error('AI 返回的训练数字超出范围');
-      const maxRepChange=Math.max(2,Math.ceil(old.reps*.25));
-      if(sets>old.sets||Math.abs(reps-old.reps)>maxRepChange||Math.abs(rest-old.rest)>60)throw new Error('AI 返回的训练调整幅度过大');
-      const referenceWeight=old.weight||choice.weight;
-      if(referenceWeight>0&&Math.abs(weight-referenceWeight)/referenceWeight>.10)throw new Error('AI 返回的重量变化过大');
-      return {...old,...choice,id:old.id,role:old.role,locked:old.locked,sets,reps,weight,rest,reason:String(item.reason||old.reason).slice(0,120),previous:old.previous};
-    });
-    const balance=engine.validatePlanBalance(nextWorkout,base.focusKey); if(!balance.valid)throw new Error('计划结构不完整');
+    const nextWorkout=validateDynamicAIPlan(items,base,choices);
     return {plan:{...base,workout:nextWorkout,source:'ai-validated',notice:String(result.summary||'已结合训练方向、近期实际记录和今天状态调整。').slice(0,180)},usedAI:true};
   } catch(e) {
-    console.warn('AI 计划适配未通过，保留本地计划:',e);
-    return {plan:{...base,notice:'AI 暂不可用或建议未通过安全检查，已保留本地计划。'},usedAI:false,error:e.message};
+    console.warn('AI 计划生成未通过，保留本地备用计划:',e);
+    return {plan:{...base,notice:`AI 个性化计划未生成（${String(e.message||'调用失败').slice(0,80)}）。当前显示本地备用计划，可重试 AI。`,aiFailure:String(e.message||'调用失败').slice(0,160)},usedAI:false,error:e.message};
   }
 }
 
@@ -638,7 +698,9 @@ async function generateTodayPlan() {
     ensureUserDataCompatibility();
     generated = createLocalPlan();
   }
-  generated= (await adaptPlanWithAI(generated)).plan;
+  const adapted=await adaptPlanWithAI(generated);
+  generated=adapted.plan;
+  if(adapted.error&&!generated.aiFailure){generated.aiFailure=adapted.error;if(!generated.notice)generated.notice=`AI 个性化计划未生成（${adapted.error}）；当前显示本地备用计划，可重试 AI。`;}
   generated.aiUsed=generated.source==='ai-validated';
   todayPlan = generated;
   if(!LS.transaction({today_plan:todayPlan,active_training:null})) { todayPlan=null;dataRecoveryNotice='计划保存失败，尚未开始训练。请重试或先导出备份。';return null; }

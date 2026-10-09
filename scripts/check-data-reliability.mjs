@@ -133,6 +133,26 @@ await test('PPL短时计划最多6个、长时最多8个，并保留旧历史',(
   assert.equal(h.run('plan.days.length'),3);assert.equal(h.run('todayIndex'),0);assert.equal(h.run("sessions[0].id"),'legacy-history');
   for(const [time,count] of [['30分钟',6],['45分钟',8],['60分钟',8],['90分钟',8]]){h.run(`setupSel={focus:'胸',state:'状态一般',time:'${time}',env:'健身房',discomfort:[],discomfortText:'无',avoid:''}`);assert.equal(h.run('createLocalPlan().workout.length'),count,time);}
 });
+await test('已有用户可切换推拉腿；预览取消不推进循环，确认后按所选日衔接',()=>{
+  const h=harness();h.run("todayIndex=0;sessions=[{id:'kept-history',date:'2020-01-01',exercises:[]}];LS.set('sessions',sessions);renderTrainingSetup()");
+  assert.match(h.elements.get('trainingContent').innerHTML,/推日/);assert.match(h.elements.get('trainingContent').innerHTML,/拉日/);assert.match(h.elements.get('trainingContent').innerHTML,/腿日/);
+  h.run("pickFocus('pull');setupSel.trainingFocus='以背部为重点';saveSetupDraft();todayPlan=createLocalPlan();LS.set('today_plan',todayPlan)");
+  assert.equal(h.run('todayPlan.focusKey'),'pull');assert.equal(h.run('todayIndex'),0);
+  h.run('discardTodayPlan()');assert.equal(h.run('todayIndex'),0);assert.equal(h.run("sessions[0].id"),'kept-history');assert.equal(h.run('setupSel.focusKey'),'pull');
+  h.run("todayPlan=createLocalPlan();todayPlan.status='active';LS.set('today_plan',todayPlan);initDynamicTraining();trainState.records=Object.fromEntries(trainState.day.exercises.map(ex=>[ex.id,Array.from({length:ex.sets},(_,i)=>({set:i+1,w:0,r:ex.reps}))]));trainState.sessionFeedback='刚刚好';confirmFinishTraining()");
+  assert.equal(h.run("focusKeyFromText(sessions[0].focusArea)"),'pull');assert.equal(h.run('todayIndex'),2,'确认拉日后下一日应为腿日');assert.equal(h.run("sessions.some(s=>s.id==='kept-history')"),true);
+});
+await test('训练中切换训练日先保存已确认组，失败或返回不会静默丢失',()=>{
+  const h=harness();h.start();h.run('requestFocusChange()');
+  assert.equal(h.run('trainState.changeFocusAfterSaving'),true);assert.equal(h.run('todayPlan.status'),'active');
+  h.run('returnToWorkout()');assert.equal(h.run('trainState.changeFocusAfterSaving'),false);assert.equal(h.run('trainState.records[Object.keys(trainState.records)[0]].length'),1);
+  h.run('requestFocusChange()');
+  h.run("setSessionFeeling('刚刚好');choosePplAdvance(true)");h.c.fail=k=>k.endsWith('_today_index');h.run('confirmFinishTraining()');
+  assert.ok(h.run('todayPlan&&trainState.pendingCompletion&&!trainState.saved'),'保存失败时仍须保留活动训练和切换意图');
+  h.c.fail=null;h.run('retryFinishSave()');
+  assert.equal(h.run('sessions.length'),1);assert.equal(h.run('sessions[0].exercises[0].sets[0].w'),82.5);assert.equal(h.run('todayPlan'),null);assert.equal(h.run('todayIndex'),1);
+  h.run("pickFocus('legs');todayPlan=createLocalPlan()");assert.equal(h.run('todayPlan.focusKey'),'legs');assert.equal(h.run('todayIndex'),1);
+});
 await test('结束部分训练需选推进方式，计划值与实际值分开保存',()=>{
   const h=harness();h.start();const targetWeight=h.run('todayPlan.workout[0].weight');h.run("trainState.advancePpl=false;confirmFinishTraining()");
   const saved=h.json('sessions[0]');assert.equal(saved.progressionAdvanced,false);assert.equal(saved.exercises[0].targetWeight,targetWeight);assert.equal(saved.exercises[0].sets[0].w,82.5);assert.equal(saved.exercises[0].status,'partial');assert.ok(saved.exercises.slice(1).every(ex=>ex.status==='not_started'&&!ex.sets.length));assert.equal(h.run('todayIndex'),0);
@@ -144,13 +164,18 @@ await test('完整训练只按已确认组计数，且不伪造体重记录',()=
   assert.ok(h.run('sessions[0].exercises.every(ex=>ex.completed&&ex.status===\'completed\')'));assert.equal(h.run('sessions[0].exercises.reduce((n,ex)=>n+ex.sets.length,0)'),h.run('sessions[0].exercises.reduce((n,ex)=>n+ex.targetSets,0)'));assert.equal(h.run('bodyRecords.length'),0);
   assert.equal(h.run('getWeekSessions().length'),1);assert.equal(h.run('trainingPhase.completedSessions'),1);
 });
-await test('可选 AI 只接收脱敏上下文，合规建议应用，异常建议回退',async()=>{
+await test('可选 AI 从全局安全候选动态构建重点计划，并校验记录、负荷和失败回退',async()=>{
   const h=harness(),catalog=JSON.parse(fs.readFileSync(new URL('public/data/exercise-catalog.v1.json',root),'utf8'));
-  h.run(`exerciseCatalog=${JSON.stringify(catalog)};profile.aiPlanEnabled=true;profile.trainingDirection='规律训练';setupSel={focus:'胸',state:'状态一般',time:'30分钟',env:'健身房',discomfort:[],discomfortText:'无',avoid:''};todayPlan=createCatalogPlan();setGlobalApiKey('synthetic-test-key')`);
-  const target=h.json('todayPlan.workout.map(ex=>({exerciseId:ex.exerciseId,sets:ex.sets,reps:ex.reps,weight:ex.weight,rest:ex.rest,reason:"保持"}))');
-  let sent='';h.c.fetch=async(url,options)=>{sent=options.body;return {ok:true,json:async()=>({choices:[{message:{content:JSON.stringify({exercises:target,summary:'保持训练方向'})}}]})};};
-  const adapted=await h.run('adaptPlanWithAI(todayPlan)');assert.equal(adapted.usedAI,true,adapted.error);assert.equal(adapted.plan.workout.length,6);assert.ok(!sent.includes('流程用户'));
+  h.run(`exerciseCatalog=${JSON.stringify(catalog)};profile.aiPlanEnabled=true;profile.trainingDirection='规律训练';setupSel={focus:'胸',focusKey:'push',trainingFocus:'以胸部为重点',state:'状态一般',time:'30分钟',env:'健身房',discomfort:[],discomfortText:'无',avoid:''};todayPlan=createCatalogPlan();setGlobalApiKey('synthetic-test-key')`);
+  const choices=h.json("getCatalogCandidates('push').filter(ex=>ex.primaryMuscles.some(m=>m.includes('胸'))).slice(0,3).concat(getCatalogCandidates('push').filter(ex=>!ex.primaryMuscles.some(m=>m.includes('胸'))).slice(0,1)).map(ex=>({exerciseId:ex.exerciseId,weight:ex.weight,pattern:ex.pattern,name:ex.name}))");
+  assert.equal(choices.length,4,'安全候选中应有重点肌群和辅助动作');
+  h.run(`sessions=[{id:'actual-chest',date:'2026-10-08',focusArea:'推',dayName:'推训练日',sessionFeedback:'刚刚好',exercises:[{exerciseId:'${choices[0].exerciseId}',name:'历史胸推',pattern:'${choices[0].pattern}',status:'completed',feedback:'轻松',sets:[{w:80,r:8}]}]}]`);
+  const target=choices.map((ex,index)=>({exerciseId:ex.exerciseId,role:index<2?'primary':'auxiliary',sets:3,reps:10,weight:index===0?80:0,rest:90,reason:'按胸部重点安排',purpose:index<3?'主要或辅助刺激胸部':'补足推日整体安排'}));
+  let sent='';h.c.fetch=async(url,options)=>{sent=options.body;return {ok:true,json:async()=>({choices:[{message:{content:JSON.stringify({exercises:target,summary:'胸部为主要训练，辅助动作照顾推日整体。'})}}]})};};
+  const adapted=await h.run('adaptPlanWithAI(todayPlan)');assert.equal(adapted.usedAI,true,adapted.error);assert.equal(adapted.plan.workout.length,4);assert.equal(adapted.plan.workout.filter(ex=>ex.role==='核心').length,2);assert.ok(sent.includes('以胸部为重点'));assert.ok(sent.includes('80'));assert.ok(!sent.includes('流程用户'));
+  assert.equal(adapted.plan.factors.focusKey,'push');assert.equal(h.run('todayIndex'),0,'生成或预览不推进循环');
   const invalid=target.map((item,index)=>index===0?{...item,weight:10000}:item);h.c.fetch=async()=>({ok:true,json:async()=>({choices:[{message:{content:JSON.stringify({exercises:invalid,summary:'无效'})}}]})});
-  const fallback=await h.run('adaptPlanWithAI(todayPlan)');assert.equal(fallback.usedAI,false);assert.equal(fallback.plan.workout[0].weight,h.run('todayPlan.workout[0].weight'));
+  const fallback=await h.run('adaptPlanWithAI(todayPlan)');assert.equal(fallback.usedAI,false);assert.ok(fallback.plan.aiFailure);assert.ok(fallback.plan.notice.includes('AI 个性化计划未生成'));
+  assert.equal(h.run('dynamicSetBudget("30分钟","比较疲劳")'),12);assert.equal(h.run('dynamicSetBudget("60分钟","状态一般")'),27);
 });
 console.log(`PASS: ${passed} 组数据可靠性回归完成`);

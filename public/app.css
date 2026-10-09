@@ -326,6 +326,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-v
 #page-training .setup-group{padding:0 0 24px;margin-bottom:24px;border-bottom:1px solid var(--border)}
 #page-training .setup-label{font-size:12px;color:#bfc1b8;letter-spacing:.02em;margin-bottom:10px}
 #page-training .opt-grid{gap:9px}
+#page-training #setupFocus{grid-template-columns:repeat(3,minmax(0,1fr))}
 .opt-chip{min-height:50px;border:1px solid var(--border);border-radius:14px;background:#121210;color:#c9cbc0;padding:12px 8px}
 .opt-chip.sel{border-color:var(--accent);background:rgba(217,255,67,.08);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 .setup-input,.field-value{background:#121210!important;border:1px solid var(--border)!important;color:var(--text)!important;border-radius:13px!important}
