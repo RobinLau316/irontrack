@@ -287,13 +287,9 @@ function renderProfileContent() {
         <label class="field-group"><span class="field-label">体重 kg</span><input class="field-value" id="pf-weight" type="number" step="0.1" value="${escapeHtml(profile.weight)}"></label>
         <label class="field-group"><span class="field-label">体脂率 %</span><input class="field-value" id="pf-bodyfat" type="number" step="0.1" value="${escapeHtml(profile.bodyFat)}"></label>
       </div><div class="text-xs text-muted mt-2">只有修改体重或体脂时才会记录一个测量点；开始训练不会自动记录身体数据。</div></details>
-      <div class="card"><div class="section-title">暂停推荐的动作</div>
-        <div class="text-xs text-muted mb-3">训练后选择“不适”的动作会暂停出现在新计划中。恢复后才会再次参与推荐。</div>
-        ${renderPausedExerciseRows()}
-      </div>
-      <div class="card"><div class="section-title">可选 AI 计划适配</div>
-        <label class="setup-label"><input id="pf-ai-enabled" type="checkbox" ${profile.aiPlanEnabled?'checked':''}> 生成计划时允许 AI 结合近期记录调整</label>
-        <div class="text-xs text-muted mt-2">启用后，训练方向、当天状态、最近实际组数/重量/次数和反馈会发送给 DeepSeek。姓名不会发送。AI 不可用时自动使用本地计划。</div>
+      <div class="card"><div class="section-title">AI 私人教练</div>
+        <div class="text-xs text-muted mt-2">教练会把你的训练档案、身体限制、当天状态和近期真实训练记录发送给 DeepSeek，用于对话、计划和复盘；姓名不会发送。首次使用时会请你确认。</div>
+        ${profile.coachDataConsent?'<button class="mini-btn mt-2" onclick="revokeCoachDataConsent()">撤回训练资料发送确认</button>':''}
         <div class="field-group mt-3"><span class="field-label">DeepSeek API Key（仅保存在本机浏览器）</span>
           <div style="display:flex;gap:8px">
             <input class="field-value" id="pf-apiKey" type="password" value="${apiKey}" placeholder="sk-..." style="flex:1;border:none;outline:none;color:var(--text);background:var(--bg);font-size:15px">
@@ -317,11 +313,20 @@ function renderProfileContent() {
       <div class="text-center text-xs text-muted mt-3" id="saveMsg"></div>`;
 }
 
+function revokeCoachDataConsent() {
+  const next={...profile,coachDataConsent:false};
+  if(!LS.set('profile',next)){alert('暂时无法保存，请重试。');return;}
+  profile=next;renderProfileContent();
+}
+
 function saveProfile() {
-  const days=Number(document.getElementById('pf-days').value);
-  if(!Number.isInteger(days)||days<1||days>7){document.getElementById('saveMsg').textContent='每周训练次数请填写 1 到 7。';return;}
-  const next={...profile,trainingDirection:document.getElementById('pf-direction').value.trim(),goal:document.getElementById('pf-direction').value.trim()||profile.goal,trainingDays:days,experienceSummary:document.getElementById('pf-experience').value.trim(),limitations:document.getElementById('pf-limitations').value.trim(),onboardingComplete:true,planTemplate:'ppl',aiPlanEnabled:document.getElementById('pf-ai-enabled').checked};
+  const requestedDays=Number(document.getElementById('pf-days').value);
+  const validDays=Number.isInteger(requestedDays)&&requestedDays>=1&&requestedDays<=7;
+  if(profile.onboardingComplete&&!validDays){document.getElementById('saveMsg').textContent='每周训练次数请填写 1 到 7。';return;}
+  const days=validDays?requestedDays:(Number(profile.trainingDays)||0);
+  const next={...profile,trainingDirection:document.getElementById('pf-direction').value.trim(),goal:document.getElementById('pf-direction').value.trim()||profile.goal,trainingDays:days,experienceSummary:document.getElementById('pf-experience').value.trim(),limitations:document.getElementById('pf-limitations').value.trim(),onboardingComplete:profile.onboardingComplete,planTemplate:'coach',aiPlanEnabled:true};
   ['height','weight','bodyFat'].forEach(key=>{const input=document.getElementById('pf-'+(key==='bodyFat'?'bodyfat':key));const value=Number(input?.value);if(Number.isFinite(value)&&value>0)next[key]=value;});
+  if(['height','weight','bodyFat'].some(key=>next[key]!==profile[key]))next.coachBodyConfirmed=true;
   const changes={profile:next};
   if(next.weight!==profile.weight||next.bodyFat!==profile.bodyFat){
     const nextRecords=cloneData(bodyRecords);
@@ -385,13 +390,14 @@ function recoveryBundle() {
 function buildBackupPayload(includePending=true) {
   const data = {};
   USER_DATA_KEYS.forEach(key => { data[key] = LS.get(key, null); });
+  if (isPlainRecord(data.profile)) { data.profile={...data.profile}; delete data.profile.coachDataConsent; }
   if (includePending) Object.assign(data, normalizeUserData(data).data);
   if (includePending && todayPlan?.status === 'active' && trainState.day) {
     data.today_plan = todayPlan;
     data.active_training = { version:1, planId:todayPlan.id, savedAt:new Date().toISOString(), state:{...trainState,timerInterval:null,restInterval:null} };
   }
   if (includePending && trainState.pendingCompletion && !trainState.saved) Object.assign(data, completionData(trainState.pendingCompletion));
-  const payload = { app:'IronTrack', version:BACKUP_VERSION, user:currentUser, exportedAt:new Date().toISOString(), whitelistVersion:PPL_WHITELIST_VERSION, data };
+  const payload = { app:'IronTrack', version:BACKUP_VERSION, user:currentUser, exportedAt:new Date().toISOString(), data };
   if (includePending) payload.recovery = recoveryBundle();
   return payload;
 }
@@ -444,7 +450,9 @@ function checkedBackup(payload) {
   if (!isPlainRecord(payload) || payload.app !== 'IronTrack' || ![1,2,3].includes(Number(payload.version)) || !isPlainRecord(payload.data)) throw new Error('文件格式或版本不支持');
   if (!isPlainRecord(payload.data.profile) || !isPlainRecord(payload.data.plan) || !Array.isArray(payload.data.sessions)) throw new Error('备份缺少个人档案、训练体系或历史记录');
   if(payload.recovery!=null&&!isPlainRecord(payload.recovery))throw new Error('恢复资料格式异常');
-  return normalizeUserData(payload.data,true).data;
+  const data=normalizeUserData(payload.data,true).data;
+  data.profile.coachDataConsent=false;
+  return data;
 }
 
 function setBackupMessage(text) {

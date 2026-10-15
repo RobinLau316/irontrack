@@ -1,6 +1,6 @@
 // IronTrack Service Worker：应用壳离线缓存。
 // 发布新版本时必须递增 CACHE_VERSION；旧缓存会在激活时自动清除。
-const CACHE_VERSION = 'irontrack-2026-10-09-dynamic-ppl-1';
+const CACHE_VERSION = 'irontrack-2026-10-15-coach-2';
 
 const SHELL = [
   './',
@@ -13,9 +13,7 @@ const SHELL = [
   './public/app/pages.js',
   './public/app/training.js',
   './public/app/boot.js',
-  './public/exercise-engine.js',
-  './public/data/exercise-catalog.v1.json',
-  './public/data/exercise-instructions-zh.v1.json',
+  './public/app/coach.js',
   './public/manifest.json',
   './public/irontrack-hero.webp',
   './public/irontrack-hero.jpg',

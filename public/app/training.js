@@ -741,12 +741,7 @@ function saveSession() {
       variants:{...cycleVariants},
       phase:{ ...trainingPhase, completedSessions:(trainingPhase.completedSessions||0)+(sessionIsComplete(session)?1:0) }
     };
-    if(!isPplPlan()) {
-      const pplDays=cloneData(DEFAULT_PLAN.days),pplIdx=pplDays.findIndex(day=>focusKeyFromText(day.focus||day.name)===key);
-      s.pendingCompletion.plan={name:PLAN_TEMPLATES.ppl.name,cycle:PLAN_TEMPLATES.ppl.cycle,days:pplDays};
-      s.pendingCompletion.profile={...profile,planTemplate:'ppl'};
-      s.pendingCompletion.nextIndex=((pplIdx<0?0:pplIdx)+(s.advancePpl===false?0:1))%pplDays.length;
-    }
+
   }
   if (LS.blocked) { LS.recover(); ensureUserDataCompatibility(); }
   // Keep a retryable checkpoint before committing history and cycle together.

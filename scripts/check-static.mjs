@@ -49,8 +49,12 @@ const cssTexts = cssLinks.map((tag) => {
 const combined = html + "\n" + cssTexts.join("\n") + "\n" + scripts.join("\n");
 
 const requiredMarkers = [
-  "EXERCISE_LIBRARY",
+  "coachRecentSessions",
+  "sendCoachIntake",
+  "confirmCoachUnderstanding",
+  "acceptCoachPhase",
   "createLocalPlan",
+  "validateDynamicAIPlan",
   "renderPlanPreview",
   "persistTrainingState",
   "exportBackup",
@@ -61,12 +65,9 @@ const requiredMarkers = [
   "ensureUserDataCompatibility",
   "rememberCompatibilityData",
   "repairAndRetryPage",
-  './public/exercise-engine.js',
-  "EXERCISE_CATALOG_URL",
-  "exercise_preferences",
-  "toggleExerciseInstructions",
-  "restorePausedExercise",
-  "replacementMuscle",
+  "coachPhase",
+  "instructions",
+  "requestCoachReview",
   'rel="apple-touch-icon"',
   'href="./public/manifest.json"',
   'href="./public/apple-touch-icon.png"',
@@ -88,17 +89,8 @@ for (const marker of ["onboardingComplete", "trainingDirection", "aiPlanEnabled"
   if (!combined.includes(marker)) throw new Error(`缺少训练流程能力：${marker}`);
 }
 
-for (const backupKey of ["exercise_preferences", "exercise_catalog_version"]) {
-  const userKeyLine = combined.match(/const USER_DATA_KEYS = \[[^\n]+/i)?.[0] || "";
-  if (!userKeyLine.includes(`'${backupKey}'`)) throw new Error(`普通备份缺少 ${backupKey}`);
-}
-
 if (/USER_DATA_KEYS[^\n]+apikey/i.test(combined)) {
   throw new Error("普通备份不应包含 API Key");
-}
-
-if (!fs.existsSync(new URL("../public/exercise-engine.js", import.meta.url))) {
-  throw new Error("缺少本地动作引擎");
 }
 
 // Service Worker：注册标记 + 预缓存清单逐条校验文件存在。
@@ -111,6 +103,9 @@ if (!fs.existsSync(swPath)) {
 }
 const swText = fs.readFileSync(swPath, "utf8");
 new Function(swText);
+if (/<script[^>]+exercise-engine/i.test(html) || /exercise-catalog\.v1\.json/.test(swText)) {
+  throw new Error("新训练流程不应加载或预缓存旧动作库");
+}
 if (!/CACHE_VERSION\s*=\s*['"][^'"]+['"]/.test(swText)) {
   throw new Error("sw.js 缺少 CACHE_VERSION 版本号");
 }

@@ -422,3 +422,10 @@ body.keyboard-active #app{padding-bottom:24px}
 
 /* 响应式 */
 @media(min-width:768px){.page{padding:0 10px}}
+.coach-message{padding:14px 16px;margin:12px 0;border-radius:16px;background:var(--surface,#171715);line-height:1.6}
+.coach-message strong{display:block;margin-bottom:5px;color:var(--accent)}
+.coach-message.user{margin-left:12%;background:rgba(190,120,70,.13)}
+.coach-review p{line-height:1.75;white-space:pre-wrap}
+#page-training .coach-review .setup-title{font-size:21px!important;line-height:1.35!important;letter-spacing:0!important;font-weight:700!important;overflow-wrap:anywhere}
+.data-consent{display:flex;align-items:flex-start;gap:9px;margin-top:14px;color:var(--muted);font-size:12px;line-height:1.55}
+.data-consent input{flex:none;margin-top:2px;accent-color:var(--accent)}
