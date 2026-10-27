@@ -303,7 +303,7 @@ function renderWarmup() {
   const s = trainState;
   const items = todayPlan.warmup;
   if (!items || items.length === 0) {
-    return `<div class="card"><div class="text-muted text-sm">今日无需专门热身，直接开始正式训练即可。</div></div>
+    return `<div class="card"><div class="text-muted text-sm">这份旧计划尚未包含热身安排，可请教练补充。</div>${missingCoachGuidesAction()}</div>
       <button class="btn btn-accent mt-3" onclick="setSection('workout')">开始正式训练</button>`;
   }
   return `
@@ -367,7 +367,7 @@ function renderStretch() {
   const s = trainState;
   const items = todayPlan.stretch;
   if (!items || items.length === 0) {
-    return `<div class="card"><div class="text-muted text-sm">今日无专项拉伸，可自行放松。</div></div>
+    return `<div class="card"><div class="text-muted text-sm">这份旧计划尚未包含训练后拉伸安排，可请教练补充。</div>${missingCoachGuidesAction()}</div>
       <button class="btn btn-accent mt-3" onclick="finishTraining()">结束训练</button>`;
   }
   return `

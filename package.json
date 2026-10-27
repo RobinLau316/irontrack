@@ -6,6 +6,6 @@
     "dev": "python3 -m http.server 4173",
     "build": "npm run check",
     "start": "python3 -m http.server 4173",
-    "check": "node scripts/check-static.mjs"
+    "check": "node scripts/check-static.mjs && node scripts/check-coach-guides.mjs"
   }
 }
