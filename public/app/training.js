@@ -330,7 +330,7 @@ function renderWorkout() {
     <div class="training-container workout-focus">
       <div class="hero-kicker text-center">动作 ${s.exIdx+1} / ${s.day.exercises.length} · ${escapeHtml(ex.role||'辅助')}</div>
       <div class="exercise-name">${escapeHtml(ex.name)}${ex.isNew?'<span class="new-exercise-badge">新动作</span>':''}</div>
-      <div class="exercise-target">目标 ${ex.weight}kg · ${ex.sets}组×${ex.reps}次</div>
+      <div class="exercise-target">目标 ${ex.weight}kg · ${ex.sets}组×${ex.reps}次</div>${ex.lastActual?`<div class="reason-note text-center">上次 ${escapeHtml(ex.lastActual.date)}：${ex.lastActual.sets.map(row=>escapeHtml(row.w)+'kg × '+escapeHtml(row.r)+'次').join('；')}</div>`:''}
       ${exerciseInstructionBlock(ex,`workout-instruction-${s.exIdx}`)}
       <div class="control-label text-center">本组重量</div>
       <div class="num-control">

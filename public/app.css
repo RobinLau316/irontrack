@@ -429,3 +429,9 @@ body.keyboard-active #app{padding-bottom:24px}
 #page-training .coach-review .setup-title{font-size:21px!important;line-height:1.35!important;letter-spacing:0!important;font-weight:700!important;overflow-wrap:anywhere}
 .data-consent{display:flex;align-items:flex-start;gap:9px;margin-top:14px;color:var(--muted);font-size:12px;line-height:1.55}
 .data-consent input{flex:none;margin-top:2px;accent-color:var(--accent)}
+
+/* 训练日记：逐组查看与更正 */
+.history-card summary { cursor:pointer; line-height:1.6; }
+.history-exercise { padding:12px 0; border-top:1px solid var(--border, #333); }
+.history-set { margin-top:8px; font-size:14px; }
+.history-set input { width:64px; padding:6px; border:1px solid #555; border-radius:6px; background:var(--bg); color:var(--text); font-size:16px; }

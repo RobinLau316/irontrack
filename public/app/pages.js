@@ -190,21 +190,39 @@ function renderDataChart(tab) {
 function renderSessionHistory() {
   const el = document.getElementById('sessionHistory');
   if (!el) return;
-  if (!sessions.length) {
-    el.innerHTML = '<div class="text-muted text-sm">完成训练后，这里会显示记录和动作反馈。</div>';
-    return;
-  }
-  el.innerHTML = sessions.slice(0,8).map(session => {
+  const archived = LS.get('sessions_archive', []);
+  const records = [...sessions.map((session,index)=>({session,index,source:'sessions'})), ...(Array.isArray(archived)?archived:[]).map((session,index)=>({session,index,source:'sessions_archive'}))];
+  if (!records.length) { el.innerHTML = '<div class="text-muted text-sm">完成训练后，这里会显示每组实际记录。</div>'; return; }
+  el.innerHTML = records.map(({session,index,source},position) => {
     const exercises = session.exercises || [];
-    const feedback = exercises.filter(ex=>ex.feedback).map(ex=>`${escapeHtml(ex.name)}：${escapeHtml(ex.feedback)}${ex.feedbackNote?'（'+escapeHtml(ex.feedbackNote)+'）':''}`).join(' · ');
     const totalSets = exercises.reduce((sum,ex)=>sum+(ex.sets||[]).length,0);
     const status=sessionIsComplete(session)?'完成训练':(totalSets?'部分训练':'没有已确认组');
-    return `<div class="history-card">
-      <div class="row"><div class="font-bold text-sm">${escapeHtml(session.dayName||session.focusArea||'训练')} · ${status}</div><span class="text-muted text-xs">${escapeHtml(session.date)}</span></div>
-      <div class="reason-note">${totalSets} 组实际记录 · ${formatTime(session.duration||0)}${session.sessionFeedback?' · '+escapeHtml(session.sessionFeedback):''}</div>
-      ${feedback?`<div class="reason-note">反馈：${feedback}</div>`:'<div class="reason-note">此记录暂无动作反馈</div>'}
-    </div>`;
+    const detail=exercises.map((ex,ei)=>{
+      const states={completed:'已完成',partial:'部分完成',skipped:'已跳过',not_started:'未开始'};
+      const previous=records.slice(position+1).map(row=>({date:row.session.date,ex:(row.session.exercises||[]).find(item=>item.name===ex.name&&(item.sets||[]).length)})).find(row=>row.ex);
+      const previousText=previous?`<div class="reason-note">上次 ${escapeHtml(previous.date)}：${previous.ex.sets.map(st=>escapeHtml(st.w)+'kg × '+escapeHtml(st.r)+'次').join('；')}</div>`:'';
+      const rows=(ex.sets||[]).map((set,si)=>`<div class="history-set">第 ${si+1} 组：<input aria-label="第${si+1}组重量" type="number" min="0" max="1000" step="0.5" value="${escapeHtml(set.w)}" id="history-w-${position}-${ei}-${si}"> kg × <input aria-label="第${si+1}组次数" type="number" min="1" max="100" step="1" value="${escapeHtml(set.r)}" id="history-r-${position}-${ei}-${si}"> 次</div>`).join('');
+      return `<div class="history-exercise"><strong>${escapeHtml(ex.name)}</strong> <span class="text-muted text-xs">${escapeHtml(states[ex.status]||((ex.sets||[]).length?'已记录':'未开始'))}</span>${previousText}${rows||'<div class="text-muted text-xs">没有已确认的组</div>'}${ex.feedback?`<div class="reason-note">${escapeHtml(ex.feedback)} ${escapeHtml(ex.feedbackNote||'')}</div>`:''}</div>`;
+    }).join('');
+    return `<details class="history-card"><summary><strong>${escapeHtml(session.dayName||session.focusArea||'训练')} · ${status}</strong><span class="text-muted text-xs"> ${escapeHtml(session.date)} · ${totalSets} 组</span></summary><div class="reason-note">${formatTime(session.duration||0)}${session.sessionFeedback?' · 感觉：'+escapeHtml(session.sessionFeedback):''}${session.sessionDiscomfort?' · 补充：'+escapeHtml(session.sessionDiscomfort):''}</div>${session.coachReview?`<div class="reason-note">教练复盘：${escapeHtml(session.coachReview)}</div>`:''}${detail}${totalSets?`<button class="mini-btn mt-2" onclick="saveHistoryCorrection('${source}',${index},${position})">保存记录更正</button><div class="text-muted text-xs mt-2">仅更正实际重量和次数；后续新计划会参考更新后的记录。</div>`:''}</details>`;
   }).join('');
+}
+
+function saveHistoryCorrection(source,index,position) {
+  if (!['sessions','sessions_archive'].includes(source)) return;
+  const stored=LS.get(source, []);
+  if(!Array.isArray(stored)||!stored[index]) { alert('记录已变化，请重新打开后再修改。'); return; }
+  const updated=cloneData(stored), session=updated[index];
+  for(let ei=0;ei<session.exercises.length;ei++) for(let si=0;si<session.exercises[ei].sets.length;si++) {
+    const w=document.getElementById(`history-w-${position}-${ei}-${si}`)?.value;
+    const r=document.getElementById(`history-r-${position}-${ei}-${si}`)?.value;
+    if(w===''||r===''||!Number.isFinite(Number(w))||Number(w)<0||Number(w)>1000||!Number.isInteger(Number(r))||Number(r)<1||Number(r)>100) { alert('请填写有效的重量（0–1000 kg）和次数（1–100）。');return; }
+    session.exercises[ei].sets[si]={...session.exercises[ei].sets[si],w:Number(w),r:Number(r)};
+  }
+  delete session.coachReview; // 旧复盘基于更正前的数据。
+  if(!LS.set(source,updated)){alert('更正未能保存，请检查本机存储后重试。');return;}
+  if(source==='sessions') sessions=updated;
+  renderSessionHistory(); updateWeekStats(); alert('训练记录已更正。已生成的计划不会自动改变。');
 }
 
 function updateWeekStats() {
@@ -300,7 +318,7 @@ function renderProfileContent() {
         <div id="apiTestMsg" class="text-xs mt-2"></div>
       </div>
       <div class="card"><div class="section-title">本地数据备份</div>
-        <div class="text-muted text-sm" style="line-height:1.6;margin-bottom:14px">训练数据只保存在当前浏览器。建议定期导出；备份不包含 API Key。</div>
+        <div class="text-muted text-sm" style="line-height:1.6;margin-bottom:14px">训练数据只保存在当前浏览器。建议定期导出；备份不包含 API Key。${profile.lastBackupRequestedAt?`<br>上次发起导出：${escapeHtml(profile.lastBackupRequestedAt.slice(0,10))}（请确认文件已保存）`:'<br>尚未记录导出时间，换设备或清理浏览器前请先备份。'}</div>
         <div style="display:flex;gap:10px">
           <button class="mini-btn" style="flex:1" onclick="exportBackup()">导出备份</button>
           <button class="mini-btn" style="flex:1" onclick="document.getElementById('backupFile').click()">导入恢复</button>
@@ -416,6 +434,8 @@ function downloadData(payload, filename) {
 
 function exportBackup() {
   downloadData(buildBackupPayload(), `irontrack-backup-${getTodayStr()}.json`);
+  const next={...profile,lastBackupRequestedAt:new Date().toISOString()};
+  if(LS.set('profile',next))profile=next;
   const msg = document.getElementById('backupMsg');
   if (msg) msg.textContent = '已生成备份，请确认文件已保存；包含当前训练和归档，API Key 未包含。';
 }
