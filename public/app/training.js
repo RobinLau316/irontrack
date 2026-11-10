@@ -100,16 +100,16 @@ async function applyPlanRequest() {
 }
 
 function updatePreviewField(index,key,value) {
-  const ex = todayPlan.workout[index];
-  if (!ex) return;
-  if (String(value).trim() === '') return;
-  const num = Number(value);
-  const limits = { sets:[1,8], reps:[1,100], weight:[0,1000], rest:[30,300] }[key];
-  if (!Number.isFinite(num) || num < limits[0] || num > limits[1]) { renderPlanPreview(); return; }
-  ex[key] = key === 'weight' ? Math.round(num*2)/2 : Math.round(num);
-  if(key==='weight')ex.weightConfirmedByUser=true;
-  ex.reason = '用户在计划预览中手动调整';
-  LS.set('today_plan', todayPlan);
+  const ex=todayPlan?.workout?.[index];
+  if(!ex||String(value).trim()==='')return;
+  const num=Number(value),limits={sets:[1,8],reps:[1,100],weight:[0,1000],rest:[30,300]}[key];
+  if(!limits||!Number.isFinite(num)||num<limits[0]||num>limits[1]){renderPlanPreview();return;}
+  const next=cloneData(todayPlan),changed=next.workout[index];
+  changed[key]=key==='weight'?Math.round(num*2)/2:Math.round(num);
+  if(key==='weight')changed.weightConfirmedByUser=true;
+  changed.reason='用户在计划预览中手动调整';
+  if(!LS.set('today_plan',next)){renderPlanPreview();planChangeMessage('修改未保存，原计划已保留，请重试。');return;}
+  todayPlan=next;
 }
 
 function swapPlanExercise(index, preferNew=false) {
@@ -405,6 +405,7 @@ function renderTrainingUI() {
     </div>
     ${todayPlan.date !== getTodayStr() ? `<div class="resume-banner">继续 ${escapeHtml(todayPlan.date)} 的未完成训练，已保留原进度。</div>` : ''}
     ${dataRecoveryNotice || LS.error ? `<div class="danger-note">${escapeHtml(dataRecoveryNotice || LS.error)}</div>` : ''}
+    ${currentPlanNeedsReview()?'<div class="danger-note">训练档案已更新，请检查本次计划是否仍适合；有不适时先停止相关动作。</div>':''}
     ${renderSectionTabs()}
     <button class="mini-btn mb-3" onclick="requestFocusChange()">保存进度并更改训练日</button>
     ${body}`;
@@ -505,7 +506,7 @@ function renderRestOverlay() {
   const container = document.getElementById('trainingContent');
   container.innerHTML = `
     <div class="rest-overlay">
-      <div class="rest-label">组间休息</div>
+      ${currentPlanNeedsReview()?'<div class="danger-note">训练档案已更新，请检查本次计划是否仍适合。</div>':''}<div class="rest-label">组间休息</div>
       <div class="rest-circle"><div class="rest-time">${s.restTimer}</div></div>
       <div class="rest-next">下一组：第 ${s.set} 组 · ${escapeHtml(ex.name)}</div>
       <div class="reason-note">${escapeHtml(s.weight)} kg × ${escapeHtml(s.reps)} 次</div><button class="skip-btn" onclick="skipRest()">跳过休息</button>${s.lastConfirmed?'<button class="text-action" onclick="undoLastSet()">撤销上一组</button>':''}

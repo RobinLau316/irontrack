@@ -2,6 +2,7 @@
 let profile, plan, sessions, bodyRecords, measurements, todayIndex, cycleVariants, coreLocks, trainingPhase, exercisePreferences;
 
 function initUserData() {
+  invalidateCoachRequests();
   if (trainState.timerInterval) clearInterval(trainState.timerInterval);
   if (trainState.restInterval) clearInterval(trainState.restInterval);
   trainState = {};
@@ -65,6 +66,7 @@ function switchUser() {
   if (todayPlan?.status === 'active' && !persistTrainingState()) { alert('当前训练尚未写入，请先导出备份或重试保存后再切换用户。'); return; }
   if (trainState.timerInterval) clearInterval(trainState.timerInterval);
   if (trainState.restInterval) clearInterval(trainState.restInterval);
+  invalidateCoachRequests();
   currentUser = '';
   renderLogin();
 }

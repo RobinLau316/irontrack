@@ -263,9 +263,17 @@ function saveProfile() {
   const validDays=Number.isInteger(requestedDays)&&requestedDays>=1&&requestedDays<=7;
   if(profile.onboardingComplete&&!validDays){document.getElementById('saveMsg').textContent='每周训练次数请填写 1 到 7。';return;}
   const days=validDays?requestedDays:(Number(profile.trainingDays)||0);
-  const next={...profile,trainingDirection:document.getElementById('pf-direction').value.trim(),goal:document.getElementById('pf-direction').value.trim()||profile.goal,trainingDays:days,experienceSummary:document.getElementById('pf-experience').value.trim(),limitations:document.getElementById('pf-limitations').value.trim(),onboardingComplete:profile.onboardingComplete,planTemplate:'coach',aiPlanEnabled:true};
+  const direction=document.getElementById('pf-direction').value.trim(), experience=document.getElementById('pf-experience').value.trim(), limitations=document.getElementById('pf-limitations').value.trim();
+  const overrides={...(profile.coachProfileOverrides||{})};
+  const changed={goal:direction!==(profile.trainingDirection||profile.goal||''),daysPerWeek:days!==Number(profile.trainingDays),experience:experience!==(profile.experienceSummary||profile.experience||''),limitations:limitations!==(profile.limitations||'')};
+  if(changed.goal)overrides.goal=direction;
+  if(changed.daysPerWeek)overrides.daysPerWeek=days;
+  if(changed.experience)overrides.experience=experience;
+  if(changed.limitations)overrides.limitations=limitations;
+  const hasChanges=Object.values(changed).some(Boolean);
+  const next={...profile,trainingDirection:direction,goal:direction,trainingDays:days,experienceSummary:experience,limitations,coachProfileOverrides:overrides,coachSummaryNeedsUpdate:!!profile.coachSummaryNeedsUpdate||hasChanges,coachPlanReviewId:hasChanges&&todayPlan?todayPlan.id:(profile.coachPlanReviewId||''),onboardingComplete:profile.onboardingComplete,planTemplate:'coach',aiPlanEnabled:true};
   ['height','weight','bodyFat'].forEach(key=>{const input=document.getElementById('pf-'+(key==='bodyFat'?'bodyfat':key));const value=Number(input?.value);if(Number.isFinite(value)&&value>0)next[key]=value;});
-  if(['height','weight','bodyFat'].some(key=>next[key]!==profile[key]))next.coachBodyConfirmed=true;
+  if(['height','weight','bodyFat'].some(key=>next[key]!==profile[key])){next.coachBodyConfirmed=true;next.coachSummaryNeedsUpdate=true;if(todayPlan)next.coachPlanReviewId=todayPlan.id;}
   const changes={profile:next};
   if(next.weight!==profile.weight||next.bodyFat!==profile.bodyFat){
     const nextRecords=cloneData(bodyRecords);
@@ -289,7 +297,7 @@ function saveProfile() {
 function addTrainingNote() {
   const input=document.getElementById('pf-note'), value=(input?.value||'').trim();
   if(!value)return;
-  const next={...profile,trainingNotes:[...(profile.trainingNotes||[]),value].slice(-30)};
+  const next={...profile,trainingNotes:[...(profile.trainingNotes||[]),value].slice(-30),coachSummaryNeedsUpdate:true,coachPlanReviewId:todayPlan?.id||profile.coachPlanReviewId||''};
   if(!LS.transaction({profile:next})){document.getElementById('saveMsg').textContent='暂时无法保存这条信息。';return;}
   profile=next;renderProfileContent();
   const msg=document.getElementById('saveMsg');if(msg)msg.textContent='已记住这条训练信息。';
