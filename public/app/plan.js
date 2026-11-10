@@ -15,7 +15,7 @@ function navigate(page) {
     if (page === 'home') renderHomePage();
     if (page === 'plan') renderPlanPage();
     if (page === 'training') enterTraining();
-    if (page === 'data') renderDataChart('weight');
+    if (page === 'data') renderDataChart('strength');
     if (page === 'profile') renderProfilePage();
   } catch(e) {
     console.error('页面加载失败:', page, e);

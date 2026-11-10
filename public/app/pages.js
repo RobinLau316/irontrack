@@ -84,107 +84,21 @@ function renderPlanPageContent() {
 }
 
 // ============ 数据页 ============
-function switchDataTab(tab, btn) {
-  document.querySelectorAll('#page-data .tab-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderDataChart(tab);
-}
-
-function renderDataChart(tab) {
+function renderDataChart() {
   if (!currentUser) return;
-  const container = document.getElementById('dataChart');
-  renderSessionHistory();
-  updateWeekStats();
-  if (tab === 'weight') {
-    if (bodyRecords.length === 0) {
-      container.innerHTML = '<div class="text-center text-muted text-sm" style="padding:40px">暂无体重记录<br>如需追踪，请在“我的”中填写身体数据</div>';
-      return;
-    }
-    const max = Math.max(...bodyRecords.map(r=>r.weight));
-    const min = Math.min(...bodyRecords.map(r=>r.weight));
-    const range = (max - min) || 1;
-    const display = bodyRecords.slice(-7);
-    container.innerHTML = `
-      <div class="row mb-3"><div class="font-bold text-sm">体重变化</div><span class="text-muted text-xs">最近${display.length}次</span></div>
-      <div class="bar-chart">
-        ${display.map(r => {
-          const h = ((r.weight-min)/range)*100+20;
-          return `<div class="bar-col"><span class="bar-value">${r.weight}</span><div class="bar" style="height:${h}%"><div class="bar-inner fill"></div></div><span class="bar-label">${escapeHtml(r.date)}</span></div>`;
-        }).join('')}
-      </div>`;
-    if (display.length > 1) {
-      const first = display[0].weight;
-      const last = display[display.length-1].weight;
-      const diff = (last - first).toFixed(1);
-      const arrow = diff > 0 ? '↑' : diff < 0 ? '↓' : '→';
-      container.innerHTML += `
-      <div class="row mt-3 text-xs text-muted">
-        <span>起始 ${first}kg</span>
-        <span class="${diff<0?'text-accent':diff>0?'':'text-muted'}" style="color:${diff>0?'#f4a261':'var(--accent)'}">${arrow} ${Math.abs(diff)}kg</span>
-        <span>当前 ${last}kg</span>
-      </div>`;
-    }
-  } else if (tab === 'measure') {
-    if (!measurements || measurements.length === 0) {
-      container.innerHTML = '<div class="text-center text-muted text-sm" style="padding:40px">暂无围度记录<br>在「我的」页面填写围度后自动记录</div>';
-      return;
-    }
-    const fields = [
-      { key: 'chest', label: '胸围' },
-      { key: 'waist', label: '腰围' },
-      { key: 'arm', label: '上臂围' },
-      { key: 'thigh', label: '大腿围' }
-    ];
-    const colors = ['var(--accent)','#f4a261','#2a9d8f','#e76f51'];
-    let html = `<div class="row mb-4"><div class="font-bold text-sm">围度变化趋势</div><div class="flex-gap text-xs">${fields.map((f,i)=>`<span><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${colors[i]};vertical-align:middle;margin-right:3px"></span>${f.label}</span>`).join('')}</div></div>`;
-    fields.forEach((f, i) => {
-      const recs = measurements.filter(r => r[f.key] > 0);
-      if (recs.length === 0) return;
-      const first = recs[0][f.key];
-      const last = recs[recs.length-1][f.key];
-      const diff = (last - first);
-      const arrow = diff > 0 ? '↑' : diff < 0 ? '↓' : '→';
-      html += `<div style="margin-bottom:16px">
-        <div class="row text-xs text-muted mb-1"><span>${f.label}</span><span style="color:${colors[i]}">${first} → ${last}cm ${arrow} ${Math.abs(diff).toFixed(1)}</span></div>
-        <div class="progress-bar"><div class="progress-fill" style="width:100%;background:${colors[i]};opacity:.35"></div></div>
-        <div class="text-xs text-muted mt-1" style="font-size:12px">最近记录 ${recs[recs.length-1].date}</div>
-      </div>`;
-    });
-    if (html.indexOf('progress-bar') === -1) {
-      container.innerHTML = '<div class="text-center text-muted text-sm" style="padding:40px">暂无围度记录<br>在「我的」页面填写围度后自动记录</div>';
-      return;
-    }
-    container.innerHTML = html;
-  } else {
-    const allEx = {};
-    [...sessions].reverse().forEach(s => {
-      s.exercises.forEach(ex => {
-        if (ex.sets.length > 0) {
-          const maxW = Math.max(...ex.sets.map(st => st.w));
-          if (!allEx[ex.name]) allEx[ex.name] = [];
-          allEx[ex.name].push({ date: s.date, weight: maxW });
-        }
-      });
-    });
-    const topEx = Object.entries(allEx)
-      .filter(([,v]) => v.length >= 2)
-      .slice(0, 4);
-    if (topEx.length === 0) {
-      container.innerHTML = '<div class="text-center text-muted text-sm" style="padding:40px">完成2次以上训练后<br>可查看力量增长曲线</div>';
-      return;
-    }
-    const colors = ['var(--accent)','#f4a261','#2a9d8f','#e76f51'];
-    container.innerHTML = `
-      <div class="row mb-4"><div class="font-bold text-sm">力量增长曲线</div><div class="flex-gap text-xs">${topEx.map(([n],i)=>`<span><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${colors[i]};vertical-align:middle;margin-right:3px"></span>${escapeHtml(n)}</span>`).join('')}</div></div>
-      ${topEx.map(([name, records], i) => {
-        const first = records[0].weight;
-        const last = records[records.length-1].weight;
-        const pct = Math.min(100, Math.max(0, Math.round(((last - first) / Math.max(first, 1)) * 100)));
-        return `<div style="margin-bottom:16px"><div class="row text-xs text-muted mb-1"><span>${escapeHtml(name)}</span><span style="color:${colors[i]}">${first} → ${last}kg ${last>=first?'+':''}${(last-first).toFixed(1)}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct>0?30+pct*0.7:10}%;background:${colors[i]}"></div></div></div>`;
-      }).join('')}
-      <div class="text-center text-xs text-muted mt-4">共 ${sessions.length} 次训练记录</div>`;
+  const container=document.getElementById('dataChart');
+  renderSessionHistory();updateWeekStats();
+  const allExercises=new Map();
+  // sessions 保存顺序为最近在前；每次展示该动作本次最高重量对应的实际组。
+  for(const session of sessions) for(const ex of (session.exercises||[])) {
+    if(!(ex.sets||[]).length)continue;
+    const best=ex.sets.reduce((a,b)=>Number(b.w)>Number(a.w)?b:a);
+    const records=allExercises.get(ex.name)||[];
+    records.push({date:session.date,weight:best.w,reps:best.r});allExercises.set(ex.name,records);
   }
-  updateWeekStats();
+  const comparable=[...allExercises.entries()].filter(([,rows])=>rows.length>=2).slice(0,4);
+  if(!comparable.length){container.innerHTML='<div class="data-empty">同一动作记录两次后，可在这里比较。</div>';return;}
+  container.innerHTML=`<div class="data-caption">每次最高重量对应的一组</div>${comparable.map(([name,rows])=>{const latest=rows[0],previous=rows[1];return `<div class="performance-row"><div><strong>${escapeHtml(name)}</strong><div class="performance-date">${escapeHtml(latest.date)} · 上次 ${escapeHtml(previous.date)}</div></div><div class="performance-values"><strong>${escapeHtml(latest.weight)} kg × ${escapeHtml(latest.reps)}</strong><span>上次 ${escapeHtml(previous.weight)} kg × ${escapeHtml(previous.reps)}</span></div></div>`;}).join('')}`;
 }
 
 function renderSessionHistory() {

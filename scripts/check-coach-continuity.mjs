@@ -63,3 +63,7 @@ assert.equal(legacyReload.run('trainState.records[trainState.day.exercises[0].id
 const backup=legacyReload.json('buildBackupPayload()');
 for(const version of [1,2,3]){legacyReload.c.payload={...backup,version};assert.equal(legacyReload.run('checkedBackup(payload).active_training.state.records[Object.keys(payload.data.active_training.state.records)[0]][0].w'),8);}
 console.log('PASS: 旧进行中训练恢复及 V1/V2/V3 备份读取');
+const chart=harness();chart.run(`sessions=[{date:'2026-11-10',exercises:[{name:'坐姿划船',sets:[{w:20,r:10},{w:25,r:6}]}]},{date:'2026-11-03',exercises:[{name:'坐姿划船',sets:[{w:20,r:8}]}]}];renderDataChart();`);
+assert.match(chart.elements.get('dataChart').innerHTML,/25 kg × 6/);assert.match(chart.elements.get('dataChart').innerHTML,/上次 20 kg × 8/);
+assert.doesNotMatch(chart.elements.get('dataChart').innerHTML,/力量增长/);
+console.log('PASS: 训练表现比较真实记录并保留对应次数');

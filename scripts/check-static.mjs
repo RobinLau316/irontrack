@@ -58,7 +58,7 @@ const requiredMarkers = [
   "renderPlanPreview",
   "persistTrainingState",
   "exportBackup",
-  "irontrack-hero.webp",
+  "home-portrait.jpg",
   "training-actions",
   "keyboard-active",
   "prefers-reduced-motion",
@@ -116,7 +116,7 @@ for (const match of swText.matchAll(/'(\.\/[^']+)'/g)) {
   if (!fs.existsSync(abs)) throw new Error(`sw.js 预缓存清单引用了不存在的文件：${entry}`);
 }
 
-for (const asset of ["irontrack-hero.webp", "irontrack-hero.jpg"]) {
+for (const asset of ["home-portrait.jpg", "irontrack-hero.webp", "irontrack-hero.jpg"]) {
   if (!fs.existsSync(new URL(`../public/${asset}`, import.meta.url))) {
     throw new Error(`缺少本地主视觉资源：${asset}`);
   }
@@ -150,7 +150,7 @@ if (manifest.id !== "../" || manifest.start_url !== "../" || manifest.scope !== 
   throw new Error("Web App 清单必须使用适配 GitHub Pages 子目录的相对入口");
 }
 
-for (const marker of ["url('./irontrack-hero.jpg')", "url('./irontrack-hero.webp')"]) {
+for (const marker of ["url('./irontrack-hero.jpg')", "url('./home-portrait.jpg')"]) {
   if (!cssTexts.join("\n").includes(marker)) throw new Error(`主视觉 CSS 路径错误：${marker}`);
 }
 
