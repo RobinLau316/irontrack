@@ -495,3 +495,7 @@ body { min-height: 100svh; overscroll-behavior-y: none; }
 .phase-summary > div { display:flex; gap:16px; justify-content:space-between; align-items:flex-start; padding:14px 0; border-bottom:1px solid var(--border); }
 .phase-summary span { color:var(--muted); flex-shrink:0; font-size:13px; }
 .phase-summary strong { font-size:14px; font-weight:600; text-align:right; overflow-wrap:anywhere; }
+.backup-reminder { display:flex; align-items:center; gap:10px; margin:18px 0; padding:12px 14px; border:1px solid var(--border); border-radius:12px; color:var(--muted); font-size:12px; line-height:1.5; }
+.backup-reminder span { flex:1; }
+.backup-reminder button { border:0; background:transparent; color:var(--accent); min-height:44px; padding:6px; font-size:13px; cursor:pointer; }
+.backup-reminder button:last-child { color:var(--muted); font-size:20px; }

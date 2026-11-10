@@ -1,43 +1,6 @@
 // ============ 训练页（动态四板块：热身/正式/拉伸/饮食） ============
 let trainState = {};
 
-function exerciseInstructionBlock(exercise, targetId) {
-  if (!exercise?.exerciseId?.startsWith('exds:')) return '';
-  const opened = openInstructionIds.has(exercise.exerciseId);
-  const steps = exerciseInstructions?.[exercise.exerciseId];
-  if (exerciseInstructions && (!Array.isArray(steps) || !steps.length)) return '';
-  const content = Array.isArray(steps) && steps.length
-    ? `<ol>${steps.map(step => `<li>${escapeHtml(step)}</li>`).join('')}</ol>`
-    : '<div class="text-muted">正在加载动作说明…</div>';
-  return `<button id="${escapeHtml(targetId)}-button" class="instruction-toggle" data-exid="${escapeHtml(exercise.exerciseId)}" data-target="${escapeHtml(targetId)}" onclick="toggleExerciseInstructions(this.dataset.exid, this.dataset.target)">${opened?'收起动作说明':'查看动作说明'}</button>
-    <div id="${escapeHtml(targetId)}" class="instruction-panel ${opened?'open':''}">${content}</div>`;
-}
-
-async function toggleExerciseInstructions(exerciseId, targetId) {
-  const panel = document.getElementById(targetId);
-  const button = document.getElementById(targetId + '-button');
-  if (!panel || !button) return;
-  if (openInstructionIds.has(exerciseId)) {
-    openInstructionIds.delete(exerciseId);
-    panel.classList.remove('open');
-    button.textContent = '查看动作说明';
-    return;
-  }
-  openInstructionIds.add(exerciseId);
-  panel.classList.add('open');
-  button.textContent = '收起动作说明';
-  const bundle = await ensureExerciseInstructions();
-  const steps = bundle?.[exerciseId];
-  if (!Array.isArray(steps) || !steps.length) {
-    openInstructionIds.delete(exerciseId);
-    button.hidden = true;
-    panel.classList.remove('open');
-    panel.hidden = true;
-    return;
-  }
-  panel.innerHTML = `<ol>${steps.map(step => `<li>${escapeHtml(step)}</li>`).join('')}</ol>`;
-}
-
 function resetTraining() {
   if (!currentUser) return;
   if (trainState.pendingCompletion && !trainState.saved) { alert('本次训练尚未保存，请先重试保存或导出备份。'); return; }
@@ -47,56 +10,6 @@ function resetTraining() {
   LS.set('today_plan', null);
   LS.set('active_training', null);
   trainState = {};
-}
-
-function renderPlanPreview() {
-  setTrainingFixedAction(false);
-  const items = todayPlan.workout.map((ex,index) => `
-    <div class="preview-item">
-      <div class="preview-head">
-        <span class="preview-role ${ex.role==='核心'?'':'aux'}">${ex.role==='核心'?'主要动作':'辅助动作'}</span>
-        <div style="flex:1"><div class="font-bold">${index+1}. ${escapeHtml(ex.name)}${ex.isNew?'<span class="new-exercise-badge">新动作</span>':''}</div><div class="reason-note">${escapeHtml(ex.purpose||ex.reason||(ex.role==='核心'?'承担当日重点训练':'辅助整体训练安排'))}</div>${ex.previous?`<div class="reason-note">上次实际：${ex.previous.weight}kg × ${ex.previous.reps}${ex.previous.feedback?' · '+escapeHtml(ex.previous.feedback):''}</div>`:''}${exerciseInstructionBlock(ex,`preview-instruction-${index}`)}</div>
-      </div>
-      <div class="edit-grid">
-        <div class="edit-field"><label>组数</label><input type="number" min="1" max="5" value="${ex.sets}" oninput="updatePreviewField(${index},'sets',this.value)"></div>
-        <div class="edit-field"><label>次数</label><input type="number" min="1" max="100" value="${ex.reps}" oninput="updatePreviewField(${index},'reps',this.value)"></div>
-        <div class="edit-field"><label>重量kg</label><input type="number" min="0" step="2.5" value="${ex.weight}" oninput="updatePreviewField(${index},'weight',this.value)"></div>
-        <div class="edit-field"><label>休息秒</label><input type="number" min="30" max="300" step="15" value="${ex.rest}" oninput="updatePreviewField(${index},'rest',this.value)"></div>
-      </div>
-      <div class="preview-actions"><button class="mini-btn" onclick="swapPlanExercise(${index})">换一个动作</button></div>
-    </div>`).join('');
-  document.getElementById('trainingContent').innerHTML = `
-    <div class="training-header"><span class="text-accent font-bold">计划预览</span><span class="plan-source ${todayPlan.aiUsed?'':'local'}">${todayPlan.aiUsed?'AI 适配':'本地计划'}</span></div>
-    ${todayPlan.notice?`<div class="resume-banner">${escapeHtml(todayPlan.notice)}</div>`:''}
-    ${todayPlan.aiFailure?'<button class="mini-btn mt-2" onclick="retryAIPlan()">重试 AI 生成</button>':''}
-    <div class="plan-request card"><label class="setup-label" for="planRequest">想改哪里？用平常的话告诉我</label><textarea id="planRequest" class="setup-input" rows="2" maxlength="400" placeholder="例如：这个动作我不会；今天轻松一点">${escapeHtml(todayPlan.userRequest||'')}</textarea><button class="mini-btn mt-3" onclick="applyPlanRequest()">按这句话调整</button><div id="planRequestMsg" class="text-sm text-muted mt-2">${todayPlan.aiUsed?'已用 AI 结合训练记录动态安排':(profile.aiPlanEnabled?'AI 未生成个性化计划，可重试或使用本地备用计划':'当前为本地规则备用计划；可在“我的”开启可选 AI')}</div></div>
-    <div class="card">
-      <div class="row mb-3"><div><div class="section-title" style="margin-bottom:2px">${escapeHtml(todayPlan.focus)} · PPL 循环</div><div class="text-muted text-sm">${todayPlan.workout.length} 个动作 · ${escapeHtml(todayPlan.factors.time)}</div></div></div>
-      ${items}
-    </div>
-    <button class="btn btn-accent" onclick="startConfirmedPlan()">确认计划并开始</button>
-    <button class="btn btn-outline mt-3" onclick="discardTodayPlan()">重新选择训练日</button>`;
-}
-
-async function retryAIPlan() {
-  if(!profile.aiPlanEnabled||!getGlobalApiKey()){alert('请先在“我的”开启计划 AI 并设置 API Key。');return;}
-  const btn=document.querySelector('#trainingContent button[onclick="retryAIPlan()"]');if(btn)btn.disabled=true;
-  const original=cloneData(todayPlan),result=await adaptPlanWithAI(original,original.userRequest||'');
-  if(result.usedAI){const next={...result.plan,aiUsed:true,aiFailure:'',userRequest:original.userRequest||''};if(LS.transaction({today_plan:next})){todayPlan=next;renderPlanPreview();}else{todayPlan=original;renderPlanPreview();alert('AI 计划生成成功，但保存失败；原计划和记录仍保留。');}}
-  else {todayPlan={...original,...result.plan,aiUsed:false,aiFailure:result.error||'AI 暂不可用'};LS.set('today_plan',todayPlan);renderPlanPreview();}
-}
-
-async function applyPlanRequest() {
-  const request=(document.getElementById('planRequest')?.value||'').trim();
-  const msg=document.getElementById('planRequestMsg');
-  if(!request){if(msg)msg.textContent='先写一句你希望调整的地方。';return;}
-  if(!profile.aiPlanEnabled||!getGlobalApiKey()){if(msg)msg.textContent='要理解自然语言并调整计划，请在“我的”开启可选 AI；当前计划和输入会保留。';return;}
-  const btn=document.querySelector('.plan-request button');if(btn)btn.disabled=true;
-  if(msg)msg.textContent='正在理解你的意思…';
-  const original=cloneData(todayPlan), result=await adaptPlanWithAI(original,request);
-  if(btn)btn.disabled=false;
-  if(result.usedAI){const next={...result.plan,userRequest:request,aiUsed:true,aiFailure:''};if(LS.transaction({today_plan:next})){todayPlan=next;renderPlanPreview();}else if(msg)msg.textContent='调整结果暂时保存失败；原计划仍保留，请重试。';}
-  else if(msg)msg.textContent=`${result.error||'暂时无法调整'}；原计划仍保留，你可以改写这句话或手动换一个同类动作。`;
 }
 
 function updatePreviewField(index,key,value) {
@@ -110,53 +23,6 @@ function updatePreviewField(index,key,value) {
   changed.reason='用户在计划预览中手动调整';
   if(!LS.set('today_plan',next)){renderPlanPreview();planChangeMessage('修改未保存，原计划已保留，请重试。');return;}
   todayPlan=next;
-}
-
-function swapPlanExercise(index, preferNew=false) {
-  const current = todayPlan.workout[index];
-  if (!current || current.locked) return;
-  let choice = null;
-  if (todayPlan.catalogVersion && exerciseCatalog && getExerciseEngine()) {
-    const engine = getExerciseEngine();
-    const usedIds = new Set(todayPlan.workout.map(ex => ex.exerciseId));
-    const context = catalogHistoryContext(todayPlan.focusKey);
-    const pool = getCatalogCandidates(todayPlan.focusKey).filter(ex =>
-      ex.replacementMuscle === current.replacementMuscle &&
-      (!ex.roleEligibility?.length || ex.roleEligibility.includes(current.role)) &&
-      !usedIds.has(ex.exerciseId)
-    );
-    const ranked = engine.scoreCandidates(pool, {
-      seed:`${todayPlan.id}:manual:${index}:${preferNew?'new':'any'}`,
-      recentExerciseIds:context.recentExerciseIds,
-      usedIds:[...usedIds],
-      lastUsed:context.lastUsed,
-      replacementMuscle:current.replacementMuscle,
-      currentVariantGroup:current.variantGroup
-    });
-    const ordered = preferNew
-      ? ranked.sort((a,b) => Number(isNewCatalogExercise(b.exercise)) - Number(isNewCatalogExercise(a.exercise)) || b.score-a.score)
-      : ranked;
-    // 同肌群、同动作目的的候选已经由安全候选池约束；不再用旧模板的固定平衡槽限制 AI 动态计划。
-    choice=ordered[0]?.exercise||null;
-  } else {
-    const used = new Set(todayPlan.workout.map(ex=>ex.name));
-    choice = allLibraryExercises(todayPlan.focusKey).find(ex=>ex.pattern===current.pattern&&!used.has(ex.name)&&!isExerciseBlocked(ex)&&matchesEnvironment(ex));
-  }
-  if (!choice) {
-    if (current.exerciseId) {
-      exercisePreferences.lightChoices[current.exerciseId] = 'progress';
-      LS.set('exercise_preferences', exercisePreferences);
-    }
-    alert('当前条件下没有既安全又保持训练结构的同类替代动作');
-    renderPlanPreview();
-    return;
-  }
-  const replacement = adaptExercise(choice, `替代“${current.name}”，保持${current.replacementMuscle||current.pattern}训练目的`);
-  replacement.role = current.role;
-  replacement.locked = false;
-  todayPlan.workout[index] = replacement;
-  LS.set('today_plan', todayPlan);
-  renderPlanPreview();
 }
 
 function startConfirmedPlan() {
@@ -177,7 +43,7 @@ function discardTodayPlan() {
   window.scrollTo(0, 0);
 }
 
-function needsWeightConfirmation(ex) { return !!ex && todayPlan?.source==='coach-ai' && (!ex.lastActual || ex.requireWeightConfirmation) && !ex.weightConfirmedByUser && Number(ex.weight)===0; }
+function needsWeightConfirmation(ex) { return !!ex && ['coach-ai','reused-plan'].includes(todayPlan?.source) && (!ex.lastActual || ex.requireWeightConfirmation) && !ex.weightConfirmedByUser && Number(ex.weight)===0; }
 
 function initDynamicTraining() {
   const tp = todayPlan;
@@ -514,39 +380,6 @@ function renderRestOverlay() {
   `;
 }
 
-function renderComplete() {
-  setTrainingFixedAction(false);
-  const s = trainState;
-  const container = document.getElementById('trainingContent');
-  const actualSets=Object.values(s.records||{}).reduce((n,rows)=>n+rows.length,0);
-  container.innerHTML = `
-    <div class="complete-container">
-      <div class="complete-icon">✓</div>
-      <div class="complete-title">${s.saved ? '训练记录已保存' : '训练结束，等待保存'}</div>
-      <div class="complete-time">${escapeHtml(s.day.name)} · ${actualSets} 组实际记录 · ${formatTime(s.sessionTime)}${s.sessionFeedback?' · '+escapeHtml(s.sessionFeedback):''}</div>
-      ${s.saveError ? `<div class="danger-note" style="margin-bottom:14px">${escapeHtml(s.saveError)}</div>` : ''}
-      ${s.archiveNote ? `<div class="reason-note" style="margin-bottom:14px">${escapeHtml(s.archiveNote)}</div>` : ''}
-      ${s.saved ? '<button class="btn btn-accent" onclick="resetTraining();renderTrainingPage()">再练一次</button>' : '<button class="btn btn-accent" onclick="retryFinishSave()">重试保存</button><button class="btn btn-outline mt-3" onclick="exportBackup()">导出含本次训练的备份</button>'}
-      <button class="btn btn-outline mt-3" onclick="navigate('home')">返回首页</button>
-    </div>
-  `;
-}
-
-function renderFinishPrompt() {
-  setTrainingFixedAction(false);
-  const s=trainState, planned=todayPlan.workout.reduce((n,ex)=>n+ex.sets,0);
-  const actual=Object.values(s.records||{}).reduce((n,rows)=>n+rows.length,0);
-  const partial=!todayPlan.workout.every(ex=>(s.records[ex.id]||[]).length>=ex.sets);
-  document.getElementById('trainingContent').innerHTML=`
-    <div class="training-header"><span class="text-accent font-bold">结束训练</span><span class="text-muted text-sm">${actual}/${planned} 组</span></div>
-    <div class="card">${s.changeFocusAfterSaving?'<div class="resume-banner">先保存本次已确认的实际训练组，再选择新的训练日。未完成内容不会记为已完成。</div>':''}<div class="setup-title">这次感觉怎么样？</div>
-      <div class="opt-grid finish-feeling">${[['轻松','🙂'],['刚刚好','👍'],['偏吃力','😮‍💨']].map(([v,e])=>`<button class="opt-chip ${s.sessionFeedback===v?'sel':''}" onclick="setSessionFeeling('${v}')">${e} ${v}</button>`).join('')}</div>
-      <label class="setup-label mt-3" for="sessionDiscomfort">如果有不适，可以补充一句</label><input id="sessionDiscomfort" class="setup-input" maxlength="240" value="${escapeHtml(s.sessionDiscomfort||'')}" placeholder="选填" oninput="trainState.sessionDiscomfort=this.value;persistTrainingState()">
-      ${partial?`<div class="setup-group"><span class="setup-label">下次怎么接着练？</span><div class="opt-grid finish-progress"><button class="opt-chip ${s.advancePpl===false?'sel':''}" onclick="choosePplAdvance(false)">继续这一天</button><button class="opt-chip ${s.advancePpl===true?'sel':''}" onclick="choosePplAdvance(true)">推进到下一天</button></div></div>`:''}
-      <div id="finishMsg" class="text-center text-muted text-sm"></div><button class="btn btn-accent mt-3" onclick="confirmFinishTraining()">${s.changeFocusAfterSaving?'保存记录并选择训练日':'保存训练记录'}</button><button class="btn btn-outline mt-3" onclick="returnToWorkout()">返回训练</button>
-    </div>`;
-}
-
 function retryFinishSave() {
   const changeFocusAfterSaving=!!trainState.changeFocusAfterSaving;
   const saved=saveSession();
@@ -554,25 +387,7 @@ function retryFinishSave() {
   renderComplete();
 }
 
-function setSessionFeeling(value) { trainState.sessionFeedback=value;persistTrainingState();renderFinishPrompt(); }
-function choosePplAdvance(value) { trainState.advancePpl=!!value;persistTrainingState();renderFinishPrompt(); }
 function returnToWorkout() { trainState.changeFocusAfterSaving=false;trainState.section='workout';persistTrainingState();renderTrainingPage(); }
-function confirmFinishTraining() {
-  const s=trainState;
-  if(s.saved||!todayPlan){if(s.pendingCompletion)saveSession();renderComplete();return;}
-  if(!s.sessionFeedback){document.getElementById('finishMsg').textContent='选一个最接近的感受就好。';return;}
-  const fullyDone=todayPlan.workout.every(ex=>(s.records[ex.id]||[]).length>=ex.sets);
-  if(!fullyDone&&typeof s.advancePpl!=='boolean'){document.getElementById('finishMsg').textContent='选一下下次继续这一天，还是推进到下一天。';return;}
-  s.sessionDiscomfort=(document.getElementById('sessionDiscomfort')?.value||'').trim();
-  s.advancePpl=fullyDone?true:s.advancePpl;s.complete=true;
-  if(s.timerInterval)clearInterval(s.timerInterval);if(s.restInterval)clearInterval(s.restInterval);
-  persistTrainingState();const changeFocusAfterSaving=!!s.changeFocusAfterSaving;
-  const saved=saveSession();
-  if(!saved){renderComplete();return;}
-  if(changeFocusAfterSaving){if(s.timerInterval)clearInterval(s.timerInterval);if(s.restInterval)clearInterval(s.restInterval);trainState={};renderTrainingSetup('上一节训练的已确认组已保存；请选今天要练的训练日。');window.scrollTo(0,0);return;}
-  renderComplete();
-}
-
 function adjustWeight(delta) {
   trainState.weight = Math.max(0, validWeight(trainState.weight, 0) + delta);
   if(trainState.weight>0){trainState.weightNeedsConfirmation=false;trainState.weightMode='';}
@@ -680,24 +495,6 @@ function handleRepsKey(event, input) {
   }
 }
 
-function completeSet() {
-  const s = trainState;
-  const ex = s.day.exercises[s.exIdx];
-  s.reps = validReps(s.reps, validReps(ex.reps, 8));
-  if (s.reps < 1) { alert('实际次数至少为 1；未完成的训练可以直接结束并记录已完成组。'); return; }
-  if (!s.records[ex.id]) s.records[ex.id] = [];
-  s.records[ex.id].push({set:s.set, w:s.weight, r:s.reps, confirmedAt:new Date().toISOString()});
-  persistTrainingState();
-  if (s.set < ex.sets) {
-    s.set++;
-    startRestTimer();
-  } else {
-    s.pendingFeedback = ex.id;
-    persistTrainingState();
-    renderTrainingPage();
-  }
-}
-
 function finishTraining() {
   if(trainState.saved||trainState.pendingCompletion){renderComplete();return;}
   if(trainState.timerInterval)clearInterval(trainState.timerInterval);if(trainState.restInterval)clearInterval(trainState.restInterval);
@@ -716,6 +513,7 @@ function completionData(pending) {
     active_training:null
   };
   if (pending.plan) { result.plan=pending.plan; result.profile=pending.profile; }
+  else if(pending.reuseProfile)result.profile=pending.reuseProfile;
   return result;
 }
 
@@ -753,20 +551,26 @@ function saveSession() {
       variants:{...cycleVariants},
       phase:{ ...trainingPhase, completedSessions:(trainingPhase.completedSessions||0)+(sessionIsComplete(session)?1:0) }
     };
+    const reusable=reusableSnapshotFor(todayPlan,session);
+    if(reusable)s.pendingCompletion.reuseProfile={...profile,reusablePlan:reusable};
 
   }
   if (LS.blocked) { LS.recover(); ensureUserDataCompatibility(); }
   // Keep a retryable checkpoint before committing history and cycle together.
   persistTrainingState();
-  const changes = completionData(s.pendingCompletion);
-  if (!LS.transaction(changes)) {
+  let changes = completionData(s.pendingCompletion);
+  let saved=LS.transaction(changes);
+  // 保存复用计划属于可选增强；空间不足时先尝试保住本次实际训练。
+  if(!saved && !LS.blocked && s.pendingCompletion.reuseProfile && !s.pendingCompletion.plan){delete s.pendingCompletion.reuseProfile;changes=completionData(s.pendingCompletion);saved=LS.transaction(changes);}
+  if (!saved) {
     s.saveError = '尚未保存成功，训练和周期进度已保留。请重试保存，或导出含本次训练的备份；不要清除浏览器数据。';
     persistTrainingState();
     return false;
   }
   sessions=changes.sessions; todayIndex=changes.today_index; cycleVariants=changes.cycle_variants;
   trainingPhase=changes.training_phase;
-  if(changes.plan){plan=changes.plan;profile=changes.profile;}
+  if(changes.plan)plan=changes.plan;
+  if(changes.profile)profile=changes.profile;
   s.saved = true;
   s.saveError = '';
   s.pendingCompletion = null;

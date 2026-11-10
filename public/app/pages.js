@@ -1,88 +1,3 @@
-// ============ 首页 ============
-function renderHomePage() {
-  if (!currentUser) return;
-  const weekSessions = getWeekSessions();
-  const weekDone = weekSessions.length;
-  const streak = getStreak();
-  const lastS = getLastSessionSummary();
-  const weekTarget = Math.max(1, profile.trainingDays);
-  const weekPct = Math.min(100, Math.round(weekDone / weekTarget * 100));
-  const suggested = suggestTodayFocus();
-  const focusKey = todayPlan?.focusKey || suggested.key;
-  const focusCode = {push:'PUSH DAY',pull:'PULL DAY',legs:'LEG DAY'}[focusKey] || 'TRAINING DAY';
-  const heroDetail = todayPlan
-    ? `${todayPlan.workout.length} 个动作 · ${todayPlan.factors.time}`
-    : `${profile.trainingDirection || profile.goal} · ${suggested.day.name}，按当天状态安排`;
-  const heroAction = todayPlan ? (todayPlan.status === 'preview' ? '继续确认计划' : '继续今日训练') : '生成今日计划';
-  const container = document.getElementById('homeContent');
-  container.innerHTML = `
-    ${dataRecoveryNotice || LS.error ? `<div class="danger-note">${escapeHtml(dataRecoveryNotice || LS.error)} <button class="mini-btn" onclick="navigate('profile')">备份与恢复</button></div>` : ''}
-    <header class="app-masthead">
-      <div><div class="brand-word">IRONTRACK</div><div class="brand-meta">个人训练 · ${escapeHtml(plan.name)}</div></div>
-      <div class="user-pill"><span>${escapeHtml(currentUser)}</span></div>
-    </header>
-    <section class="home-hero" onclick="navigate('training')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();navigate('training')}">
-      <div class="hero-kicker">${focusCode} · PPL 循环</div>
-      <div class="hero-title">今天，<br>继续向上。</div>
-      <div class="hero-summary">${escapeHtml(heroDetail)}</div>
-      <div class="hero-action"><span>${heroAction}</span><span>→</span></div>
-    </section>
-    <div class="home-section-label">本周状态</div>
-    <div class="home-metrics">
-      <div class="home-metric primary" onclick="navigate('data')" style="cursor:pointer"><small>训练进度</small><strong>${weekDone} / ${weekTarget}</strong><div class="home-progress"><i style="width:${weekPct}%"></i></div></div>
-      <div class="home-metric"><small>连续训练</small><strong>${streak}<span style="font-size:13px;color:var(--muted);margin-left:4px">天</span></strong></div>
-    </div>
-    <div class="home-section-label">训练概览</div>
-    <div class="home-list">
-      ${lastS ? `<div class="home-row" onclick="navigate('data')"><div><div class="home-row-label">上次训练 · ${escapeHtml(lastS.date)}</div><div class="home-row-value">${escapeHtml(lastS.dayName)} · ${lastS.totalSets} 组</div></div><div class="home-row-side">${lastS.duration}<br>${escapeHtml(lastS.feedback||'已保存')}</div></div>` : `<div class="home-row" onclick="navigate('training')"><div><div class="home-row-label">上次训练</div><div class="home-row-value">完成第一次训练后显示摘要</div></div><span class="home-row-arrow">→</span></div>`}
-      <div class="home-row" onclick="navigate('plan')"><div><div class="home-row-label">训练体系</div><div class="home-row-value">${escapeHtml(plan.name)} · 下一项 ${escapeHtml(suggested.day.name)}</div></div><span class="home-row-arrow">→</span></div>
-      <div class="home-row" onclick="navigate('data')"><div><div class="home-row-label">数据记录</div><div class="home-row-value">共 ${sessions.length} 条训练记录</div></div><span class="home-row-arrow">→</span></div>
-    </div>`;
-}
-
-// ============ 训练体系页 ============
-function renderPlanPage() {
-  if (!currentUser) return;
-  try {
-    ensureUserDataCompatibility();
-    renderPlanPageContent();
-  } catch(e) {
-    console.error('训练体系加载失败:', e);
-    renderPageRecovery('plan');
-  }
-}
-
-function renderPlanPageContent() {
-  const sugg = suggestTodayFocus();
-  const phaseDays = Math.max(1, Math.floor((Date.now()-new Date(trainingPhase.startedAt||getTodayStr()).getTime())/86400000)+1);
-  const phaseWeek = Math.max(1, Math.ceil(phaseDays/7));
-
-  const container = document.getElementById('systemContent');
-  container.innerHTML = `
-    <div class="row mb-4">
-      <div>
-        <h1 class="section-title" style="font-size:24px;margin-bottom:2px">训练体系</h1>
-        <p class="text-muted text-sm">持续训练方向 · 按实际训练逐次调整</p>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header"><span class="text-accent text-sm font-bold">下一次训练</span></div>
-      <div class="setup-recommend" style="margin-top:14px">💡 ${escapeHtml(sugg.reason)}</div>
-      <div class="text-muted text-sm" style="margin-top:10px">${escapeHtml(sugg.day.name)}（${escapeHtml(sugg.day.focus)}） · 每周约 ${profile.trainingDays} 次</div>
-      <button class="btn btn-accent mt-3" onclick="navigate('training')">${todayPlan ? '继续今日训练' : '开始今日训练'}</button>
-    </div>
-
-    <div class="card">
-      <div class="section-title">持续方向</div>
-      <div class="text-sm">${escapeHtml(profile.trainingDirection||profile.goal||'逐步建立稳定训练习惯')}</div>
-      <div class="text-muted text-sm" style="margin-top:10px">${escapeHtml(profile.experienceSummary||profile.experience||'训练经验尚未补充')} · 当前阶段第 ${phaseWeek} 周，已完成 ${trainingPhase.completedSessions||0} 次</div>
-    </div>
-
-    <div class="card">
-    </div>`;
-}
-
 // ============ 数据页 ============
 let selectedPerformanceExercise='';
 function formatSetLoad(set) { return set?.loadType==='bodyweight'?'徒手':`${escapeHtml(set?.w ?? 0)} kg`; }
@@ -234,19 +149,19 @@ function renderProfileContent() {
         <label class="field-group"><span class="field-label">体重 kg</span><input class="field-value" id="pf-weight" type="number" step="0.1" value="${escapeHtml(profile.weight)}"></label>
         <label class="field-group"><span class="field-label">体脂率 %</span><input class="field-value" id="pf-bodyfat" type="number" step="0.1" value="${escapeHtml(profile.bodyFat)}"></label>
       </div><div class="text-xs text-muted mt-2">只有修改体重或体脂时才会记录一个测量点；开始训练不会自动记录身体数据。</div></details>
-      <details class="card"><summary class="section-title">AI 私人教练</summary>
+      <details class="card" id="ai-settings"><summary class="section-title">AI 私人教练</summary>
         <div class="text-xs text-muted mt-2">教练会把你的训练档案、身体限制、当天状态和近期真实训练记录发送给 DeepSeek，用于对话、计划和复盘；姓名不会发送。首次使用时会请你确认。</div>
         ${profile.coachDataConsent?'<button class="mini-btn mt-2" onclick="revokeCoachDataConsent()">撤回训练资料发送确认</button>':''}
-        <div class="field-group mt-3"><span class="field-label">DeepSeek API Key（仅保存在本机浏览器）</span>
+        <div class="field-group mt-3"><span class="field-label">DeepSeek API Key（保存在此浏览器，所有本地用户共用）</span>
           <div style="display:flex;gap:8px">
             <input class="field-value" id="pf-apiKey" type="password" value="${apiKey}" placeholder="sk-..." style="flex:1;border:none;outline:none;color:var(--text);background:var(--bg);font-size:15px">
             <button onclick="testApiKey()" style="padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;cursor:pointer;white-space:nowrap;min-height:44px">测试连接</button>
           </div>
         </div>
-        <div class="text-xs text-muted mt-2">在 <a href="https://platform.deepseek.com" target="_blank" rel="noopener" style="color:var(--accent)">platform.deepseek.com</a> 获取 Key。训练数据只保存在当前浏览器；备份不包含 API Key。</div>
-        <div id="apiTestMsg" class="text-xs mt-2"></div>
+        <div class="text-xs text-muted mt-2">在 <a href="https://platform.deepseek.com" target="_blank" rel="noopener" style="color:var(--accent)">platform.deepseek.com</a> 获取 Key。测试连接会发送一条简短测试消息；备份不包含 API Key。</div>
+        <div id="apiTestMsg" class="text-xs mt-2" role="status"></div><button class="mini-btn mt-2" onclick="saveCoachApiKey()">保存 Key</button><button class="mini-btn mt-2" onclick="navigate('training')">返回训练</button>
       </details>
-      <details class="card" ${dataRecoveryNotice||LS.error?'open':''}><summary class="section-title">本地数据备份</summary>
+      <details class="card" id="data-backup" ${dataRecoveryNotice||LS.error?'open':''}><summary class="section-title">本地数据备份</summary>
         <div class="text-muted text-sm" style="line-height:1.6;margin-bottom:14px">训练数据只保存在当前浏览器。建议定期导出；备份不包含 API Key。${profile.lastBackupRequestedAt?`<br>上次发起导出：${escapeHtml(profile.lastBackupRequestedAt.slice(0,10))}（请确认文件已保存）`:'<br>尚未记录导出时间，换设备或清理浏览器前请先备份。'}</div>
         <div style="display:flex;gap:10px">
           <button class="mini-btn" style="flex:1" onclick="exportBackup()">导出备份</button>
@@ -293,10 +208,10 @@ function saveProfile() {
   if(!LS.transaction(changes)){document.getElementById('saveMsg').textContent='暂时无法保存，请导出备份后重试。';return;}
   profile=next;
   if(changes.body_records)bodyRecords=changes.body_records;
-  setGlobalApiKey(document.getElementById('pf-apiKey').value.trim());
+  const keySaved=setGlobalApiKey(document.getElementById('pf-apiKey').value.trim());
 
   var msg = document.getElementById('saveMsg');
-  msg.textContent = '已保存';
+  msg.textContent = keySaved?'已保存':'训练档案已保存，但 AI Key 未保存，请检查浏览器存储。';
   setTimeout(function(){ msg.textContent = ''; }, 2000);
   renderUserSection();
   renderHomePage();
@@ -311,25 +226,25 @@ function addTrainingNote() {
   const msg=document.getElementById('saveMsg');if(msg)msg.textContent='已记住这条训练信息。';
 }
 
+function saveCoachApiKey() {
+  const key=(document.getElementById('pf-apiKey')?.value||'').trim(),msg=document.getElementById('apiTestMsg');
+  if(!key){msg.textContent='请输入 API Key。';return;}
+  if(!setGlobalApiKey(key)){msg.textContent='Key 未能保存，请检查浏览器存储。';return;}
+  msg.textContent='Key 已保存在此浏览器，可测试连接或返回训练。';renderUserSection();
+}
 async function testApiKey() {
-  const key = document.getElementById('pf-apiKey').value.trim();
-  if (!key) { document.getElementById('apiTestMsg').innerHTML = '<span style="color:#f4a261">请输入 API Key</span>'; return; }
-  document.getElementById('apiTestMsg').innerHTML = '<span style="color:var(--muted)">测试中...</span>';
+  const field=document.getElementById('pf-apiKey'),key=(field?.value||'').trim(),msg=document.getElementById('apiTestMsg'),identity=requestIdentity();
+  if(!key){msg.textContent='请输入 API Key。';return;}
+  msg.textContent='正在测试连接…';const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
   try {
-    const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-      body: JSON.stringify({ model: 'deepseek-chat', messages: [{ role: 'user', content: '回复"OK"' }], max_tokens: 5 })
-    });
-    if (res.ok) {
-      setGlobalApiKey(key);
-      document.getElementById('apiTestMsg').innerHTML = '<span style="color:#2a9d8f">连接成功，已保存</span>';
-    } else {
-      const err = await res.json().catch(() => ({}));
-      document.getElementById('apiTestMsg').innerHTML = '<span style="color:#e76f51">连接失败: ' + (err.error?.message || res.status) + '</span>';
-    }
-  } catch(e) {
-    document.getElementById('apiTestMsg').innerHTML = '<span style="color:#e76f51">网络错误: ' + e.message + '</span>';
-  }
+    const res=await fetch('https://api.deepseek.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:'回复"OK"'}],max_tokens:5}),signal:controller.signal});
+    if(!requestIdentityMatches(identity))return;
+    if(document.getElementById('pf-apiKey')!==field||field.value.trim()!==key){msg.textContent='输入已变化，请重新测试。';return;}
+    if(!res.ok){msg.textContent=res.status===401||res.status===403?'连接未通过，请检查 Key 和账号权限。':res.status===429?'请求受限，请稍后重试。':'连接失败，请检查网络和服务状态后重试。';return;}
+    if(!setGlobalApiKey(key)){msg.textContent='连接成功，但 Key 未保存，请检查浏览器存储。';return;}
+    msg.textContent='连接成功，Key 已保存在此浏览器。';renderUserSection();
+  }catch(e){if(requestIdentityMatches(identity)&&document.getElementById('pf-apiKey')===field)msg.textContent='连接失败，请检查网络后重试；已输入的 Key 保留。';}
+  finally{clearTimeout(timer);}
 }
 
 const RECOVERY_KEYS = ['pre_import_backup','pre_restore_backup','compat_recovery','catalog_compat_recovery_v1','imported_recovery'];

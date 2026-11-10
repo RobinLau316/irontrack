@@ -4,8 +4,8 @@ function getGlobalApiKey() {
   catch(e) { return ''; }
 }
 function setGlobalApiKey(key) {
-  try { localStorage.setItem('irontrack_global_apikey', key); }
-  catch(e) { console.warn('存储 API Key 失败:', e); }
+  try { localStorage.setItem('irontrack_global_apikey', key);return true; }
+  catch(e) { console.warn('存储 API Key 失败:', e);return false; }
 }
 
 // ============ 用户管理 ============
