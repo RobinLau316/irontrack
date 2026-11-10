@@ -1,6 +1,6 @@
 // IronTrack Service Worker：应用壳离线缓存。
 // 发布新版本时必须递增 CACHE_VERSION；旧缓存会在激活时自动清除。
-const CACHE_VERSION = 'irontrack-2026-11-10-continuity-1';
+const CACHE_VERSION = 'irontrack-2026-11-10-simple-2';
 
 const SHELL = [
   './',

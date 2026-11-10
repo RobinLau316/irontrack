@@ -42,14 +42,14 @@ await test('生成计划包含三部分，预览与训练页都显示AI说明',a
   h.run('renderPlanPreview()');
   const preview=h.elements.get('trainingContent').innerHTML;
   assert.ok(preview.includes('训练前热身') && preview.includes('训练后拉伸'));
-  assert.ok(preview.indexOf(fixture.warmup[0].name)<preview.indexOf('正式训练 ·'));
-  assert.ok(preview.indexOf(fixture.stretch[0].name)>preview.indexOf('正式训练 ·'));
+  assert.ok(preview.indexOf(fixture.warmup[0].name)<preview.indexOf('plan-exercise'));
+  assert.ok(preview.indexOf(fixture.stretch[0].name)>preview.indexOf('plan-exercise'));
   h.run('startConfirmedPlan();toggleGuide("warmup",0)');
   assert.equal(h.run('trainState.section'),'warmup');
   assert.ok(h.elements.get('trainingContent').innerHTML.includes(fixture.warmup[0].note));
   const reload=harness(h.store);
   assert.deepEqual(reload.json('trainState.warmupDone'),[0]);
-  reload.run('setSection("workout");completeSet();skipRest();completeSet();');
+  reload.run('setSection("workout");confirmBodyweight();completeSet();skipRest();confirmBodyweight();completeSet();');
   assert.equal(reload.run('trainState.section'),'stretch');
   assert.ok(reload.elements.get('trainingContent').innerHTML.includes(fixture.stretch[0].note));
   reload.run('toggleGuide("stretch",0)');
@@ -75,7 +75,7 @@ await test('微调请求携带既有热身拉伸，返回的新建议同步入�
 });
 await test('旧计划补充指南保留正式动作、已完成组及已有热身勾选',async()=>{
   const h=harness();setup(h);await h.run('generateTodayPlan()');
-  h.run('todayPlan.stretch=[];startConfirmedPlan();toggleGuide("warmup",0);setSection("workout");completeSet();skipRest();setSection("stretch");');
+  h.run('todayPlan.stretch=[];startConfirmedPlan();toggleGuide("warmup",0);setSection("workout");confirmBodyweight();completeSet();skipRest();setSection("stretch");');
   const before=h.json('({workout:todayPlan.workout,state:trainState})');
   await h.run('supplementCoachGuides()');
   assert.deepEqual(h.json('todayPlan.workout'),before.workout);

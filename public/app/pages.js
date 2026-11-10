@@ -201,11 +201,18 @@ function renderSessionHistory() {
       const states={completed:'已完成',partial:'部分完成',skipped:'已跳过',not_started:'未开始'};
       const previous=records.slice(position+1).map(row=>({date:row.session.date,ex:(row.session.exercises||[]).find(item=>item.name===ex.name&&(item.sets||[]).length)})).find(row=>row.ex);
       const previousText=previous?`<div class="reason-note">上次 ${escapeHtml(previous.date)}：${previous.ex.sets.map(st=>escapeHtml(st.w)+'kg × '+escapeHtml(st.r)+'次').join('；')}</div>`:'';
-      const rows=(ex.sets||[]).map((set,si)=>`<div class="history-set">第 ${si+1} 组：<input aria-label="第${si+1}组重量" type="number" min="0" max="1000" step="0.5" value="${escapeHtml(set.w)}" id="history-w-${position}-${ei}-${si}"> kg × <input aria-label="第${si+1}组次数" type="number" min="1" max="100" step="1" value="${escapeHtml(set.r)}" id="history-r-${position}-${ei}-${si}"> 次</div>`).join('');
+      const rows=(ex.sets||[]).map((set,si)=>`<div class="history-set">第 ${si+1} 组：<input aria-label="第${si+1}组重量" type="number" min="0" max="1000" step="0.5" value="${escapeHtml(set.w)}" id="history-w-${position}-${ei}-${si}" readonly> kg × <input aria-label="第${si+1}组次数" type="number" min="1" max="100" step="1" value="${escapeHtml(set.r)}" id="history-r-${position}-${ei}-${si}" readonly> 次</div>`).join('');
       return `<div class="history-exercise"><strong>${escapeHtml(ex.name)}</strong> <span class="text-muted text-xs">${escapeHtml(states[ex.status]||((ex.sets||[]).length?'已记录':'未开始'))}</span>${previousText}${rows||'<div class="text-muted text-xs">没有已确认的组</div>'}${ex.feedback?`<div class="reason-note">${escapeHtml(ex.feedback)} ${escapeHtml(ex.feedbackNote||'')}</div>`:''}</div>`;
     }).join('');
-    return `<details class="history-card"><summary><strong>${escapeHtml(session.dayName||session.focusArea||'训练')} · ${status}</strong><span class="text-muted text-xs"> ${escapeHtml(session.date)} · ${totalSets} 组</span></summary><div class="reason-note">${formatTime(session.duration||0)}${session.sessionFeedback?' · 感觉：'+escapeHtml(session.sessionFeedback):''}${session.sessionDiscomfort?' · 补充：'+escapeHtml(session.sessionDiscomfort):''}</div>${session.coachReview?`<div class="reason-note">教练复盘：${escapeHtml(session.coachReview)}</div>`:''}${detail}${totalSets?`<button class="mini-btn mt-2" onclick="saveHistoryCorrection('${source}',${index},${position})">保存记录更正</button><div class="text-muted text-xs mt-2">仅更正实际重量和次数；后续新计划会参考更新后的记录。</div>`:''}</details>`;
+    return `<details class="history-card" id="history-card-${position}"><summary><strong>${escapeHtml(session.dayName||session.focusArea||'训练')} · ${status}</strong><span class="text-muted text-xs"> ${escapeHtml(session.date)} · ${totalSets} 组</span></summary><div class="reason-note">${formatTime(session.duration||0)}${session.sessionFeedback?' · 感觉：'+escapeHtml(session.sessionFeedback):''}${session.sessionDiscomfort?' · 补充：'+escapeHtml(session.sessionDiscomfort):''}</div>${session.coachReview?`<div class="reason-note">教练复盘：${escapeHtml(session.coachReview)}</div>`:''}${detail}${totalSets?`<button class="mini-btn mt-2" onclick="editHistory(${position})">✎ 更正</button><button class="mini-btn mt-2 history-save" hidden onclick="saveHistoryCorrection('${source}',${index},${position})">保存更正</button>`:''}</details>`;
   }).join('');
+}
+
+function editHistory(position) {
+  const card=document.getElementById(`history-card-${position}`);if(!card)return;
+  card.querySelectorAll('.history-set input').forEach(input=>input.readOnly=false);
+  card.classList.add('editing');
+  const save=card.querySelector('.history-save');if(save)save.hidden=false;
 }
 
 function saveHistoryCorrection(source,index,position) {
@@ -292,20 +299,20 @@ function renderProfileContent() {
   const container = document.getElementById('profileContent');
   const apiKey = getGlobalApiKey();
   container.innerHTML = `
-      <div class="card"><div class="section-title">训练档案</div>
+      <details class="card"><summary class="section-title">训练档案</summary>
         <label class="setup-label" for="pf-direction">接下来几周，你最想改善什么？</label><textarea id="pf-direction" class="setup-input onboarding-answer" maxlength="500">${escapeHtml(profile.trainingDirection||profile.goal||'')}</textarea>
         <label class="setup-label mt-3" for="pf-days">通常每周能练几次？</label><input id="pf-days" class="setup-input" type="number" min="1" max="7" inputmode="numeric" value="${escapeHtml(profile.trainingDays)}">
         <label class="setup-label mt-3" for="pf-experience">你的训练经验（选填）</label><textarea id="pf-experience" class="setup-input onboarding-answer" maxlength="500">${escapeHtml(profile.experienceSummary||profile.experience||'')}</textarea>
         <label class="setup-label mt-3" for="pf-limitations">长期疼痛、动作限制或其他需要记住的事（选填）</label><textarea id="pf-limitations" class="setup-input onboarding-answer" maxlength="500">${escapeHtml(profile.limitations||'')}</textarea>
         <label class="setup-label mt-3" for="pf-note">补充一条训练档案（选填）</label><input id="pf-note" class="setup-input" maxlength="240" placeholder="例如：深蹲时希望多注意动作稳定"><button class="mini-btn mt-2" onclick="addTrainingNote()">保存这条信息</button>
         ${(profile.trainingNotes||[]).length?`<div class="reason-note mt-2">已记住：${(profile.trainingNotes||[]).slice(-5).map(escapeHtml).join(' · ')}</div>`:''}
-      </div>
+      </details>
       <details class="card"><summary class="section-title">身体数据（选填）</summary><div class="grid-2 mt-3">
         <label class="field-group"><span class="field-label">身高 cm</span><input class="field-value" id="pf-height" type="number" value="${escapeHtml(profile.height)}"></label>
         <label class="field-group"><span class="field-label">体重 kg</span><input class="field-value" id="pf-weight" type="number" step="0.1" value="${escapeHtml(profile.weight)}"></label>
         <label class="field-group"><span class="field-label">体脂率 %</span><input class="field-value" id="pf-bodyfat" type="number" step="0.1" value="${escapeHtml(profile.bodyFat)}"></label>
       </div><div class="text-xs text-muted mt-2">只有修改体重或体脂时才会记录一个测量点；开始训练不会自动记录身体数据。</div></details>
-      <div class="card"><div class="section-title">AI 私人教练</div>
+      <details class="card"><summary class="section-title">AI 私人教练</summary>
         <div class="text-xs text-muted mt-2">教练会把你的训练档案、身体限制、当天状态和近期真实训练记录发送给 DeepSeek，用于对话、计划和复盘；姓名不会发送。首次使用时会请你确认。</div>
         ${profile.coachDataConsent?'<button class="mini-btn mt-2" onclick="revokeCoachDataConsent()">撤回训练资料发送确认</button>':''}
         <div class="field-group mt-3"><span class="field-label">DeepSeek API Key（仅保存在本机浏览器）</span>
@@ -316,8 +323,8 @@ function renderProfileContent() {
         </div>
         <div class="text-xs text-muted mt-2">在 <a href="https://platform.deepseek.com" target="_blank" rel="noopener" style="color:var(--accent)">platform.deepseek.com</a> 获取 Key。训练数据只保存在当前浏览器；备份不包含 API Key。</div>
         <div id="apiTestMsg" class="text-xs mt-2"></div>
-      </div>
-      <div class="card"><div class="section-title">本地数据备份</div>
+      </details>
+      <details class="card" ${dataRecoveryNotice||LS.error?'open':''}><summary class="section-title">本地数据备份</summary>
         <div class="text-muted text-sm" style="line-height:1.6;margin-bottom:14px">训练数据只保存在当前浏览器。建议定期导出；备份不包含 API Key。${profile.lastBackupRequestedAt?`<br>上次发起导出：${escapeHtml(profile.lastBackupRequestedAt.slice(0,10))}（请确认文件已保存）`:'<br>尚未记录导出时间，换设备或清理浏览器前请先备份。'}</div>
         <div style="display:flex;gap:10px">
           <button class="mini-btn" style="flex:1" onclick="exportBackup()">导出备份</button>
@@ -326,7 +333,7 @@ function renderProfileContent() {
         <input id="backupFile" type="file" accept="application/json,.json" style="display:none" onchange="importBackupFile(this.files[0]);this.value=''">
         <div id="backupMsg" class="text-xs text-muted mt-3">${escapeHtml(dataRecoveryNotice || LS.error)}</div>
         ${renderRecoveryOptions()}
-      </div>
+      </details>
       <button class="btn btn-accent" onclick="saveProfile()">保存修改</button>
       <div class="text-center text-xs text-muted mt-3" id="saveMsg"></div>`;
 }

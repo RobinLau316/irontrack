@@ -107,6 +107,7 @@ function updatePreviewField(index,key,value) {
   const limits = { sets:[1,8], reps:[1,100], weight:[0,1000], rest:[30,300] }[key];
   if (!Number.isFinite(num) || num < limits[0] || num > limits[1]) { renderPlanPreview(); return; }
   ex[key] = key === 'weight' ? Math.round(num*2)/2 : Math.round(num);
+  if(key==='weight')ex.weightConfirmedByUser=true;
   ex.reason = '用户在计划预览中手动调整';
   LS.set('today_plan', todayPlan);
 }
@@ -176,6 +177,8 @@ function discardTodayPlan() {
   window.scrollTo(0, 0);
 }
 
+function needsWeightConfirmation(ex) { return !!ex && todayPlan?.source==='coach-ai' && !ex.lastActual && !ex.weightConfirmedByUser && Number(ex.weight)===0; }
+
 function initDynamicTraining() {
   const tp = todayPlan;
   const exercises = tp.workout;
@@ -184,6 +187,7 @@ function initDynamicTraining() {
     exIdx: 0, set: 1,
     weight: exercises[0] ? exercises[0].weight||0 : 0,
     reps: exercises[0] ? exercises[0].reps||8 : 8,
+    weightNeedsConfirmation:needsWeightConfirmation(exercises[0]),
     records: {}, feedback:{}, skipped:{}, pendingFeedback:null, isResting: false, restTimer: 0, restEndAt:0, sessionTime: 0, complete: false,
     sessionFeedback:'',sessionDiscomfort:'',advancePpl:null,
     section: 'warmup',   // warmup | workout | stretch | nutrition
@@ -330,12 +334,13 @@ function renderWorkout() {
     <div class="training-container workout-focus">
       <div class="hero-kicker text-center">动作 ${s.exIdx+1} / ${s.day.exercises.length} · ${escapeHtml(ex.role||'辅助')}</div>
       <div class="exercise-name">${escapeHtml(ex.name)}${ex.isNew?'<span class="new-exercise-badge">新动作</span>':''}</div>
-      <div class="exercise-target">目标 ${ex.weight}kg · ${ex.sets}组×${ex.reps}次</div>${ex.lastActual?`<div class="reason-note text-center">上次 ${escapeHtml(ex.lastActual.date)}：${ex.lastActual.sets.map(row=>escapeHtml(row.w)+'kg × '+escapeHtml(row.r)+'次').join('；')}</div>`:''}
-      ${exerciseInstructionBlock(ex,`workout-instruction-${s.exIdx}`)}
+      <div class="exercise-target">目标 ${s.weightNeedsConfirmation?'重量待确认':ex.weight+'kg'} · ${ex.sets}组×${ex.reps}次</div>${ex.lastActual?`<div class="reason-note text-center">上次 ${escapeHtml(ex.lastActual.date)}：${ex.lastActual.sets.map(row=>escapeHtml(row.w)+'kg × '+escapeHtml(row.r)+'次').join('；')}</div>`:''}
+      ${!ex.lastActual && ex.instructions?.[0] && ex.instructions[0].length<=45?`<div class="reason-note text-center">${escapeHtml(ex.instructions[0])}</div>`:''}${exerciseInstructionBlock(ex,`workout-instruction-${s.exIdx}`)}
+      <div id="weightConfirmHint" class="reason-note text-center" ${s.weightNeedsConfirmation?'':'hidden'}>请填写实际重量，或 <button class="inline-action" onclick="confirmBodyweight()">确认徒手</button></div>
       <div class="control-label text-center">本组重量</div>
       <div class="num-control">
         <div class="num-btn" onclick="adjustWeight(-2.5)">−</div>
-        <div class="num-display"><input class="big reps-input weight-input" type="text" inputmode="decimal" value="${s.weight}" aria-label="训练重量" onfocus="focusTrainingInput(this)" onkeydown="handleWeightKey(event,this)" onblur="commitWeightInput(this)"><div class="unit">kg</div></div>
+        <div class="num-display"><input class="big reps-input weight-input" type="text" inputmode="decimal" value="${s.weightNeedsConfirmation?'':s.weight}" placeholder="—" aria-label="训练重量" onfocus="focusTrainingInput(this)" onkeydown="handleWeightKey(event,this)" onblur="commitWeightInput(this)"><div class="unit">kg</div></div>
         <div class="num-btn" onclick="adjustWeight(2.5)">+</div>
       </div>
       <div class="control-label text-center">本组次数</div>
@@ -345,12 +350,12 @@ function renderWorkout() {
         <div class="num-btn" onclick="adjustReps(1)">+</div>
       </div>
       <div class="set-indicator">第 ${s.set} 组 / 共 ${ex.sets} 组 · 动作 ${s.exIdx+1}/${s.day.exercises.length}</div>
-      <div class="reason-note text-center">${ex.role==='核心'?'保持主动作连续，方便比较实际表现':'按今天训练方向安排'}</div>
+
       ${recs.length > 0 ? `<div class="set-history">${recs.map(r=>`<span class="set-dot">组${r.set}:${r.w}×${r.r}</span>`).join('')}</div>` : ''}
     </div>
     <div class="training-actions">
       <div id="workoutMore" class="workout-more">
-        <button class="btn btn-outline" onclick="skipExercise()">跳过当前动作</button>
+        ${s.lastConfirmed?'<button class="btn btn-outline" onclick="undoLastSet()">撤销上一组</button>':''}<button class="btn btn-outline" onclick="skipExercise()">跳过当前动作</button>
         <button class="btn btn-outline" onclick="finishTraining()">结束并记录已完成组</button>
       </div>
       <button class="training-more-toggle" onclick="toggleWorkoutActions()">更多操作 · 跳过动作</button>
@@ -368,7 +373,7 @@ function renderStretch() {
   const items = todayPlan.stretch;
   if (!items || items.length === 0) {
     return `<div class="card"><div class="text-muted text-sm">这份旧计划尚未包含训练后拉伸安排，可请教练补充。</div>${missingCoachGuidesAction()}</div>
-      <button class="btn btn-accent mt-3" onclick="finishTraining()">结束训练</button>`;
+      <button class="btn btn-accent mt-3" onclick="finishTraining()">结束训练</button>${s.lastConfirmed?'<button class="text-action" onclick="undoLastSet()">撤销上一组</button>':''}`;
   }
   return `
     <div class="card">
@@ -381,7 +386,7 @@ function renderStretch() {
           </div>`).join('')}
       </div>
     </div>
-    <button class="btn btn-accent mt-3" onclick="finishTraining()">结束训练</button>`;
+    <button class="btn btn-accent mt-3" onclick="finishTraining()">结束训练</button>${s.lastConfirmed?'<button class="text-action" onclick="undoLastSet()">撤销上一组</button>':''}`;
 }
 
 function renderTrainingUI() {
@@ -471,6 +476,7 @@ function advanceAfterExercise() {
     const completed = (s.records[next.id]||[]).length;
     s.set = Math.min(next.sets, completed + 1);
     s.weight = next.weight;
+    s.weightNeedsConfirmation=needsWeightConfirmation(next) && !completed;
     s.reps = next.reps;
     persistTrainingState();
     startRestTimer();
@@ -485,6 +491,7 @@ function skipExercise() {
   const s = trainState;
   const ex = s.day.exercises[s.exIdx];
   if (!confirm(`确定跳过“${ex.name}”吗？`)) return;
+  s.lastConfirmed=null;
   s.skipped = s.skipped || {};
   s.skipped[ex.id] = true;
   s.feedback[ex.id] = { value:'跳过', note:'用户主动跳过', at:new Date().toISOString() };
@@ -501,7 +508,7 @@ function renderRestOverlay() {
       <div class="rest-label">组间休息</div>
       <div class="rest-circle"><div class="rest-time">${s.restTimer}</div></div>
       <div class="rest-next">下一组：第 ${s.set} 组 · ${escapeHtml(ex.name)}</div>
-      <button class="skip-btn" onclick="skipRest()">跳过休息</button>
+      <div class="reason-note">${escapeHtml(s.weight)} kg × ${escapeHtml(s.reps)} 次</div><button class="skip-btn" onclick="skipRest()">跳过休息</button>${s.lastConfirmed?'<button class="text-action" onclick="undoLastSet()">撤销上一组</button>':''}
     </div>
   `;
 }
@@ -567,6 +574,7 @@ function confirmFinishTraining() {
 
 function adjustWeight(delta) {
   trainState.weight = Math.max(0, validWeight(trainState.weight, 0) + delta);
+  if(trainState.weight>0)trainState.weightNeedsConfirmation=false;
   persistTrainingState();
   renderWorkoutOnly();
 }
@@ -577,8 +585,9 @@ function renderWorkoutOnly() {
   s.reps = validReps(s.reps, validReps(ex.reps, 8));
   const recs = s.records[ex.id] || [];
   const ui = document.getElementById('trainingContent');
-  ui.querySelector('.exercise-target').textContent = `目标 ${ex.weight}kg · ${ex.sets}组×${ex.reps}次`;
+  ui.querySelector('.exercise-target').textContent = `目标 ${s.weightNeedsConfirmation?'重量待确认':ex.weight+'kg'} · ${ex.sets}组×${ex.reps}次`;
   ui.querySelector('.num-control .big').value = s.weight;
+  const weightHint=document.getElementById('weightConfirmHint');if(weightHint)weightHint.hidden=!s.weightNeedsConfirmation;
   const small = ui.querySelector('.num-control .small');
   if (small) small.value = s.reps;
   ui.querySelector('.set-indicator').textContent = `第 ${s.set} 组 / 共 ${ex.sets} 组 · 动作 ${s.exIdx+1}/${s.day.exercises.length}`;
@@ -597,6 +606,7 @@ function switchExercise(dir) {
   const next = s.day.exercises[idx];
   s.set = Math.min(next.sets, (s.records[next.id]||[]).length + 1);
   s.weight = next.weight;
+  s.weightNeedsConfirmation=needsWeightConfirmation(next) && !(s.records[next.id]||[]).length;
   s.reps = next.reps;
   persistTrainingState();
   renderTrainingUI();
@@ -631,8 +641,9 @@ function focusTrainingInput(input) {
 
 function commitWeightInput(input) {
   const previous = validWeight(trainState.weight, 0);
+  if(input.value.trim()!=='' && Number.isFinite(Number(input.value)) && Number(input.value)>=0)trainState.weightNeedsConfirmation=false;
   trainState.weight = validWeight(input.value, previous);
-  input.value = trainState.weight;
+  input.value = trainState.weightNeedsConfirmation?'':trainState.weight;
   document.body.classList.remove('keyboard-active');
   persistTrainingState();
 }

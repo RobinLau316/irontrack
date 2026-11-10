@@ -48,3 +48,18 @@ q.run(`sessions=[{id:'review-test',date:'2026-11-10',duration:60,exercises:[{nam
 await q.run(`requestCoachReview({id:'review-test',date:'2026-11-10',exercises:[{name:'测试动作一',sets:[{w:10,r:8,confirmedAt:'t'}]}]})`);
 assert.equal(q.run(`sessions[0].coachReview`),'本次复盘');assert.match(q.elements.get('trainingContent').innerHTML,/本次复盘/);
 console.log('PASS: 复盘与具体训练绑定，切换用户后不串写');
+const u=harness();setup(u);await u.run('generateTodayPlan()');
+u.run('startConfirmedPlan();setSection("workout");completeSet()');
+assert.equal(u.run('Object.values(trainState.records).flat().length'),0,'未知重量不能被自动记录为零');
+u.run('confirmBodyweight();completeSet()');assert.equal(u.run('Object.values(trainState.records).flat().length'),1);
+const restored=harness(u.store);assert.equal(restored.run('trainState.lastConfirmed.exerciseId'),restored.run('trainState.day.exercises[0].id'),'刷新后保留撤销目标');
+restored.run('undoLastSet()');assert.equal(restored.run('Object.values(trainState.records).flat().length'),0);assert.equal(restored.run('trainState.exIdx'),0);assert.equal(restored.run('trainState.isResting'),false);
+restored.run('completeSet();skipRest()');assert.equal(restored.run('trainState.weightNeedsConfirmation'),true,'新动作须分别确认重量');
+console.log('PASS: 新动作重量显式确认、撤销与刷新恢复');
+const legacy=harness();setup(legacy);await legacy.run('generateTodayPlan()');
+legacy.run(`delete todayPlan.workout[0].lastActual; todayPlan.status='active'; LS.set('today_plan',todayPlan); initDynamicTraining(); trainState.records[trainState.day.exercises[0].id]=[{set:1,w:8,r:10,confirmedAt:'legacy'}];persistTrainingState();`);
+const legacyReload=harness(legacy.store);
+assert.equal(legacyReload.run('trainState.records[trainState.day.exercises[0].id][0].w'),8,'旧进行中训练可恢复');
+const backup=legacyReload.json('buildBackupPayload()');
+for(const version of [1,2,3]){legacyReload.c.payload={...backup,version};assert.equal(legacyReload.run('checkedBackup(payload).active_training.state.records[Object.keys(payload.data.active_training.state.records)[0]][0].w'),8);}
+console.log('PASS: 旧进行中训练恢复及 V1/V2/V3 备份读取');
