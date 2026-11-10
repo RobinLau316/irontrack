@@ -491,3 +491,7 @@ body { min-height: 100svh; overscroll-behavior-y: none; }
 .performance-row strong { display:block; font-size:14px; overflow-wrap:anywhere; }
 .performance-date, .performance-values span { display:block; color:var(--muted); font-size:12px; margin-top:5px; }
 .performance-values { text-align:right; flex-shrink:0; }
+.phase-summary { border-top:1px solid var(--border); }
+.phase-summary > div { display:flex; gap:16px; justify-content:space-between; align-items:flex-start; padding:14px 0; border-bottom:1px solid var(--border); }
+.phase-summary span { color:var(--muted); flex-shrink:0; font-size:13px; }
+.phase-summary strong { font-size:14px; font-weight:600; text-align:right; overflow-wrap:anywhere; }

@@ -84,21 +84,27 @@ function renderPlanPageContent() {
 }
 
 // ============ 数据页 ============
+let selectedPerformanceExercise='';
+function formatSetLoad(set) { return set?.loadType==='bodyweight'?'徒手':`${escapeHtml(set?.w ?? 0)} kg`; }
+function selectPerformanceExercise(value) { selectedPerformanceExercise=value;renderDataChart(); }
 function renderDataChart() {
-  if (!currentUser) return;
-  const container=document.getElementById('dataChart');
-  renderSessionHistory();updateWeekStats();
-  const allExercises=new Map();
-  // sessions 保存顺序为最近在前；每次展示该动作本次最高重量对应的实际组。
-  for(const session of sessions) for(const ex of (session.exercises||[])) {
-    if(!(ex.sets||[]).length)continue;
-    const best=ex.sets.reduce((a,b)=>Number(b.w)>Number(a.w)?b:a);
-    const records=allExercises.get(ex.name)||[];
-    records.push({date:session.date,weight:best.w,reps:best.r});allExercises.set(ex.name,records);
+  if(!currentUser)return;
+  const container=document.getElementById('dataChart');renderSessionHistory();updateWeekStats();
+  const archived=LS.get('sessions_archive',[]),all=[...(sessions||[]),...(Array.isArray(archived)?archived:[])],groups=new Map();
+  for(const session of all){
+    const current=new Map();
+    for(const ex of (session.exercises||[])){
+      if(!(ex.sets||[]).length)continue;
+      const canonical=canonicalExerciseName(ex.name),key=exerciseNameKey(canonical),best=ex.sets.reduce((a,b)=>Number(b.w)>Number(a.w)?b:a),prior=current.get(key);
+      if(!prior||Number(best.w)>Number(prior.set.w))current.set(key,{name:canonical,set:best});
+    }
+    for(const [key,item] of current){const group=groups.get(key)||{name:item.name,rows:[]};group.rows.push({date:session.date,set:item.set});groups.set(key,group);}
   }
-  const comparable=[...allExercises.entries()].filter(([,rows])=>rows.length>=2).slice(0,4);
-  if(!comparable.length){container.innerHTML='<div class="data-empty">同一动作记录两次后，可在这里比较。</div>';return;}
-  container.innerHTML=`<div class="data-caption">每次最高重量对应的一组</div>${comparable.map(([name,rows])=>{const latest=rows[0],previous=rows[1];return `<div class="performance-row"><div><strong>${escapeHtml(name)}</strong><div class="performance-date">${escapeHtml(latest.date)} · 上次 ${escapeHtml(previous.date)}</div></div><div class="performance-values"><strong>${escapeHtml(latest.weight)} kg × ${escapeHtml(latest.reps)}</strong><span>上次 ${escapeHtml(previous.weight)} kg × ${escapeHtml(previous.reps)}</span></div></div>`;}).join('')}`;
+  const items=[...groups.entries()];
+  if(!items.length){container.innerHTML='<div class="data-empty">完成训练后，可查看动作记录。</div>';return;}
+  if(!groups.has(selectedPerformanceExercise))selectedPerformanceExercise=(items.find(([,group])=>group.rows.length>=2)||items[0])[0];
+  const group=groups.get(selectedPerformanceExercise),latest=group.rows[0],previous=group.rows[1];
+  container.innerHTML=`<label class="setup-label" for="performance-exercise">选择动作</label><select id="performance-exercise" class="setup-input" onchange="selectPerformanceExercise(this.value)">${items.map(([key,item])=>`<option value="${escapeHtml(key)}" ${key===selectedPerformanceExercise?'selected':''}>${escapeHtml(item.name)}</option>`).join('')}</select><div class="data-caption mt-3">每次最高重量对应的一组</div><div class="performance-row"><div><strong>最近 · ${escapeHtml(latest.date)}</strong><div class="performance-date">${previous?'上次 · '+escapeHtml(previous.date):'再记录一次可比较'}</div></div><div class="performance-values"><strong>${formatSetLoad(latest.set)} × ${escapeHtml(latest.set.r)} 次</strong>${previous?`<span>上次 ${formatSetLoad(previous.set)} × ${escapeHtml(previous.set.r)} 次</span>`:''}</div></div>`;
 }
 
 function renderSessionHistory() {
@@ -113,9 +119,9 @@ function renderSessionHistory() {
     const status=sessionIsComplete(session)?'完成训练':(totalSets?'部分训练':'没有已确认组');
     const detail=exercises.map((ex,ei)=>{
       const states={completed:'已完成',partial:'部分完成',skipped:'已跳过',not_started:'未开始'};
-      const previous=records.slice(position+1).map(row=>({date:row.session.date,ex:(row.session.exercises||[]).find(item=>item.name===ex.name&&(item.sets||[]).length)})).find(row=>row.ex);
-      const previousText=previous?`<div class="reason-note">上次 ${escapeHtml(previous.date)}：${previous.ex.sets.map(st=>escapeHtml(st.w)+'kg × '+escapeHtml(st.r)+'次').join('；')}</div>`:'';
-      const rows=(ex.sets||[]).map((set,si)=>`<div class="history-set">第 ${si+1} 组：<input aria-label="第${si+1}组重量" type="number" min="0" max="1000" step="0.5" value="${escapeHtml(set.w)}" id="history-w-${position}-${ei}-${si}" readonly> kg × <input aria-label="第${si+1}组次数" type="number" min="1" max="100" step="1" value="${escapeHtml(set.r)}" id="history-r-${position}-${ei}-${si}" readonly> 次</div>`).join('');
+      const previous=records.slice(position+1).map(row=>({date:row.session.date,ex:(row.session.exercises||[]).find(item=>sameExerciseName(item.name,ex.name)&&(item.sets||[]).length)})).find(row=>row.ex);
+      const previousText=previous?`<div class="reason-note">上次 ${escapeHtml(previous.date)}：${previous.ex.sets.map(st=>formatSetLoad(st)+' × '+escapeHtml(st.r)+'次').join('；')}</div>`:'';
+      const rows=(ex.sets||[]).map((set,si)=>`<div class="history-set">第 ${si+1} 组：${set.loadType==='bodyweight'?'<span class="text-muted text-xs">徒手 · </span>':''}<input aria-label="第${si+1}组重量" type="number" min="0" max="1000" step="0.5" value="${escapeHtml(set.w)}" id="history-w-${position}-${ei}-${si}" readonly> kg × <input aria-label="第${si+1}组次数" type="number" min="1" max="100" step="1" value="${escapeHtml(set.r)}" id="history-r-${position}-${ei}-${si}" readonly> 次</div>`).join('');
       return `<div class="history-exercise"><strong>${escapeHtml(ex.name)}</strong> <span class="text-muted text-xs">${escapeHtml(states[ex.status]||((ex.sets||[]).length?'已记录':'未开始'))}</span>${previousText}${rows||'<div class="text-muted text-xs">没有已确认的组</div>'}${ex.feedback?`<div class="reason-note">${escapeHtml(ex.feedback)} ${escapeHtml(ex.feedbackNote||'')}</div>`:''}</div>`;
     }).join('');
     return `<details class="history-card" id="history-card-${position}"><summary><strong>${escapeHtml(session.dayName||session.focusArea||'训练')} · ${status}</strong><span class="text-muted text-xs"> ${escapeHtml(session.date)} · ${totalSets} 组</span></summary><div class="reason-note">${formatTime(session.duration||0)}${session.sessionFeedback?' · 感觉：'+escapeHtml(session.sessionFeedback):''}${session.sessionDiscomfort?' · 补充：'+escapeHtml(session.sessionDiscomfort):''}</div>${session.coachReview?`<div class="reason-note">教练复盘：${escapeHtml(session.coachReview)}</div>`:''}${detail}${totalSets?`<button class="mini-btn mt-2" onclick="editHistory(${position})">✎ 更正</button><button class="mini-btn mt-2 history-save" hidden onclick="saveHistoryCorrection('${source}',${index},${position})">保存更正</button>`:''}</details>`;
@@ -138,12 +144,14 @@ function saveHistoryCorrection(source,index,position) {
     const w=document.getElementById(`history-w-${position}-${ei}-${si}`)?.value;
     const r=document.getElementById(`history-r-${position}-${ei}-${si}`)?.value;
     if(w===''||r===''||!Number.isFinite(Number(w))||Number(w)<0||Number(w)>1000||!Number.isInteger(Number(r))||Number(r)<1||Number(r)>100) { alert('请填写有效的重量（0–1000 kg）和次数（1–100）。');return; }
-    session.exercises[ei].sets[si]={...session.exercises[ei].sets[si],w:Number(w),r:Number(r)};
+    const updatedSet={...session.exercises[ei].sets[si],w:Number(w),r:Number(r)};
+    if(updatedSet.loadType==='bodyweight'&&updatedSet.w!==0)delete updatedSet.loadType;
+    session.exercises[ei].sets[si]=updatedSet;
   }
   delete session.coachReview; // 旧复盘基于更正前的数据。
   if(!LS.set(source,updated)){alert('更正未能保存，请检查本机存储后重试。');return;}
   if(source==='sessions') sessions=updated;
-  renderSessionHistory(); updateWeekStats(); alert('训练记录已更正。已生成的计划不会自动改变。');
+  renderDataChart(); alert('训练记录已更正。已生成的计划不会自动改变。');
 }
 
 function updateWeekStats() {

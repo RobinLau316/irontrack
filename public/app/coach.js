@@ -5,17 +5,40 @@ function invalidateCoachRequests() { coachSessionEpoch++; coachIntakeRequest++; 
 function requestIdentity() { return {user:currentUser, epoch:coachSessionEpoch}; }
 function requestIdentityMatches(identity) { return !!identity.user && currentUser===identity.user && coachSessionEpoch===identity.epoch; }
 function intakeRequestMatches(request) { return requestIdentityMatches(request.identity) && request.id===coachIntakeRequest && sameData(profile,request.profile) && sameData(LS.get('onboarding_draft',null),request.draft); }
-function planRequestMatches(request) { return requestIdentityMatches(request.identity) && request.id===coachPlanRequest && sameData(profile,request.profile) && sameData(todayPlan,request.plan) && sameData(LS.get('setup_draft',null),request.setupDraft); }
-function beginPlanRequest() { return {identity:requestIdentity(),id:++coachPlanRequest,profile:cloneData(profile),plan:cloneData(todayPlan),setupDraft:cloneData(LS.get('setup_draft',null))}; }
+function planRequestMatches(request) { return requestIdentityMatches(request.identity) && request.id===coachPlanRequest && sameData(profile,request.profile) && sameData(trainingPhase,request.phase) && sameData(todayPlan,request.plan) && sameData(LS.get('setup_draft',null),request.setupDraft); }
+function beginPlanRequest() { return {identity:requestIdentity(),id:++coachPlanRequest,profile:cloneData(profile),phase:cloneData(trainingPhase),plan:cloneData(todayPlan),setupDraft:cloneData(LS.get('setup_draft',null))}; }
 function renderCoachIfVisible() { if(currentPage==='training')renderOnboarding(); }
 
+
+// 动作名称的关联只来自用户明确确认，不自动推断相似动作。
+function exerciseNameKey(name) { return String(name||'').trim().toLowerCase(); }
+function exerciseAliasEntries() { return Array.isArray(profile?.exerciseAliases)?profile.exerciseAliases.filter(row=>row&&typeof row.name==='string'&&typeof row.canonical==='string'):[]; }
+function canonicalExerciseName(name) { const text=String(name||'').trim(), match=exerciseAliasEntries().find(row=>exerciseNameKey(row.name)===exerciseNameKey(text));return match?match.canonical:text; }
+function sameExerciseName(a,b) { return exerciseNameKey(canonicalExerciseName(a))===exerciseNameKey(canonicalExerciseName(b)); }
+function exerciseHistoryFor(name,limit=Infinity) {
+  const archived=LS.get('sessions_archive',[]), all=[...(sessions||[]),...(Array.isArray(archived)?archived:[])];
+  return all.flatMap(session=>(session.exercises||[]).filter(ex=>sameExerciseName(ex.name,name)&&(ex.sets||[]).length).map(ex=>({date:session.date,name:ex.name,sets:ex.sets}))).slice(0,limit);
+}
+function exerciseHistoryNames() {
+  const archived=LS.get('sessions_archive',[]), all=[...(sessions||[]),...(Array.isArray(archived)?archived:[])], names=[];
+  for(const session of all)for(const ex of (session.exercises||[]))if((ex.sets||[]).length && !names.some(name=>exerciseNameKey(name)===exerciseNameKey(ex.name)))names.push(ex.name);
+  return names;
+}
+function concerningSymptoms(text) {
+  const value=String(text||''),pattern=/(胸痛|胸闷|胸口痛|呼吸困难|喘不过气|晕厥|昏厥|晕倒|头晕|心悸)/g;
+  for(const match of value.matchAll(pattern)){
+    const before=value.slice(Math.max(0,match.index-5),match.index);
+    if(!/(没有|并无|无明显|不再|未出现|无)$/.test(before))return true;
+  }
+  return false;
+}
 
 function coachRecentSessions(limit = 8) {
   return (sessions || []).slice(0, limit).map(session => ({
     date:session.date, duration:session.duration || 0, feedback:session.sessionFeedback || '', discomfort:session.sessionDiscomfort || '',
     exercises:(session.exercises || []).map(ex => ({
-      name:ex.name, status:ex.status || '', feedback:ex.feedback || '',
-      sets:(ex.sets || []).map(set => ({weight:Number(set.w)||0,reps:Number(set.r)||0}))
+      name:canonicalExerciseName(ex.name), recordedName:ex.name, status:ex.status || '', feedback:ex.feedback || '',
+      sets:(ex.sets || []).map(set => ({weight:Number(set.w)||0,reps:Number(set.r)||0,...(set.loadType==='bodyweight'?{loadType:'bodyweight'}:{})}))
     })).filter(ex => ex.sets.length)
   }));
 }
@@ -172,6 +195,7 @@ function renderTrainingSetup(notice='') {
   document.getElementById('trainingContent').innerHTML=`<div class="simple-heading"><span class="eyebrow">TODAY</span><h1>今天的训练</h1></div>${notice?`<div class="resume-banner">${escapeHtml(notice)}</div>`:''}
   <fieldset class="quick-field"><legend>可用时间</legend><div class="quick-options">${['30分钟','45分钟','60分钟'].map(v=>`<label><input type="radio" name="quickTime" value="${v}" ${setupSel.time===v?'checked':''}><span>${v}</span></label>`).join('')}<label><input type="radio" name="quickTime" value="other" ${!['30分钟','45分钟','60分钟'].includes(setupSel.time)?'checked':''}><span>其他</span></label></div><input id="customMinutes" class="setup-input mt-2" type="number" min="10" max="180" inputmode="numeric" placeholder="输入分钟数" value="${!['30分钟','45分钟','60分钟'].includes(setupSel.time)?escapeHtml(parseInt(setupSel.time)||''):''}" ${['30分钟','45分钟','60分钟'].includes(setupSel.time)?'hidden':''}></fieldset>
   <fieldset class="quick-field"><legend>今天状态 <span class="text-muted text-xs">选填</span></legend><div class="quick-options">${['正常','有点累','有不适'].map(v=>`<label><input type="radio" name="quickState" value="${v}" ${setupSel.state===v?'checked':''}><span>${v}</span></label>`).join('')}</div></fieldset>
+  <div id="symptomAlert" class="danger-note" ${concerningSymptoms(setupSel.todayNote||'')?'':'hidden'}>你提到了胸痛、呼吸困难、晕厥、头晕或心悸等情况。如果目前存在，请停止运动并及时就医。<label class="data-consent"><input id="symptomClear" type="checkbox"> 我确认上述症状目前不存在</label></div>
   <div id="discomfortHint" class="danger-note" ${setupSel.state==='有不适'?'':'hidden'}>明显疼痛或异常症状时，请停止相关训练。请说明不适，以便调整计划。</div>
   <details class="simple-detail" ${setupSel.todayNote?'open':''}><summary>补充情况 <span>选填</span></summary><textarea id="coachToday" class="setup-input mt-2" rows="2" maxlength="700" placeholder="例如：右肩不舒服，今天想练下肢">${escapeHtml(setupSel.todayNote||'')}</textarea></details>
   <details class="simple-detail"><summary>可用器械 <span>${escapeHtml(equipment||'请填写')}</span></summary><input id="coachEquipment" class="setup-input mt-2" maxlength="300" value="${escapeHtml(equipment)}" placeholder="例如：健身房常用器械"></details>
@@ -180,18 +204,18 @@ function renderTrainingSetup(notice='') {
   const saveDraft=()=>{const t=document.querySelector('[name="quickTime"]:checked')?.value;const custom=document.getElementById('customMinutes').value;setupSel.time=t==='other'?(custom?custom+'分钟':'其他'):t||setupSel.time;setupSel.state=document.querySelector('[name="quickState"]:checked')?.value||'';setupSel.todayNote=document.getElementById('coachToday').value;setupSel.equipmentText=document.getElementById('coachEquipment').value;saveSetupDraft();};
   document.querySelectorAll('[name="quickTime"]').forEach(input=>input.addEventListener('change',()=>{document.getElementById('customMinutes').hidden=input.value!=='other';saveDraft();}));
   document.querySelectorAll('[name="quickState"]').forEach(input=>input.addEventListener('change',()=>{const warning=document.getElementById('discomfortHint');warning.hidden=input.value!=='有不适';if(input.value==='有不适')document.getElementById('coachToday').closest('details').open=true;saveDraft();}));
-  ['customMinutes','coachToday','coachEquipment'].forEach(id=>document.getElementById(id).addEventListener('input',saveDraft));
+  ['customMinutes','coachToday','coachEquipment'].forEach(id=>document.getElementById(id).addEventListener('input',event=>{if(id==='coachToday'){document.getElementById('symptomAlert').hidden=!concerningSymptoms(event.target.value);document.getElementById('symptomClear').checked=false;}saveDraft();}));
 }
 
 function createLocalPlan() {
   const note=setupSel.todayNote||'';
   const focus=note.match(/胸|背|腿|肩|手臂|上肢|下肢|全身/)?.[0]||'综合训练';
-  return {id:'coach-'+Date.now(),date:getTodayStr(),status:'preview',source:'coach-ai',focus,focusKey:focusKeyFromText(focus),factors:{time:setupSel.time||'45分钟',state:setupSel.state||'未提供',discomfortText:note},warmup:[],workout:[],stretch:[],notice:'教练根据阶段目标和训练记录拟定，确认后逐组带练。'};
+  return {id:'coach-'+Date.now(),date:getTodayStr(),status:'preview',source:'coach-ai',focus,focusKey:focusKeyFromText(focus),factors:{time:setupSel.time||'45分钟',state:setupSel.state||'未提供',discomfortText:note,symptomClear:!!setupSel.symptomClear},warmup:[],workout:[],stretch:[],notice:'教练根据阶段目标和训练记录拟定，确认后逐组带练。'};
 }
 
 function dynamicPlanPromptPayload(base, requestText='') {
   const knownEquipment=profile.coachIntakeFacts?(profile.coachIntakeFacts.equipment||[]):(profile.equipment||[]);
-  return {profile:coachProfileContext(),recentRealSessions:coachRecentSessions(),today:{note:setupSel.todayNote||'',equipment:setupSel.equipmentText||knownEquipment.join('、'),minutes:setupSel.time||'45分钟',state:setupSel.state||'未提供'},phaseProgress:{completedSessions:trainingPhase?.completedSessions||0,startedAt:trainingPhase?.startedAt||'',weekCompleted:getWeekSessions().length,weeklyTarget:profile.trainingDays||null},previousGuides:{warmup:base.warmup||[],stretch:base.stretch||[]},previousPlan:(base.workout||[]).map(ex=>({name:ex.name,sets:ex.sets,reps:ex.reps,weight:ex.weight})),userRequest:requestText};
+  return {profile:coachProfileContext(),recentRealSessions:coachRecentSessions(),today:{note:setupSel.todayNote||'',equipment:setupSel.equipmentText||knownEquipment.join('、'),minutes:setupSel.time||'45分钟',state:setupSel.state||'未提供',symptomStatus:setupSel.symptomClear?'用户确认所述症状目前不存在':''},phaseProgress:{completedSessions:trainingPhase?.completedSessions||0,startedAt:trainingPhase?.startedAt||'',weekCompleted:getWeekSessions().length,weeklyTarget:profile.trainingDays||null,focus:trainingPhase?.focus||'',reviewDate:trainingPhase?.reviewDate||'',nextStep:trainingPhase?.nextStep||''},previousGuides:{warmup:base.warmup||[],stretch:base.stretch||[]},previousPlan:(base.workout||[]).map(ex=>({name:ex.name,sets:ex.sets,reps:ex.reps,weight:ex.weight})),userRequest:requestText};
 }
 
 function validateDynamicAIPlan(items, base, candidates) {
@@ -200,19 +224,18 @@ function validateDynamicAIPlan(items, base, candidates) {
   const workout=items.map(item=>{
     const name=String(item?.name||'').trim();
     if(name.length<2||name.length>50)throw new Error('计划包含无法识别的动作名称');
-    const normalized=name.toLowerCase().replace(/[\s·（）()\-]/g,'');
+    const normalized=exerciseNameKey(canonicalExerciseName(name)).replace(/[\s·（）()\-]/g,'');
     if(names.has(normalized))throw new Error('计划包含重复动作');names.add(normalized);
     const sets=Number(item.sets),reps=Number(item.reps),weight=Number(item.weight),rest=Number(item.rest);
     if(!Number.isInteger(sets)||sets<1||sets>5||!Number.isInteger(reps)||reps<1||reps>30||!Number.isFinite(weight)||weight<0||weight>1000||!Number.isInteger(rest)||rest<20||rest>300)throw new Error('训练数字超出合理校验范围');
-    const exact=(sessions||[]).slice(0,8).flatMap(s=>(s.exercises||[]).filter(ex=>String(ex.name||'').toLowerCase()===name.toLowerCase()).flatMap(ex=>ex.sets||[]));
+    const exact=(sessions||[]).slice(0,8).flatMap(s=>(s.exercises||[]).filter(ex=>sameExerciseName(ex.name,name)).flatMap(ex=>ex.sets||[]));
     const previous=exact.length?{weight:Math.max(...exact.map(x=>Number(x.w)||0)),reps:exact.at(-1)?.r}:null;
     if(!previous&&weight!==0)throw new Error(`“${name}”没有可核验的实际重量，建议重量应留空`);
     if(previous&&weight>previous.weight*1.15+2.5)throw new Error(`“${name}”建议重量高于近期实际记录的校验范围`);
     const instructions=Array.isArray(item.instructions)?item.instructions.map(x=>String(x).slice(0,180)).slice(0,6):String(item.instructions||'').split(/[。；\n]/).filter(Boolean).slice(0,6).map(x=>x.slice(0,180));
     if(instructions.length<2)throw new Error(`“${name}”缺少清楚的动作教学`);
-    const lastSession=(sessions||[]).find(session=>(session.exercises||[]).some(ex=>String(ex.name||'').toLowerCase()===name.toLowerCase() && (ex.sets||[]).length));
-    const lastExercise=lastSession?.exercises.find(ex=>String(ex.name||'').toLowerCase()===name.toLowerCase() && (ex.sets||[]).length);
-    const lastActual=lastExercise?{date:lastSession.date,sets:lastExercise.sets.map(st=>({w:st.w,r:st.r}))}:null;
+    const last=exerciseHistoryFor(name,1)[0];
+    const lastActual=last?{date:last.date,sets:last.sets.map(st=>({w:st.w,r:st.r,...(st.loadType?{loadType:st.loadType}:{})}))}:null;
     return {lastActual,id:'coach-ex-'+Math.random().toString(36).slice(2,10),name,role:item.role==='primary'?'核心':'辅助',sets,reps,weight,rest,purpose:String(item.purpose||'').slice(0,180),reason:String(item.reason||'').slice(0,180),instructions,pattern:'综合'};
   });
   const budget=Math.min(30,Math.floor((Number(String(setupSel.time||'45').match(/\d+/)?.[0])||45)*0.55));
@@ -285,7 +308,7 @@ async function adaptPlanWithAI(base, requestText='') {
   if(!getGlobalApiKey())return {plan:{...base,aiFailure:'请先在“我的”设置 DeepSeek API Key。'},usedAI:false,error:'请先设置 API Key'};
   setupSel={...setupSel,...(base.factors||{})};
   const payload=dynamicPlanPromptPayload(base,requestText);
-  const prompt=`你是用户长期合作的专业私人健身教练。根据档案、阶段目标、真实已完成训练和今天状态，独立制定或微调当天完整力量训练计划。动作库已弃用：请自行选择用户容易理解、当前器械可用、适合其经验的动作，使用清楚的通俗中文名称。如果现有阶段安排或旧总结与当前档案冲突，优先采用当前档案并提醒用户重新确认阶段安排。优先延续熟悉且有记录的有效动作；避免同一计划中训练目的相同的近似动作堆叠。每个动作提供2至6条可照做的步骤，说明起始姿势、动作过程和关键注意点；讲解不可声称已观察用户动作。考虑训练时间、疲劳、限制和不适，不诊断疾病；明显疼痛时给出保守安排并提醒停止诱发疼痛的动作。只把真实记录当成能力依据，不编造完成记录。动作有可核验记录时重量不得高于该动作近期最高实际重量15%再加2.5kg；没有精确记录时weight必须为0。动作2至8个，每个1至5组、1至30次、休息20至300秒；总组数按时间控制。根据最近真实记录、用户反馈和阶段安排，给每个动作写清依据或数据不足时如何保守开始；不要凭空声称动作标准或用户有余力。用户提出小调整时尽量保留其他安排并说明改动原因。必须生成完整的warmup和stretch数组，各1至6项，根据当天正式动作、器械和身体限制安排；每项包含通俗名称name和说明note，note写清如何做、次数或时长及注意点，不能只在summary里提建议。可用时间须包含热身、正式训练和拉伸，必要时减少正式训练组数。summary用一句简短中文说明今天最重要的安排，避免重复，安全提示不可省略。返回完整有效 JSON，不要markdown：{"warmup":[{"name":"热身动作名","note":"做法、次数或时长及注意点"}],"stretch":[{"name":"拉伸动作名","note":"做法、次数或时长及注意点"}],"exercises":[{"name":"通俗中文动作名","role":"primary|auxiliary","sets":3,"reps":8,"weight":0,"rest":90,"purpose":"训练作用","reason":"安排理由","instructions":["准备姿势","动作过程","关键注意点"]}],"summary":"今天的安排和依据，用通俗话说明"}。\n输入：${JSON.stringify(payload)}`;
+  const prompt=`用户记录的阶段重点和下一次安排只是用户计划，不代表已经完成。只根据明确确认的名称关联比较历史记录，不要自己合并相似动作。标记为bodyweight的记录是用户确认的徒手动作；未标记的0kg不推断为徒手。你是用户长期合作的专业私人健身教练。根据档案、阶段目标、真实已完成训练和今天状态，独立制定或微调当天完整力量训练计划。动作库已弃用：请自行选择用户容易理解、当前器械可用、适合其经验的动作，使用清楚的通俗中文名称。如果现有阶段安排或旧总结与当前档案冲突，优先采用当前档案并提醒用户重新确认阶段安排。优先延续熟悉且有记录的有效动作；避免同一计划中训练目的相同的近似动作堆叠。每个动作提供2至6条可照做的步骤，说明起始姿势、动作过程和关键注意点；讲解不可声称已观察用户动作。考虑训练时间、疲劳、限制和不适，不诊断疾病；明显疼痛时给出保守安排并提醒停止诱发疼痛的动作。只把真实记录当成能力依据，不编造完成记录。动作有可核验记录时重量不得高于该动作近期最高实际重量15%再加2.5kg；没有精确记录时weight必须为0。动作2至8个，每个1至5组、1至30次、休息20至300秒；总组数按时间控制。根据最近真实记录、用户反馈和阶段安排，给每个动作写清依据或数据不足时如何保守开始；不要凭空声称动作标准或用户有余力。用户提出小调整时尽量保留其他安排并说明改动原因。必须生成完整的warmup和stretch数组，各1至6项，根据当天正式动作、器械和身体限制安排；每项包含通俗名称name和说明note，note写清如何做、次数或时长及注意点，不能只在summary里提建议。可用时间须包含热身、正式训练和拉伸，必要时减少正式训练组数。summary用一句简短中文说明今天最重要的安排，避免重复，安全提示不可省略。返回完整有效 JSON，不要markdown：{"warmup":[{"name":"热身动作名","note":"做法、次数或时长及注意点"}],"stretch":[{"name":"拉伸动作名","note":"做法、次数或时长及注意点"}],"exercises":[{"name":"通俗中文动作名","role":"primary|auxiliary","sets":3,"reps":8,"weight":0,"rest":90,"purpose":"训练作用","reason":"安排理由","instructions":["准备姿势","动作过程","关键注意点"]}],"summary":"今天的安排和依据，用通俗话说明"}。\n输入：${JSON.stringify(payload)}`;
   try {
     const raw=await aiCall(prompt,true);if(!raw)throw new Error('AI 暂不可用');
     const result=safeParseAIJson(raw),workout=validateDynamicAIPlan(result.exercises,base,[]);
@@ -312,6 +335,8 @@ async function confirmSetup() {
   if(selectedTime==='other'&&(!Number.isInteger(Number(custom))||Number(custom)<10||Number(custom)>180)){msg.textContent='请输入 10 到 180 分钟。';return;}
   setupSel.time=selectedTime==='other'?`${Number(custom)}分钟`:selectedTime;
   setupSel.state=document.querySelector('[name="quickState"]:checked')?.value||'';
+  if(concerningSymptoms(note)&&!document.getElementById('symptomClear')?.checked){msg.textContent='请先确认当前症状；如果仍有症状，请停止运动并及时就医。';document.getElementById('symptomAlert').hidden=false;return;}
+  setupSel.symptomClear=concerningSymptoms(note)&&!!document.getElementById('symptomClear')?.checked;
   if(setupSel.state==='有不适'&&!note){msg.textContent='请补充不适情况，以便教练调整。';document.getElementById('coachToday').closest('details').open=true;return;}
   setupSel.todayNote=note;setupSel.equipmentText=(document.getElementById('coachEquipment')?.value||'').trim();
   saveSetupDraft();
@@ -339,10 +364,43 @@ function compactCoachText(text, fallback='查看教练建议') {
 
 function renderPlanPreview() {
   setTrainingFixedAction(false);
-  const items=todayPlan.workout.map((ex,index)=>`<details class="plan-exercise"><summary><span class="plan-number">${String(index+1).padStart(2,'0')}</span><span class="plan-ex-main"><strong>${escapeHtml(ex.name)}</strong><small>${ex.lastActual?'上次 '+escapeHtml(ex.lastActual.date)+' · '+escapeHtml(ex.lastActual.sets[0]?.w)+' kg × '+escapeHtml(ex.lastActual.sets[0]?.r)+' 次':'首次记录 · 重量待确认'}</small></span><span class="plan-target">${ex.sets} 组 × ${ex.reps} 次</span></summary><div class="plan-ex-detail">${ex.reason?`<div class="reason-note">${escapeHtml(ex.reason)}</div>`:''}${exerciseInstructionBlock(ex,`coach-preview-${index}`)}<div class="edit-grid"><div class="edit-field"><label>组数</label><input type="number" min="1" max="5" value="${ex.sets}" oninput="updatePreviewField(${index},'sets',this.value)"></div><div class="edit-field"><label>次数</label><input type="number" min="1" max="30" value="${ex.reps}" oninput="updatePreviewField(${index},'reps',this.value)"></div><div class="edit-field"><label>重量 kg</label><input type="number" min="0" step="0.5" value="${ex.weight}" oninput="updatePreviewField(${index},'weight',this.value)"></div><div class="edit-field"><label>休息秒</label><input type="number" min="20" max="300" value="${ex.rest}" oninput="updatePreviewField(${index},'rest',this.value)"></div></div><button class="mini-btn mt-2" onclick="swapPlanExercise(${index})">替换动作</button></div></details>`).join('');
+  const items=todayPlan.workout.map((ex,index)=>`<details class="plan-exercise"><summary><span class="plan-number">${String(index+1).padStart(2,'0')}</span><span class="plan-ex-main"><strong>${escapeHtml(ex.name)}</strong><small>${ex.lastActual?'上次 '+escapeHtml(ex.lastActual.date)+' · '+(ex.lastActual.sets[0]?.loadType==='bodyweight'?'徒手':escapeHtml(ex.lastActual.sets[0]?.w)+' kg')+' × '+escapeHtml(ex.lastActual.sets[0]?.r)+' 次':'首次记录 · 重量待确认'}</small></span><span class="plan-target">${ex.sets} 组 × ${ex.reps} 次</span></summary><div class="plan-ex-detail">${ex.reason?`<div class="reason-note">${escapeHtml(ex.reason)}</div>`:''}${exerciseInstructionBlock(ex,`coach-preview-${index}`)}<div class="edit-grid"><div class="edit-field"><label>组数</label><input type="number" min="1" max="5" value="${ex.sets}" oninput="updatePreviewField(${index},'sets',this.value)"></div><div class="edit-field"><label>次数</label><input type="number" min="1" max="30" value="${ex.reps}" oninput="updatePreviewField(${index},'reps',this.value)"></div><div class="edit-field"><label>重量 kg</label><input type="number" min="0" step="0.5" value="${ex.weight}" oninput="updatePreviewField(${index},'weight',this.value)"></div><div class="edit-field"><label>休息秒</label><input type="number" min="20" max="300" value="${ex.rest}" oninput="updatePreviewField(${index},'rest',this.value)"></div></div><button class="mini-btn mt-2" onclick="swapPlanExercise(${index})">替换动作</button>${renderExerciseLinkChoice(ex,index)}</div></details>`).join('');
   const warning=/疼|不适|停止|暂停|伤|异常/.test(todayPlan.notice||'');
-  document.getElementById('trainingContent').innerHTML=`<div class="simple-heading"><span class="eyebrow">TODAY'S PLAN</span><h1>今天 · ${escapeHtml(todayPlan.focus||'训练')}</h1><p>${todayPlan.workout.length} 个动作 · ${escapeHtml(todayPlan.factors.time||'')}</p></div>${currentPlanNeedsReview()?'<div class="danger-note">训练档案已更新，此计划根据旧资料生成。请检查计划，或返回重新安排。</div>':''}${todayPlan.notice?warning?`<div class="danger-note">${escapeHtml(todayPlan.notice)}</div>`:`<details class="simple-detail coach-brief"><summary>${escapeHtml(compactCoachText(todayPlan.notice))}</summary><p>${escapeHtml(todayPlan.notice)}</p></details>`:''}
+  document.getElementById('trainingContent').innerHTML=`<div class="simple-heading"><span class="eyebrow">TODAY'S PLAN</span><h1>今天 · ${escapeHtml(todayPlan.focus||'训练')}</h1><p>${todayPlan.workout.length} 个动作 · ${escapeHtml(todayPlan.factors.time||'')}</p></div>${currentPlanNeedsReview()?'<div class="danger-note">训练档案或阶段安排已更新，此计划根据旧资料生成。请检查计划，或返回重新安排。</div>':''}${todayPlan.factors?.state==='有不适'?'<div class="danger-note">今天报告了不适。请先检查安排；出现明显疼痛或异常症状时停止相关训练。</div>':''}<div class="text-muted text-xs">AI 计划供参考，请结合实际状态检查动作和负重。</div>${todayPlan.notice?warning?`<div class="danger-note">${escapeHtml(todayPlan.notice)}</div>`:`<details class="simple-detail coach-brief"><summary>${escapeHtml(compactCoachText(todayPlan.notice))}</summary><p>${escapeHtml(todayPlan.notice)}</p></details>`:''}
   <details class="simple-detail"><summary>热身 <span>${(todayPlan.warmup||[]).length} 项</span></summary>${renderCoachGuidePreview(todayPlan.warmup,'训练前热身')}</details><div id="planChangeStatus" class="text-sm text-muted" role="status"></div><div class="plan-list">${items}</div><details class="simple-detail"><summary>拉伸 <span>${(todayPlan.stretch||[]).length} 项</span></summary>${renderCoachGuidePreview(todayPlan.stretch,'训练后拉伸')}</details>${!todayPlan.warmup?.length||!todayPlan.stretch?.length?missingCoachGuidesAction():''}<button class="btn btn-accent mt-3" onclick="startConfirmedPlan()">开始热身</button><details class="simple-detail"><summary>调整计划</summary><label class="setup-label" for="planRequest">告诉教练想改什么</label><textarea id="planRequest" class="setup-input" rows="2" maxlength="500">${escapeHtml(todayPlan.userRequest||'')}</textarea><button class="mini-btn mt-2" onclick="applyPlanRequest()">调整</button><div id="planRequestMsg" class="text-sm text-muted mt-2" role="status"></div></details><button class="text-action" onclick="discardTodayPlan()">修改今天的情况</button>`;
+}
+
+function renderExerciseLinkChoice(ex,index) {
+  const names=exerciseHistoryNames().filter(name=>exerciseNameKey(name)!==exerciseNameKey(ex.name));
+  const existing=exerciseAliasEntries().find(row=>exerciseNameKey(row.name)===exerciseNameKey(ex.name));
+  if(!names.length&&!existing)return '';
+  return `<details class="instruction-detail"><summary>关联已有动作记录</summary><p>只有确定是同一个动作时才关联；相同名称的记录会一起比较，历史原文不会修改。</p>${existing?`<p>当前关联：${escapeHtml(existing.canonical)}</p><button class="mini-btn" onclick="unlinkExercise(${index})">取消关联</button>`:''}${names.length?`<label class="setup-label" for="exercise-link-${index}">选择已有动作</label><select id="exercise-link-${index}" class="setup-input"><option value="">请选择</option>${names.map(name=>`<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('')}</select><button class="mini-btn mt-2" onclick="linkExercise(${index})">确认关联</button>`:''}</details>`;
+}
+function linkExercise(index) {
+  const ex=todayPlan?.workout?.[index], selected=document.getElementById(`exercise-link-${index}`)?.value;
+  if(!ex||todayPlan.status!=='preview'||!selected||!exerciseHistoryNames().includes(selected)){planChangeMessage('请选择已有动作。');return;}
+  if(!confirm(`确认“${ex.name}”与“${selected}”是同一个动作？`))return;
+  const canonical=canonicalExerciseName(selected);
+  if(todayPlan.workout.some((item,i)=>i!==index&&exerciseNameKey(canonicalExerciseName(item.name))===exerciseNameKey(canonical))){planChangeMessage('该动作已在今天的计划中，请检查后再关联。');return;}
+  const aliases=exerciseAliasEntries().filter(row=>exerciseNameKey(row.name)!==exerciseNameKey(ex.name));
+  if(exerciseNameKey(ex.name)!==exerciseNameKey(canonical))aliases.push({name:ex.name,canonical});
+  const nextProfile={...profile,exerciseAliases:aliases},nextPlan=cloneData(todayPlan);
+  const oldProfile=profile;profile=nextProfile;const last=exerciseHistoryFor(ex.name,1)[0];profile=oldProfile;
+  nextPlan.workout[index].lastActual=last?{date:last.date,sets:last.sets.map(st=>({w:st.w,r:st.r,...(st.loadType?{loadType:st.loadType}:{})}))}:null;
+  if(Number(ex.weight)===0&&!ex.weightConfirmedByUser)nextPlan.workout[index].requireWeightConfirmation=true;
+  if(!LS.transaction({profile:nextProfile,today_plan:nextPlan})){planChangeMessage('关联未保存，请重试。');return;}
+  profile=nextProfile;todayPlan=nextPlan;renderPlanPreview();
+}
+function unlinkExercise(index) {
+  const ex=todayPlan?.workout?.[index];if(!ex||todayPlan.status!=='preview')return;
+  if(!confirm(`取消“${ex.name}”的记录关联？`))return;
+  const nextProfile={...profile,exerciseAliases:exerciseAliasEntries().filter(row=>exerciseNameKey(row.name)!==exerciseNameKey(ex.name))},nextPlan=cloneData(todayPlan);
+  const oldProfile=profile;profile=nextProfile;const last=exerciseHistoryFor(ex.name,1)[0];profile=oldProfile;
+  nextPlan.workout[index].lastActual=last?{date:last.date,sets:last.sets.map(st=>({w:st.w,r:st.r,...(st.loadType?{loadType:st.loadType}:{})}))}:null;
+  if(!last&&!ex.weightConfirmedByUser){nextPlan.workout[index].weight=0;nextPlan.workout[index].requireWeightConfirmation=true;}
+  else if(Number(ex.weight)===0&&!ex.weightConfirmedByUser)nextPlan.workout[index].requireWeightConfirmation=true;
+  if(!LS.transaction({profile:nextProfile,today_plan:nextPlan})){planChangeMessage('取消关联未保存，请重试。');return;}
+  profile=nextProfile;todayPlan=nextPlan;renderPlanPreview();
 }
 
 function planChangeMessage(message) {
@@ -379,19 +437,28 @@ function renderHomePage() {
 
 function renderPlanPage() {
   if(!currentUser)return;
-  const phase=profile.coachPhase||'先与教练确认训练目标。';
-  document.getElementById('systemContent').innerHTML=`<div class="simple-heading"><span class="eyebrow">YOUR PLAN</span><h1>训练路线</h1><p>本周 ${getWeekSessions().length}${profile.trainingDays?' / '+escapeHtml(profile.trainingDays):''} 次 · 本阶段 ${trainingPhase?.completedSessions||0} 次</p></div>${profile.coachPendingPhase?`<div class="danger-note"><strong>阶段调整建议</strong><p>${escapeHtml(profile.coachPendingPhase)}</p><button class="mini-btn" onclick="acceptCoachPhaseChange()">确认调整</button></div>`:''}<div class="route-goal"><span class="eyebrow">当前目标</span><strong>${escapeHtml(profile.trainingDirection||'逐步建立训练习惯')}</strong></div><details class="simple-detail"><summary>阶段安排</summary><p class="preserve-lines">${escapeHtml(phase)}</p></details><details class="simple-detail"><summary>教练对你的了解</summary>${coachProfileIsStale()?'<p>档案已更新，以下为此前的教练总结；阶段安排可能需要重新确认。</p>':''}<p class="preserve-lines">${escapeHtml(profile.coachSummary||'尚未建立')}</p><button class="mini-btn" onclick="renderOnboarding()">更新训练需求</button></details><button class="btn btn-accent mt-3" onclick="navigate('training')">进入训练</button>`;
+  const phase=profile.coachPhase||'先与教练确认训练目标。',last=(sessions||[]).find(row=>(row.exercises||[]).some(ex=>(ex.sets||[]).length));
+  const reviewDate=trainingPhase?.reviewDate||'',due=reviewDate&&reviewDate<=getTodayStr();
+  document.getElementById('systemContent').innerHTML=`<div class="simple-heading"><span class="eyebrow">YOUR PLAN</span><h1>训练路线</h1><p>本周 ${getWeekSessions().length}${profile.trainingDays?' / '+escapeHtml(profile.trainingDays):''} 次 · 本阶段 ${trainingPhase?.completedSessions||0} 次</p></div>${profile.coachPendingPhase?`<div class="danger-note"><strong>阶段调整建议</strong><p>${escapeHtml(profile.coachPendingPhase)}</p><button class="mini-btn" onclick="acceptCoachPhaseChange()">确认调整</button></div>`:''}<div class="route-goal"><span class="eyebrow">当前目标</span><strong>${escapeHtml(profile.trainingDirection||'逐步建立训练习惯')}</strong></div><div class="phase-summary"><div><span>阶段重点</span><strong>${escapeHtml(trainingPhase?.focus||'尚未填写')}</strong></div><div><span>下一步计划</span><strong>${escapeHtml(trainingPhase?.nextStep||'由教练结合实际记录安排')}</strong></div><div><span>复盘时间</span><strong>${escapeHtml(reviewDate||'尚未设定')}${due?' · 可复盘':''}</strong></div>${last?`<div><span>最近训练</span><strong>${escapeHtml(last.date)} · ${escapeHtml(last.dayName||'训练')}</strong></div>`:''}</div><details class="simple-detail"><summary>记录阶段重点与复盘时间</summary><p>根据你和教练确认的安排填写；不会自动创建训练或复盘。</p><label class="setup-label" for="phase-focus">阶段重点（选填）</label><input id="phase-focus" class="setup-input" maxlength="160" value="${escapeHtml(trainingPhase?.focus||'')}"><label class="setup-label mt-3" for="phase-next">下一步计划（选填）</label><input id="phase-next" class="setup-input" maxlength="160" value="${escapeHtml(trainingPhase?.nextStep||'')}"><label class="setup-label mt-3" for="phase-review">复盘日期（选填）</label><input id="phase-review" class="setup-input" type="date" value="${escapeHtml(reviewDate)}"><button class="mini-btn mt-2" onclick="savePhaseDetails()">保存阶段信息</button><div id="phase-msg" class="text-sm text-muted mt-2" role="status"></div></details><details class="simple-detail"><summary>教练建议</summary><p class="preserve-lines">${escapeHtml(phase)}</p></details><details class="simple-detail"><summary>教练对你的了解</summary>${coachProfileIsStale()?'<p>档案已更新，以下为此前的教练总结；阶段安排可能需要重新确认。</p>':''}<p class="preserve-lines">${escapeHtml(profile.coachSummary||'尚未建立')}</p><button class="mini-btn" onclick="renderOnboarding()">更新训练需求</button></details><button class="btn btn-accent mt-3" onclick="navigate('training')">进入训练</button>`;
+}
+function savePhaseDetails() {
+  const focus=(document.getElementById('phase-focus')?.value||'').trim(),nextStep=(document.getElementById('phase-next')?.value||'').trim(),reviewDate=(document.getElementById('phase-review')?.value||'').trim(),msg=document.getElementById('phase-msg');
+  if(reviewDate&&!/^\d{4}-\d{2}-\d{2}$/.test(reviewDate)){msg.textContent='请填写有效的日期。';return;}
+  const nextPhase={...trainingPhase,focus:focus.slice(0,160),nextStep:nextStep.slice(0,160),reviewDate};
+  const changed=!sameData(nextPhase,trainingPhase),nextProfile=changed&&todayPlan?{...profile,coachPlanReviewId:todayPlan.id}:profile;
+  if(!LS.transaction({training_phase:nextPhase,profile:nextProfile})){msg.textContent='未能保存，请重试。';return;}
+  trainingPhase=nextPhase;profile=nextProfile;renderPlanPage();
 }
 
 function completeSet() {
   const s=trainState,ex=s.day.exercises[s.exIdx];if(s.weightNeedsConfirmation){alert('请先填写实际重量，或确认徒手。');return;}s.reps=validReps(s.reps,validReps(ex.reps,8));if(s.reps<1){alert('实际次数至少为 1。');return;}
-  if(!s.records[ex.id])s.records[ex.id]=[];const row={set:s.set,w:s.weight,r:s.reps,confirmedAt:new Date().toISOString()};s.records[ex.id].push(row);s.lastConfirmed={exerciseId:ex.id,confirmedAt:row.confirmedAt};persistTrainingState();
+  if(!s.records[ex.id])s.records[ex.id]=[];const row={set:s.set,w:s.weight,r:s.reps,...(s.weightMode==='bodyweight'?{loadType:'bodyweight'}:{}),confirmedAt:new Date().toISOString()};s.records[ex.id].push(row);s.lastConfirmed={exerciseId:ex.id,confirmedAt:row.confirmedAt};persistTrainingState();
   if(s.set<ex.sets){s.set++;startRestTimer();return;}
   advanceAfterExercise();
 }
 
 function confirmBodyweight() {
-  trainState.weight=0;trainState.weightNeedsConfirmation=false;persistTrainingState();renderTrainingPage();
+  trainState.weight=0;trainState.weightMode='bodyweight';trainState.weightNeedsConfirmation=false;persistTrainingState();renderTrainingPage();
 }
 
 function undoLastSet() {
@@ -400,16 +467,16 @@ function undoLastSet() {
   const index=s.day.exercises.findIndex(ex=>ex.id===last.exerciseId), rows=s.records[last.exerciseId]||[];
   if(index<0||!rows.length||rows[rows.length-1].confirmedAt!==last.confirmedAt)return;
   const removed=rows.pop();if(s.restInterval)clearInterval(s.restInterval);
-  s.isResting=false;s.restTimer=0;s.restEndAt=0;s.exIdx=index;s.set=removed.set;s.weight=removed.w;s.reps=removed.r;s.weightNeedsConfirmation=false;s.section='workout';s.lastConfirmed=null;
+  s.isResting=false;s.restTimer=0;s.restEndAt=0;s.exIdx=index;s.set=removed.set;s.weight=removed.w;s.weightMode=removed.loadType||'';s.reps=removed.r;s.weightNeedsConfirmation=false;s.section='workout';s.lastConfirmed=null;
   persistTrainingState();renderTrainingPage();
 }
 
 function renderFinishPrompt() {
   setTrainingFixedAction(false);
   const s=trainState,actual=Object.values(s.records||{}).reduce((n,rows)=>n+rows.length,0);
-  document.getElementById('trainingContent').innerHTML=`<div class="simple-heading"><span class="eyebrow">WORKOUT COMPLETE</span><h1>训练完成</h1><p>${formatTime(s.sessionTime||0)} · ${actual} 组</p></div><fieldset class="quick-field"><legend>今天感觉如何 <span class="text-muted text-xs">选填</span></legend><div class="quick-options">${['轻松','合适','吃力','有不适'].map(v=>`<label><input type="radio" name="sessionEffort" value="${v}" ${s.sessionFeedback===v?'checked':''}><span>${v}</span></label>`).join('')}</div></fieldset><details class="simple-detail" ${s.sessionDiscomfort?'open':''}><summary>补充说明 <span>选填</span></summary><textarea id="sessionDiscomfort" class="setup-input mt-2" rows="2" maxlength="500" placeholder="例如：右肩不舒服">${escapeHtml(s.sessionDiscomfort||'')}</textarea></details><div id="finishMsg" class="text-center text-muted text-sm mt-2" role="status"></div><button class="btn btn-accent mt-3" onclick="confirmFinishTraining()">保存训练</button><button class="text-action" onclick="returnToWorkout()">返回训练</button>`;
+  document.getElementById('trainingContent').innerHTML=`<div class="simple-heading"><span class="eyebrow">WORKOUT COMPLETE</span><h1>训练完成</h1><p>${formatTime(s.sessionTime||0)} · ${actual} 组</p></div><fieldset class="quick-field"><legend>今天感觉如何 <span class="text-muted text-xs">选填</span></legend><div class="quick-options">${['轻松','合适','吃力','有不适'].map(v=>`<label><input type="radio" name="sessionEffort" value="${v}" ${s.sessionFeedback===v?'checked':''}><span>${v}</span></label>`).join('')}</div></fieldset><details class="simple-detail" ${s.sessionDiscomfort?'open':''}><summary>补充说明 <span>选填</span></summary><textarea id="sessionDiscomfort" class="setup-input mt-2" rows="2" maxlength="500" placeholder="例如：右肩不舒服">${escapeHtml(s.sessionDiscomfort||'')}</textarea></details><div id="finishSafety" class="danger-note" ${concerningSymptoms(s.sessionDiscomfort||'')?'':'hidden'}>如果目前有胸痛、呼吸困难或头晕等症状，请停止运动并及时就医。</div><div id="finishMsg" class="text-center text-muted text-sm mt-2" role="status"></div><button class="btn btn-accent mt-3" onclick="confirmFinishTraining()">保存训练</button><button class="text-action" onclick="returnToWorkout()">返回训练</button>`;
   document.querySelectorAll('[name="sessionEffort"]').forEach(input=>input.addEventListener('change',()=>{s.sessionFeedback=input.value;if(input.value==='有不适')document.getElementById('sessionDiscomfort').closest('details').open=true;persistTrainingState();}));
-  document.getElementById('sessionDiscomfort').addEventListener('input',event=>{s.sessionDiscomfort=event.target.value;persistTrainingState();});
+  document.getElementById('sessionDiscomfort').addEventListener('input',event=>{s.sessionDiscomfort=event.target.value;document.getElementById('finishSafety').hidden=!concerningSymptoms(event.target.value);persistTrainingState();});
 }
 
 function renderComplete() {
@@ -427,7 +494,7 @@ function acceptCoachPhaseChange() {
 }
 
 async function requestCoachReview(session) {
-  const user=currentUser, state=trainState, identity=requestIdentity(), profileAtStart=cloneData(profile);
+  const user=currentUser, state=trainState, identity=requestIdentity(), profileAtStart=cloneData(profile), phaseAtStart=cloneData(trainingPhase);
   if(!profile.coachDataConsent){renderComplete();return;}
   state.reviewing=true;renderComplete();
   let review='', pending='';
@@ -438,7 +505,7 @@ async function requestCoachReview(session) {
     pending=result.needsConfirmation===true?String(result.nextPhase||'').slice(0,1800):'';
   } catch(e) {review='训练记录已保存。暂时无法生成 AI 复盘，之后打开时仍可结合这些实际记录继续安排。';}
   // 异步请求返回时可能已切换用户或开始另一场训练。
-  if(!requestIdentityMatches(identity)||currentUser!==user||!sameData(profile,profileAtStart)) {state.reviewing=false;return;}
+  if(!requestIdentityMatches(identity)||currentUser!==user||!sameData(profile,profileAtStart)||!sameData(trainingPhase,phaseAtStart)) {state.reviewing=false;return;}
   const history=LS.get('sessions',[]), index=history.findIndex(row=>row.id===session.id);
   if(index<0) return;
   // 不把更正之前的分析附在更正之后的记录上。
@@ -456,7 +523,7 @@ async function confirmFinishTraining() {
   const s=trainState;if(s.saved||!todayPlan){if(s.pendingCompletion)saveSession();renderComplete();return;}
   s.sessionDiscomfort=(document.getElementById('sessionDiscomfort')?.value||'').trim();s.sessionFeedback=(document.querySelector('[name="sessionEffort"]:checked')?.value||'');s.advancePpl=false;s.complete=true;
   if(s.timerInterval)clearInterval(s.timerInterval);if(s.restInterval)clearInterval(s.restInterval);persistTrainingState();
-  const pendingSession={id:'session-'+todayPlan.id,date:getTodayStr(),dayName:todayPlan.focus||'训练',focusArea:todayPlan.focus||'训练',exercises:s.day.exercises.map(ex=>({name:ex.name,role:ex.role,targetSets:ex.sets,targetReps:ex.reps,targetWeight:ex.weight,completed:(s.records[ex.id]||[]).length>=ex.sets,status:(s.records[ex.id]||[]).length>=ex.sets?'completed':(s.records[ex.id]||[]).length?'partial':'not_started',feedback:'',sets:(s.records[ex.id]||[]).map(row=>({w:row.w,r:row.r,confirmedAt:row.confirmedAt}))})),duration:s.sessionTime,sessionFeedback:s.sessionFeedback,sessionDiscomfort:s.sessionDiscomfort,source:'coach-ai'};
+  const pendingSession={id:'session-'+todayPlan.id,date:getTodayStr(),dayName:todayPlan.focus||'训练',focusArea:todayPlan.focus||'训练',exercises:s.day.exercises.map(ex=>({name:ex.name,role:ex.role,targetSets:ex.sets,targetReps:ex.reps,targetWeight:ex.weight,completed:(s.records[ex.id]||[]).length>=ex.sets,status:(s.records[ex.id]||[]).length>=ex.sets?'completed':(s.records[ex.id]||[]).length?'partial':'not_started',feedback:'',sets:(s.records[ex.id]||[]).map(row=>({w:row.w,r:row.r,...(row.loadType?{loadType:row.loadType}:{}),confirmedAt:row.confirmedAt}))})),duration:s.sessionTime,sessionFeedback:s.sessionFeedback,sessionDiscomfort:s.sessionDiscomfort,source:'coach-ai'};
   s.reviewSessionId=pendingSession.id;
   s.saved=saveSession();
   if(!s.saved){renderComplete();return;}

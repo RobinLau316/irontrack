@@ -102,11 +102,11 @@ async function applyPlanRequest() {
 function updatePreviewField(index,key,value) {
   const ex=todayPlan?.workout?.[index];
   if(!ex||String(value).trim()==='')return;
-  const num=Number(value),limits={sets:[1,8],reps:[1,100],weight:[0,1000],rest:[30,300]}[key];
-  if(!limits||!Number.isFinite(num)||num<limits[0]||num>limits[1]){renderPlanPreview();return;}
+  const num=Number(value),limits={sets:[1,5],reps:[1,30],weight:[0,1000],rest:[20,300]}[key];
+  if(!limits||!Number.isFinite(num)||num<limits[0]||num>limits[1]||(key!=='weight'&&!Number.isInteger(num))){renderPlanPreview();planChangeMessage('数值超出允许范围，请检查。');return;}
   const next=cloneData(todayPlan),changed=next.workout[index];
   changed[key]=key==='weight'?Math.round(num*2)/2:Math.round(num);
-  if(key==='weight')changed.weightConfirmedByUser=true;
+  if(key==='weight'){changed.weightConfirmedByUser=true;changed.requireWeightConfirmation=false;}
   changed.reason='用户在计划预览中手动调整';
   if(!LS.set('today_plan',next)){renderPlanPreview();planChangeMessage('修改未保存，原计划已保留，请重试。');return;}
   todayPlan=next;
@@ -177,7 +177,7 @@ function discardTodayPlan() {
   window.scrollTo(0, 0);
 }
 
-function needsWeightConfirmation(ex) { return !!ex && todayPlan?.source==='coach-ai' && !ex.lastActual && !ex.weightConfirmedByUser && Number(ex.weight)===0; }
+function needsWeightConfirmation(ex) { return !!ex && todayPlan?.source==='coach-ai' && (!ex.lastActual || ex.requireWeightConfirmation) && !ex.weightConfirmedByUser && Number(ex.weight)===0; }
 
 function initDynamicTraining() {
   const tp = todayPlan;
@@ -187,7 +187,7 @@ function initDynamicTraining() {
     exIdx: 0, set: 1,
     weight: exercises[0] ? exercises[0].weight||0 : 0,
     reps: exercises[0] ? exercises[0].reps||8 : 8,
-    weightNeedsConfirmation:needsWeightConfirmation(exercises[0]),
+    weightNeedsConfirmation:needsWeightConfirmation(exercises[0]),weightMode:'',
     records: {}, feedback:{}, skipped:{}, pendingFeedback:null, isResting: false, restTimer: 0, restEndAt:0, sessionTime: 0, complete: false,
     sessionFeedback:'',sessionDiscomfort:'',advancePpl:null,
     section: 'warmup',   // warmup | workout | stretch | nutrition
@@ -334,7 +334,7 @@ function renderWorkout() {
     <div class="training-container workout-focus">
       <div class="hero-kicker text-center">动作 ${s.exIdx+1} / ${s.day.exercises.length} · ${escapeHtml(ex.role||'辅助')}</div>
       <div class="exercise-name">${escapeHtml(ex.name)}${ex.isNew?'<span class="new-exercise-badge">新动作</span>':''}</div>
-      <div class="exercise-target">目标 ${s.weightNeedsConfirmation?'重量待确认':ex.weight+'kg'} · ${ex.sets}组×${ex.reps}次</div>${ex.lastActual?`<div class="reason-note text-center">上次 ${escapeHtml(ex.lastActual.date)}：${ex.lastActual.sets.map(row=>escapeHtml(row.w)+'kg × '+escapeHtml(row.r)+'次').join('；')}</div>`:''}
+      <div class="exercise-target">目标 ${s.weightNeedsConfirmation?'重量待确认':ex.weight+'kg'} · ${ex.sets}组×${ex.reps}次</div>${ex.lastActual?`<div class="reason-note text-center">上次 ${escapeHtml(ex.lastActual.date)}：${ex.lastActual.sets.map(row=>(row.loadType==='bodyweight'?'徒手':escapeHtml(row.w)+'kg')+' × '+escapeHtml(row.r)+'次').join('；')}</div>`:''}
       ${!ex.lastActual && ex.instructions?.[0] && ex.instructions[0].length<=45?`<div class="reason-note text-center">${escapeHtml(ex.instructions[0])}</div>`:''}${exerciseInstructionBlock(ex,`workout-instruction-${s.exIdx}`)}
       <div id="weightConfirmHint" class="reason-note text-center" ${s.weightNeedsConfirmation?'':'hidden'}>请填写实际重量，或 <button class="inline-action" onclick="confirmBodyweight()">确认徒手</button></div>
       <div class="control-label text-center">本组重量</div>
@@ -405,7 +405,7 @@ function renderTrainingUI() {
     </div>
     ${todayPlan.date !== getTodayStr() ? `<div class="resume-banner">继续 ${escapeHtml(todayPlan.date)} 的未完成训练，已保留原进度。</div>` : ''}
     ${dataRecoveryNotice || LS.error ? `<div class="danger-note">${escapeHtml(dataRecoveryNotice || LS.error)}</div>` : ''}
-    ${currentPlanNeedsReview()?'<div class="danger-note">训练档案已更新，请检查本次计划是否仍适合；有不适时先停止相关动作。</div>':''}
+    ${currentPlanNeedsReview()?'<div class="danger-note">训练档案或阶段安排已更新，请检查本次计划是否仍适合；有不适时先停止相关动作。</div>':''}
     ${renderSectionTabs()}
     <button class="mini-btn mb-3" onclick="requestFocusChange()">保存进度并更改训练日</button>
     ${body}`;
@@ -476,7 +476,7 @@ function advanceAfterExercise() {
     const next = s.day.exercises[s.exIdx];
     const completed = (s.records[next.id]||[]).length;
     s.set = Math.min(next.sets, completed + 1);
-    s.weight = next.weight;
+    s.weight = next.weight;s.weightMode='';
     s.weightNeedsConfirmation=needsWeightConfirmation(next) && !completed;
     s.reps = next.reps;
     persistTrainingState();
@@ -506,7 +506,7 @@ function renderRestOverlay() {
   const container = document.getElementById('trainingContent');
   container.innerHTML = `
     <div class="rest-overlay">
-      ${currentPlanNeedsReview()?'<div class="danger-note">训练档案已更新，请检查本次计划是否仍适合。</div>':''}<div class="rest-label">组间休息</div>
+      ${currentPlanNeedsReview()?'<div class="danger-note">训练档案或阶段安排已更新，请检查本次计划是否仍适合。</div>':''}<div class="rest-label">组间休息</div>
       <div class="rest-circle"><div class="rest-time">${s.restTimer}</div></div>
       <div class="rest-next">下一组：第 ${s.set} 组 · ${escapeHtml(ex.name)}</div>
       <div class="reason-note">${escapeHtml(s.weight)} kg × ${escapeHtml(s.reps)} 次</div><button class="skip-btn" onclick="skipRest()">跳过休息</button>${s.lastConfirmed?'<button class="text-action" onclick="undoLastSet()">撤销上一组</button>':''}
@@ -575,7 +575,7 @@ function confirmFinishTraining() {
 
 function adjustWeight(delta) {
   trainState.weight = Math.max(0, validWeight(trainState.weight, 0) + delta);
-  if(trainState.weight>0)trainState.weightNeedsConfirmation=false;
+  if(trainState.weight>0){trainState.weightNeedsConfirmation=false;trainState.weightMode='';}
   persistTrainingState();
   renderWorkoutOnly();
 }
@@ -606,7 +606,7 @@ function switchExercise(dir) {
   s.exIdx = idx;
   const next = s.day.exercises[idx];
   s.set = Math.min(next.sets, (s.records[next.id]||[]).length + 1);
-  s.weight = next.weight;
+  s.weight = next.weight;s.weightMode='';
   s.weightNeedsConfirmation=needsWeightConfirmation(next) && !(s.records[next.id]||[]).length;
   s.reps = next.reps;
   persistTrainingState();
@@ -642,7 +642,7 @@ function focusTrainingInput(input) {
 
 function commitWeightInput(input) {
   const previous = validWeight(trainState.weight, 0);
-  if(input.value.trim()!=='' && Number.isFinite(Number(input.value)) && Number(input.value)>=0)trainState.weightNeedsConfirmation=false;
+  if(input.value.trim()!=='' && Number.isFinite(Number(input.value)) && Number(input.value)>=0){trainState.weightNeedsConfirmation=false;if(Number(input.value)!==previous)trainState.weightMode='';}
   trainState.weight = validWeight(input.value, previous);
   input.value = trainState.weightNeedsConfirmation?'':trainState.weight;
   document.body.classList.remove('keyboard-active');
@@ -742,7 +742,7 @@ function saveSession() {
         const recs = s.records[ex.id] || [];
         const feedback = s.feedback[ex.id] || {};
         const skipped=!!(s.skipped||{})[ex.id],completed=recs.length>=ex.sets&&!skipped;
-        return { exerciseId:ex.exerciseId||'',name:ex.name,nameSnapshot:ex.nameSnapshot||ex.name,catalogVersion:ex.catalogVersion||todayPlan.catalogVersion||'',replacementMuscle:ex.replacementMuscle||'',variantGroup:ex.variantGroup||'',role:ex.role,pattern:ex.pattern,targetSets:ex.sets,targetReps:ex.reps,targetWeight:ex.weight,completed,skipped,status:completed?'completed':(skipped?(recs.length?'partial':'skipped'):(recs.length?'partial':'not_started')),feedback:feedback.value||'',feedbackNote:feedback.note||'',sets:recs.map(r=>({w:r.w,r:r.r,confirmedAt:r.confirmedAt||''}))};
+        return { exerciseId:ex.exerciseId||'',name:ex.name,nameSnapshot:ex.nameSnapshot||ex.name,catalogVersion:ex.catalogVersion||todayPlan.catalogVersion||'',replacementMuscle:ex.replacementMuscle||'',variantGroup:ex.variantGroup||'',role:ex.role,pattern:ex.pattern,targetSets:ex.sets,targetReps:ex.reps,targetWeight:ex.weight,completed,skipped,status:completed?'completed':(skipped?(recs.length?'partial':'skipped'):(recs.length?'partial':'not_started')),feedback:feedback.value||'',feedbackNote:feedback.note||'',sets:recs.map(r=>({w:r.w,r:r.r,...(r.loadType?{loadType:r.loadType}:{}),confirmedAt:r.confirmedAt||''}))};
       })
     };
     const key = todayPlan.focusKey || focusKeyFromText(todayPlan.focus);
